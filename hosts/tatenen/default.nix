@@ -1,6 +1,6 @@
 { agenix, config, pkgs, unstable, ... }: {
   age = {
-    identityPaths = [ "/etc/secrets/yk5nano475.txt" ];
+    # identityPaths = [ "/etc/secrets/yk5nano475.txt" ];
     secrets.paul-password.file = ../../secrets/paul-password.age;
   };
   boot = {
