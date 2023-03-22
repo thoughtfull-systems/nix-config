@@ -51,7 +51,7 @@ tempdir=$(mktemp -d)
 tempfile="${tempdir}/ssh_host_ed25519_key.pub"
 bootstrapfile="${scriptdir}/../age/keys/bootstrap.pub"
 log "Copying bootstrap key to ${tempfile}"
-scp "${scpargs[@]}" "nixos@${ip}:/mnt/etc/ssh/ssh_host_ed25519_key.pub" "${tempdir}"
+scp "${scpargs[@]}" "nixos@${ip}:/etc/ssh/ssh_host_ed25519_key.pub" "${tempdir}"
 if [[ $(cat "${tempfile}") != $(cat "${bootstrapfile}") ]]; then
   log "Replacing ${bootstrapfile} with ${tempfile}"
   mv "${tempfile}" "${bootstrapfile}"
