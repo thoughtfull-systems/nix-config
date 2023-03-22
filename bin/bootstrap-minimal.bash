@@ -31,9 +31,9 @@ configscript="${3}"
 
 ## Verify clean git status
 if (output=$(git status --porcelain) && [[ -z "${output}" ]]) &>/dev/null; then
-  die "Working directory is not clean"
-else
   log "Working directory is clean"
+else
+  die "Working directory is not clean"
 fi
 
 ## Use host branch, if available
