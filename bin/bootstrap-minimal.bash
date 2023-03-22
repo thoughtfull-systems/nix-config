@@ -54,7 +54,7 @@ log "Copying bootstrap key to ${tempfile}"
 scp "${scpargs[@]}" "nixos@${ip}:/etc/ssh/ssh_host_ed25519_key.pub" "${tempdir}"
 if [[ $(cat "${tempfile}") != $(cat "${bootstrapfile}") ]]; then
   log "Replacing ${bootstrapfile} with ${tempfile}"
-  mv "${tempfile}" "${bootstrapfile}"
+  # mv "${tempfile}" "${bootstrapfile}"
 
   ## Re-key secrets
   pushd "${scriptdir}/../age"
