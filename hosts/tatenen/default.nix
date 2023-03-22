@@ -1,7 +1,7 @@
 { agenix, config, pkgs, unstable, ... }: {
   age = {
     identityPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-    secrets.paul-password.file = ../../secrets/paul-password.age;
+    secrets.paul-password.file = ../../age/secrets/paul-password.age;
   };
   boot = {
     initrd = {
