@@ -46,6 +46,12 @@ fi
 
 heading "BEGIN bootstrapping $(date)"
 
+## SCP bootstrap script
+scp "${scpargs[@]}" "${scriptdir}/${configscript}" "nixos@${ip}:${configscript}"
+
+## SSH and execute bootstrap script
+ssh "${scpargs[@]}" -t "nixos@${ip}" sudo bash "${configscript}" "${hostname}"
+
 ## Download SSH host public key
 tempdir=$(mktemp -d)
 tempfile="${tempdir}/ssh_host_ed25519_key.pub"
@@ -70,10 +76,7 @@ else
   rm "${tempfile}"
 fi
 
-## SCP bootstrap script
-scp "${scpargs[@]}" "${scriptdir}/${configscript}" "nixos@${ip}:${configscript}"
-
 ## SSH and execute bootstrap script
-ssh "${scpargs[@]}" -t "nixos@${ip}" sudo bash "${configscript}" "${hostname}"
+ssh "${scpargs[@]}" -t "nixos@${ip}" sudo nixos-install --no-root-password --flake /mnt/etc/nixos#${host}
 
 heading "END bootstrapping $(date)"
