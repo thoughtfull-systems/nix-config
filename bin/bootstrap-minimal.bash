@@ -56,7 +56,7 @@ if ${git} branch -a | grep "${hostname}" && \
 fi
 
 # - (manual) enable ssh access with password or ssh key
-if ! ssh "${ip}" :; then
+if ! ssh "nixos@${ip}" :; then
   die "Set up SSH access to '${ip}' (either password or public key)"
 fi
 
