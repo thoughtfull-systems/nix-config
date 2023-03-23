@@ -71,7 +71,7 @@ else
 fi
 
 ssh "${scpargs[@]}" "nixos@${ip}" \
-    sudo cp /etc/ssh/ssh_host_ed25519_key /tmp/bootstrap.key
+    sudo cp /etc/ssh/ssh_host_ed25519_key /mnt/tmp/bootstrap.key
 
 ## SCP bootstrap script
 scp "${scpargs[@]}" "${scriptdir}/${configscript}" "nixos@${ip}:${configscript}"
