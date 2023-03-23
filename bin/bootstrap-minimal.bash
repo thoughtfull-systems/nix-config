@@ -46,18 +46,12 @@ fi
 
 heading "BEGIN bootstrapping $(date)"
 
-## SCP bootstrap script
-scp "${scpargs[@]}" "${scriptdir}/${configscript}" "nixos@${ip}:${configscript}"
-
-## SSH and execute bootstrap script
-ssh "${scpargs[@]}" -t "nixos@${ip}" sudo bash "${configscript}" "${hostname}"
-
 ## Download SSH host public key
 tempdir=$(mktemp -d)
 tempfile="${tempdir}/ssh_host_ed25519_key.pub"
 bootstrapfile="${scriptdir}/../age/keys/bootstrap.pub"
 log "Copying bootstrap key to ${tempfile}"
-scp "${scpargs[@]}" "nixos@${ip}:/mnt/etc/ssh/ssh_host_ed25519_key.pub" "${tempdir}"
+scp "${scpargs[@]}" "nixos@${ip}:/etc/ssh/ssh_host_ed25519_key.pub" "${tempdir}"
 if [[ $(cat "${tempfile}") != $(cat "${bootstrapfile}") ]]; then
   log "Replacing ${bootstrapfile} with ${tempfile}"
   mv "${tempfile}" "${bootstrapfile}"
@@ -76,7 +70,13 @@ else
   rm "${tempfile}"
 fi
 
+ssh "${scpargs[@]}" "nixos@${ip}" \
+    sudo cp /etc/ssh/ssh_host_ed25519_key /tmp/bootstrap.key
+
+## SCP bootstrap script
+scp "${scpargs[@]}" "${scriptdir}/${configscript}" "nixos@${ip}:${configscript}"
+
 ## SSH and execute bootstrap script
-ssh "${scpargs[@]}" -t "nixos@${ip}" sudo nixos-install --no-root-password --flake /mnt/etc/nixos#${host}
+ssh "${scpargs[@]}" -t "nixos@${ip}" sudo bash "${configscript}" "${hostname}"
 
 heading "END bootstrapping $(date)"
