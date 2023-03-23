@@ -1,5 +1,15 @@
 #!/usr/bin/env -S bash -euo pipefail
 
+# Redirect stdout and stderr to a log file
+logfile=$(mktemp)
+echo "#### Temporary log file '${logfile}'"
+exec 3>&1 4>&2
+trap 'exec 2>&4 1>&3' 0 1 2 3
+exec 1> >(tee ${logfile}) 2>&1
+
+#### EVERYTHING BELOW WILL GO TO TERMINAL AND LOGFILE ####
+set -exuo pipefail
+
 git="nix run nixpkgs#git --"
 
 function die { echo "!!! ${1}" >&2; exit 1; }
@@ -30,8 +40,13 @@ else
   log "Working directory is clean"
 fi
 
+# Validate arguments
 [[ -v 1 ]] || die "Expected hostname as first argument"
 hostname="${1}"
+([[ -v 2 ]] && (ping -c1 "${2}" &>/dev/null)) || \
+  die "Expected IP address as second argument"
+ip="${2}"
+
 # - (confirm) checkout hostname branch? Before subshell to allow for hostname
 # branch changes to script
 
@@ -40,19 +55,10 @@ if ${git} branch -a | grep "${hostname}" && \
   ${git} checkout ${hostname}
 fi
 
-# Redirect stdout and stderr to a log file
-logfile=$(mktemp)
-echo "#### Temporary log file '${logfile}'"
-exec 3>&1 4>&2
-trap 'exec 2>&4 1>&3' 0 1 2 3
-exec 1> >(tee ${logfile}) 2>&1
-
-#### EVERYTHING BELOW WILL GO TO TERMINAL AND LOGFILE ####
-set -exuo pipefail
-
-# - validate arguments: hostname, ip
-
 # - (manual) enable ssh access with password or ssh key
+if ! ssh "${ip}" :; then
+  die "Set up SSH access to '${ip}' (either password or public key)"
+fi
 
 # - (confirm) create new partition table?
 
