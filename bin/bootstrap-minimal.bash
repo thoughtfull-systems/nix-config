@@ -62,7 +62,7 @@ if [[ $(cat "${tempfile}") != $(cat "${bootstrapfile}") ]]; then
   popd
 
   ## Commit and push new secrets
-  git add "${scriptdir}/../age/secrets"
+  git add "${scriptdir}/../age"
   git commit -m"Bootstrapping ${hostname}"
   git push
 else
