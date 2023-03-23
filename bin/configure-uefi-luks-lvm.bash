@@ -282,6 +282,14 @@ if ! is_mounted $(realpath ${efi_device}); then
   sudo mount ${efi_device} /mnt/boot
 fi
 
+# to decrypt age secrets
+if [[ ! -f /mnt/tmp/bootstrap.key ]]; then
+  log "Copying ssh host key to '/mnt/tmp/bootstrap.key'"
+  sudo cp /etc/ssh/ssh_host_ed25519_key /mnt/tmp/bootstrap.key
+else
+  log "Using existing '/mnt/tmp/bootstrap.key'"
+fi
+
 if [[ ! -e /mnt/etc/nixos ]]; then
   log "Initializing repository at '/mnt/etc/nixos'..."
   sudo git clone ${flake_repo} /mnt/etc/nixos
