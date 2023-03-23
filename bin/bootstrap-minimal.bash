@@ -50,7 +50,7 @@ ip="${2}"
 # - (confirm) checkout hostname branch? Before subshell to allow for hostname
 # branch changes to script
 
-if ${git} branch -a | grep "${hostname}" && \
+if "${git}" branch -a | grep "${hostname}" && \
     confirm "Checkout '${hostname}' branch?"; then
   ${git} checkout ${hostname}
 fi
@@ -60,6 +60,9 @@ if ! ssh "nixos@${ip}" :; then
   die "Set up SSH access to '${ip}' (either password or public key)"
 fi
 
+if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
+  :
+fi
 # - (confirm) create new partition table?
 
 #   - create partition table
