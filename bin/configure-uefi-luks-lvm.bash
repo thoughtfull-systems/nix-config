@@ -27,6 +27,7 @@ if [[ ! -v LOGFILE ]]; then
        nixpkgs#age \
        nixpkgs#age-plugin-yubikey \
        nixpkgs#pcsclite \
+       nixpkgs#file \
        -c bash "${0}" "${@}") |& tee ${LOGFILE}
   exit ${?}
 fi
