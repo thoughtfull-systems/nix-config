@@ -30,7 +30,7 @@ else
   log "Working directory is clean"
 fi
 
-[[ ! -z "${1}" ]] || die "Expected hostname as first argument"
+[[ -v 1 ]] || die "Expected hostname as first argument"
 hostname="${1}"
 # - (confirm) checkout hostname branch? Before subshell to allow for hostname
 # branch changes to script
