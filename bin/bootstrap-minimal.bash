@@ -47,16 +47,16 @@ hostname="${1}"
   die "Expected IP address as second argument"
 ip="${2}"
 
-# - (confirm) checkout hostname branch? Before subshell to allow for hostname
-# branch changes to script
-
-if "${git}" branch -a | grep "${hostname}" && \
+# (confirm) Checkout hostname branch?
+if ${git} branch -a | grep "${hostname}" && \
     confirm "Checkout '${hostname}' branch?"; then
   ${git} checkout ${hostname}
+  # TODO: exec into new script?
 fi
 
-# - (manual) enable ssh access with password or ssh key
-if ! ssh "nixos@${ip}" :; then
+ssh="ssh nixos@${ip}"
+if ! ${ssh} :; then
+  # (manual) Enable ssh access with password or ssh key
   die "Set up SSH access to '${ip}' (either password or public key)"
 fi
 
