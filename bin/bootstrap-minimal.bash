@@ -100,19 +100,29 @@ if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
   done
   echo "Are your REALLY sure you want to erase and partition '${disk}'?"
   if ask "(Please enter YES in all caps):" && [[ $REPLY = "YES" ]]; then
-    # Create partition table
+    log "Creating partition table"
     (${ssh} sudo parted -fs ${disk} mklabel gpt
-     # Create boot 1G partition
+     log "Creating boot partition (1G)"
      ${ssh} sudo parted -fs ${disk} mkpart ${boot_name} fat32 1MiB 1GiB
      ${ssh} sudo parted -fs ${disk} set 1 esp 2>&1
-     # Create luks partition with free space
+     log "Creating luks partition with free space"
      ${ssh} sudo parted -fs ${disk} mkpart ${crypt_name} 1GiB 100%) 2>&1\
       | indent
   fi
 fi
 
-has_partition "${boot_name}" || die "Missing '${boot_name}' partition"
-has_partition "${crypt_name}" || die "Missing '${crypt_name}' partition"
+boot_device="/dev/disk/by-partlabel/${boot_name}"
+if has_partition "${boot_name}"; then
+  log "Using '${boot_device}' device"
+else
+  die "Missing '${boot_name}' partition"
+fi
+crypt_device="/dev/disk/by-partlabel/${crypt_name}"
+if has_partition "${crypt_name}"; then
+  log "Using '${crypt_device}' device"
+else
+  die "Missing '${crypt_name}' partition"
+fi
 
 # - scp host public key -> age/keys/bootstrap.pub
 
