@@ -39,7 +39,7 @@ fi
 [[ -v 1 ]] || die "Expected hostname as first argument"
 hostname="${1}"
 
-function indent { sed -s "l"; }
+function indent { sed -s "s/^/    /g"; }
 
 # Checkout hostname branch?
 if (${git} branch -a | grep "${hostname}") &>/dev/null &&
@@ -73,7 +73,7 @@ else
   die "Set up SSH access to '${ip}' (either password or public key)"
 fi
 
-${ssh} sudo parted -l 2>&1 | indent
+${ssh} sudo parted -l 2>/dev/null | indent
 if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
   :
 fi
