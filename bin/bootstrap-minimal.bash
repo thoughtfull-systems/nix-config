@@ -90,6 +90,8 @@ if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
     ask "'${disk}' does not exist; partition which disk?" disk
   done
   ${ssh} sudo parted -s ${disk} mklabel gpt
+  ${ssh} sudo parted -s ${disk} mkpart ${hostname}-boot fat32 0 1G
+  ${ssh} sudo parted -s ${disk} mkpart ${hostname}-root 1G
 fi
 # - (confirm) create new partition table?
 
