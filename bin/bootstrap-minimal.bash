@@ -89,9 +89,10 @@ if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
   while ! ${ssh} sudo parted -s "${disk}" print &>/dev/null; do
     ask "'${disk}' does not exist; partition which disk?" disk
   done
-  ${ssh} sudo parted -s ${disk} mklabel gpt 2>&1 | indent
-  ${ssh} sudo parted -s ${disk} mkpart ${hostname}-boot fat32 0 1G 2>&1 | indent
-  ${ssh} sudo parted -s ${disk} mkpart ${hostname}-root 1G 2>&1 | indent
+  (${ssh} sudo parted -s ${disk} \
+          mklabel gpt \
+          mkpart ${hostname}-boot fat32 0GiB 1GiB \
+          mkpart ${hostname}-root 1GiB 100% 2>&1) | indent
 fi
 # - (confirm) create new partition table?
 
