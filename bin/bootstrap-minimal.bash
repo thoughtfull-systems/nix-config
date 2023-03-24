@@ -83,7 +83,9 @@ else
   die "Set up SSH access to '${ip}' (either password or public key)"
 fi
 
-function has_partition { (${ssh} "[[ -b \"/dev/disk/by-partlabel/${1}\" ]]"; }
+function has_partition {
+  ${ssh} "[[ -b \"/dev/disk/by-partlabel/${1}\" ]]" &>/dev/null
+}
 boot_name="${hostname}-boot"
 has_partition "${boot_name}" || log "Missing '${boot_name}' partition"
 crypt_name="${hostname}-lvm-crypt"
