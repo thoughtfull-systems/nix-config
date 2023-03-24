@@ -73,9 +73,9 @@ else
   die "Set up SSH access to '${ip}' (either password or public key)"
 fi
 
-${ssh} sudo parted -l | indent
+${ssh} sudo parted -l 2>&1 | indent
 if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
-
+  :
 fi
 # - (confirm) create new partition table?
 
