@@ -15,7 +15,7 @@ function die { echo "!!! ${1}" >&2; exit 1; }
 function log { echo "=== ${1}"; }
 
 function confirm {
-  read -p "${1} (y/N) " 2>&4
+  read -p "${1} (y/N) "
   if [[ ${REPLY} =~ ^[Yy].* ]]; then
     return 0
   else
