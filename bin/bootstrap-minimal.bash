@@ -75,7 +75,7 @@ fi
   die "Expected IP address as second argument"
 ip="${2}"
 
-ssh="ssh nixos@${ip}"
+ssh="ssh nixos@${ip} -t"
 if ${ssh} : &>/dev/null; then
   log "Confirmed SSH access to machine"
 else
