@@ -1,26 +1,18 @@
 #!/usr/bin/env -S bash -euo pipefail
-
-# Redirect stdout and stderr to a log file
 logfile=$(mktemp)
-echo "#### Temporary log file '${logfile}'"
+echo "### Temporary log file '${logfile}'"
+# Save reference to stdout and stderr
 exec 3>&1 4>&2
+# Restore stdout and stderr on signal
 trap 'exec 2>&4 1>&3' 0 1 2 3
+# Redirect tee stdout and stderr to logfile
 exec 1> >(tee ${logfile}) 2>&1
 
-#### EVERYTHING BELOW WILL GO TO TERMINAL AND LOGFILE ####
+### EVERYTHING BELOW WILL GO TO CONSOLE AND LOGFILE ###
 set -euo pipefail
-
-git="nix run nixpkgs#git --"
 
 function die { echo "!!! ${1}" >&2; exit 1; }
 function log { echo "=== ${1}"; }
-function doc {
-  echo <<EOF
-********************************************************************************
-${1}
-********************************************************************************
-EOF
-}
 
 function confirm {
   read -p "${1} (y/N) " 2>&3
@@ -31,31 +23,51 @@ function confirm {
   fi
 }
 
-## Phose 1
+## STAGE 1 ##
+git="nix run nixpkgs#git --"
 
 # Verify git working dir is clean
-if ! (output=$(${git} status --porcelain) && [[ -z "${output}" ]]); then
-  die "Working directory is dirty"
-else
+if (output=$(${git} status --porcelain 2>/dev/null) && \
+      [[ -z "${output}" ]]); then
   log "Working directory is clean"
+else
+  die "Working directory is dirty"
 fi
 
-# Validate arguments
+# Validate hostname argument
 [[ -v 1 ]] || die "Expected hostname as first argument"
 hostname="${1}"
+
+function indent { sed 's/^/^    /g' }
+
+# Checkout hostname branch?
+if (${git} branch -a | grep "${hostname}") &>/dev/null &&
+     ! ((${git} branch --show-current | grep "${hostname}")) &>/dev/null && \
+       confirm "Checkout '${hostname}' branch?"; then
+  log "Checking out '${hostname}' branch"
+  ${git} checkout ${hostname} 2>&1 | indent
+  log "Fetching latest from origin"
+  ${git} pull 2>&1 | indent
+  log "Working directory up-to-date"
+  log "Exec'ing into new script"
+  exec $(realpath ${0})
+else
+  log "Fetching latest from origin"
+  ${git} pull 2>&1 | indent
+  log "Working directory up-to-date"
+fi
+
+### SCRIPT IS RELOADED ###
+## STAGE 2 ##
+# Validate ip argument
 ([[ -v 2 ]] && (ping -c1 "${2}" &>/dev/null)) || \
   die "Expected IP address as second argument"
 ip="${2}"
 
-# (confirm) Checkout hostname branch?
-if ${git} branch -a | grep "${hostname}" && \
-    confirm "Checkout '${hostname}' branch?"; then
-  ${git} checkout ${hostname}
-  # TODO: exec into new script?
-fi
-
 ssh="ssh nixos@${ip}"
-if ! ${ssh} :; then
+if ${ssh} : &>/dev/null; then
+  log "Confirmed SSH access to machine"
+else
   # (manual) Enable ssh access with password or ssh key
   die "Set up SSH access to '${ip}' (either password or public key)"
 fi
@@ -153,10 +165,10 @@ fi
 # ## Validate arguments
 # ###
 # ([[ -v 1 ]] && ping -c 1 "${1}" &>/dev/null) \
-#   || die "Expected IP address as first argument"
+  #   || die "Expected IP address as first argument"
 # [[ -v 2 ]] || die "Expected hostname as second argument"
 # ([[ -v 3 ]] && [[ -f "${scriptdir}/${3}" ]]) || \
-#   die "Expected config script as third argument"
+  #   die "Expected config script as third argument"
 
 # ip="${1}"
 # hostname="${2}"
