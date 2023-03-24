@@ -96,7 +96,7 @@ if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
    ${ssh} sudo parted -fs ${disk} mkpart ${hostname}-boot fat32 1MiB 1GiB
    ${ssh} sudo parted -fs ${disk} set 1 esp
    # Create luks partition with free space
-   ${ssh} sudo parted -fs ${disk} mkpart ${hostname}-root 1GiB 100% 2>&1) \
+   ${ssh} sudo parted -fs ${disk} mkpart ${hostname}-lvm-crypt 1GiB 100% 2>&1) \
     | indent
 fi
 
