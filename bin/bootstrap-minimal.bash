@@ -14,9 +14,19 @@ set -euo pipefail
 function die { echo "!!! ${1}" >&2; exit 1; }
 function log { echo "=== ${1}"; }
 
-function confirm {
-  read -p "${1} (y/N) "
+function ask() {
+  msg="??? ${1} "
+  if [[ -v 2 ]]; then
+    read -p "${msg}" ${2}
+  else
+    read -p "${msg}"
+  fi
+  # prevents bunching in the log (because input is not logged)
   echo
+}
+
+function confirm {
+  ask "${1} (y/N)"
   if [[ ${REPLY} =~ ^[Yy].* ]]; then
     return 0
   else
@@ -75,7 +85,10 @@ fi
 
 ${ssh} sudo parted -l 2>&1 | indent
 if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
-  :
+  ask "Partition which disk?" disk
+  while ! ${ssh} sudo parted -l "${disk}" &>/dev/null; do
+    ask "'${disk}' does not exist, partition which disk?" disk
+  done
 fi
 # - (confirm) create new partition table?
 
