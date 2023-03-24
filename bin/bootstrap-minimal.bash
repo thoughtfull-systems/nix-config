@@ -39,7 +39,7 @@ fi
 [[ -v 1 ]] || die "Expected hostname as first argument"
 hostname="${1}"
 
-function indent { sed -s "s/^/    /g"; }
+function indent { awk '{print "    "$0}'; }
 
 # Checkout hostname branch?
 if (${git} branch -a | grep "${hostname}") &>/dev/null &&
