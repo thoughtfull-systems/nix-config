@@ -16,6 +16,7 @@ function log { echo "=== ${1}"; }
 
 function confirm {
   read -p "${1} (y/N) "
+  echo
   if [[ ${REPLY} =~ ^[Yy].* ]]; then
     return 0
   else
