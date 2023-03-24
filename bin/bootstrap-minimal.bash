@@ -50,7 +50,7 @@ if (${git} branch -a | grep "${hostname}") &>/dev/null &&
   ${git} pull 2>&1 | indent
   log "Working directory up-to-date"
   log "Exec'ing into new script"
-  exec $(realpath ${0})
+  exec $(realpath ${0}) "${@}"
 else
   log "Fetching latest from origin"
   ${git} pull 2>&1 | indent
