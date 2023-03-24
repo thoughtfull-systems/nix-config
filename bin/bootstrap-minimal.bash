@@ -113,13 +113,13 @@ fi
 
 boot_device="/dev/disk/by-partlabel/${boot_name}"
 if has_partition "${boot_name}"; then
-  log "Using '${boot_device}' device"
+  log "Using '${boot_device}' partition"
 else
   die "Missing '${boot_name}' partition"
 fi
 crypt_device="/dev/disk/by-partlabel/${crypt_name}"
 if has_partition "${crypt_name}"; then
-  log "Using '${crypt_device}' device"
+  log "Using '${crypt_device}' partition"
 else
   die "Missing '${crypt_name}' partition"
 fi
