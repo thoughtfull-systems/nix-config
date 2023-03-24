@@ -98,7 +98,7 @@ if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
   while ! ${ssh} sudo parted -s "${disk}" print &>/dev/null; do
     ask "'${disk}' does not exist; partition which disk?" disk
   done
-  echo "Are your REALLY sure you want to erase and partition '${disk}'?"
+  echo "??? Are your REALLY sure you want to erase and partition '${disk}'?"
   if ask "(Please enter YES in all caps):" && [[ $REPLY = "YES" ]]; then
     log "Creating partition table"
     ${ssh} sudo parted -fs ${disk} mklabel gpt 2>&1 | indent
