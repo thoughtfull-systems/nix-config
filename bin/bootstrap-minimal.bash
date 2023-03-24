@@ -101,13 +101,13 @@ if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
   echo "Are your REALLY sure you want to erase and partition '${disk}'?"
   if ask "(Please enter YES in all caps):" && [[ $REPLY = "YES" ]]; then
     log "Creating partition table"
-    (${ssh} sudo parted -fs ${disk} mklabel gpt
-     log "Creating boot partition (1G)"
-     ${ssh} sudo parted -fs ${disk} mkpart ${boot_name} fat32 1MiB 1GiB
-     ${ssh} sudo parted -fs ${disk} set 1 esp 2>&1
-     log "Creating luks partition with free space"
-     ${ssh} sudo parted -fs ${disk} mkpart ${crypt_name} 1GiB 100%) 2>&1\
+    ${ssh} sudo parted -fs ${disk} mklabel gpt 2>&1 | indent
+    log "Creating boot partition (1G)"
+    ${ssh} sudo parted -fs ${disk} mkpart ${boot_name} fat32 1MiB 1GiB 2>&1\
       | indent
+    ${ssh} sudo parted -fs ${disk} set 1 esp 2>&1 | indent
+    log "Creating luks partition with free space"
+    ${ssh} sudo parted -fs ${disk} mkpart ${crypt_name} 1GiB 100% 2>&1 | indent
   fi
 fi
 
