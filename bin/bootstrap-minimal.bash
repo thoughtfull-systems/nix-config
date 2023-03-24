@@ -92,7 +92,8 @@ if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
   (${ssh} sudo parted -s ${disk} \
           mklabel gpt \
           mkpart ${hostname}-boot fat32 1MiB 1GiB \
-          mkpart ${hostname}-root 1GiB 100% 2>&1) | indent
+          mkpart ${hostname}-root 1GiB 100% \
+          set 1 esp 2>&1) | indent
 fi
 # - (confirm) create new partition table?
 
