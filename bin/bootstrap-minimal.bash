@@ -38,8 +38,8 @@ function confirm {
 git="nix run nixpkgs#git --"
 
 # Verify git working dir is clean
-if (output=$(${git} status --porcelain 2>/dev/null) && \
-      [[ -z "${output}" ]]); then
+if (output=$(${git} status --porcelain 2>/dev/null)\
+      && [[ -z "${output}" ]]); then
   log "Working directory is clean"
 else
   die "Working directory is dirty"
@@ -53,8 +53,8 @@ function indent { sed -E 's/\r$//g;s/\r/\n/g' | sed -E "s/^/    /g"; }
 
 # Checkout hostname branch?
 if (${git} branch -a | grep "${hostname}") &>/dev/null &&
-     [[ ! $(${git} branch --show-current 2>/dev/null) = "${hostname}" ]] && \
-       confirm "Checkout '${hostname}' branch?"; then
+     [[ ! $(${git} branch --show-current 2>/dev/null) = "${hostname}" ]]\
+       && confirm "Checkout '${hostname}' branch?"; then
   log "Checking out '${hostname}' branch"
   ${git} checkout ${hostname} 2>&1 | indent
   log "Fetching latest from origin"
@@ -71,8 +71,8 @@ fi
 ### SCRIPT IS RELOADED ###
 ## STAGE 2 ##
 # Validate ip argument
-([[ -v 2 ]] && (ping -c1 "${2}" &>/dev/null)) || \
-  die "Expected IP address as second argument"
+([[ -v 2 ]] && (ping -c1 "${2}" &>/dev/null))\
+  || die "Expected IP address as second argument"
 ip="${2}"
 
 ssh="ssh nixos@${ip} -qt"
@@ -83,6 +83,12 @@ else
   die "Set up SSH access to '${ip}' (either password or public key)"
 fi
 
+function has_partition { (${ssh} parted -l | grep "${1}") &>/dev/null; }
+boot_name="${hostname}-boot"
+has_partition "${boot_name}" || log "Missing '${boot_name}' partition"
+crypt_name="${hostname}-lvm-crypt"
+has_partition "${crypt_name}" || log "Missing '${crypt_name}' partition"
+
 ${ssh} sudo parted -l 2>&1 | indent
 # Create new partition table?
 if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
@@ -90,15 +96,21 @@ if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
   while ! ${ssh} sudo parted -s "${disk}" print &>/dev/null; do
     ask "'${disk}' does not exist; partition which disk?" disk
   done
-  # Create partition table
-  (${ssh} sudo parted -fs ${disk} mklabel gpt
-   # Create boot 1G partition
-   ${ssh} sudo parted -fs ${disk} mkpart ${hostname}-boot fat32 1MiB 1GiB
-   ${ssh} sudo parted -fs ${disk} set 1 esp
-   # Create luks partition with free space
-   ${ssh} sudo parted -fs ${disk} mkpart ${hostname}-lvm-crypt 1GiB 100% 2>&1) \
-    | indent
+  echo "Are your REALLY sure you want to erase and partition '${disk}'?"
+  if ask "(Please enter YES in all caps):" && [[ $REPLY = "YES" ]]; then
+    # Create partition table
+    (${ssh} sudo parted -fs ${disk} mklabel gpt
+     # Create boot 1G partition
+     ${ssh} sudo parted -fs ${disk} mkpart ${boot_name} fat32 1MiB 1GiB
+     ${ssh} sudo parted -fs ${disk} set 1 esp 2>&1
+     # Create luks partition with free space
+     ${ssh} sudo parted -fs ${disk} mkpart ${crypt_name} 1GiB 100%) 2>&1\
+      | indent
+  fi
 fi
+
+has_partition "${boot_name}" || die "Missing '${boot_name}' partition"
+has_partition "${crypt_name}" || die "Missing '${crypt_name}' partition"
 
 # - scp host public key -> age/keys/bootstrap.pub
 
@@ -181,10 +193,10 @@ fi
 # ###
 # ## Validate arguments
 # ###
-# ([[ -v 1 ]] && ping -c 1 "${1}" &>/dev/null) \
+# ([[ -v 1 ]] && ping -c 1 "${1}" &>/dev/null)\
   #   || die "Expected IP address as first argument"
 # [[ -v 2 ]] || die "Expected hostname as second argument"
-# ([[ -v 3 ]] && [[ -f "${scriptdir}/${3}" ]]) || \
+# ([[ -v 3 ]] && [[ -f "${scriptdir}/${3}" ]]) ||\
   #   die "Expected config script as third argument"
 
 # ip="${1}"
