@@ -42,7 +42,7 @@ function indent { sed "s/^/    /g"; }
 
 # Checkout hostname branch?
 if (${git} branch -a | grep "${hostname}") &>/dev/null &&
-     ! ((${git} branch --show-current | grep "${hostname}")) &>/dev/null && \
+     [[ ! $(${git} branch --show-current 2>/dev/null) = "${hostname}" ]] && \
        confirm "Checkout '${hostname}' branch?"; then
   log "Checking out '${hostname}' branch"
   ${git} checkout ${hostname} 2>&1 | indent
