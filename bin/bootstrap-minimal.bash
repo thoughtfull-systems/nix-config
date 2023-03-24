@@ -84,24 +84,21 @@ else
 fi
 
 ${ssh} sudo parted -l 2>&1 | indent
+# Create new partition table?
 if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
   ask "Partition which disk?" disk
   while ! ${ssh} sudo parted -s "${disk}" print &>/dev/null; do
     ask "'${disk}' does not exist; partition which disk?" disk
   done
-  (${ssh} sudo parted -fs ${disk} \
-          mklabel gpt \
-          mkpart ${hostname}-boot fat32 1MiB 1GiB \
-          mkpart ${hostname}-root 1GiB 100% \
-          set 1 esp  2>&1) | indent
+  # Create partition table
+  (${ssh} sudo parted -fs ${disk} mklabel gpt
+   # Create boot 1G partition
+   ${ssh} sudo parted -fs ${disk} mkpart ${hostname}-boot fat32 1MiB 1GiB
+   ${ssh} sudo parted -fs ${disk} set 1 esp
+   # Create luks partition with free space
+   ${ssh} sudo parted -fs ${disk} mkpart ${hostname}-root 1GiB 100% 2>&1) \
+    | indent
 fi
-# - (confirm) create new partition table?
-
-#   - create partition table
-
-#   - create boot partition 1G
-
-#   - create luks partition with free space
 
 # - scp host public key -> age/keys/bootstrap.pub
 
