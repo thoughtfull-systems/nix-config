@@ -35,12 +35,12 @@ function confirm {
 }
 
 ## STAGE 1 ##
-git="nix run nixpkgs#git --"
+nix="nix --extra-experimental-features nix-command \
+         --extra-experimental-features flakes"
+git="${nix} run nixpkgs#git --"
 
 # Verify git working dir is clean
-if (output=$(${git} status --porcelain 2>/dev/null) &&
-      [[ -z "${output}" ]])
-then
+if output=$(${git} status --porcelain 2>/dev/null) && [[ -z "${output}" ]]; then
   log "Working directory is clean"
 else
   die "Working directory is dirty"
@@ -53,25 +53,29 @@ hostname="${1}"
 function indent { sed -E 's/\r$//g;s/\r/\n/g' | sed -E "s/^/    /g"; }
 
 # Checkout hostname branch?
+function pull_latest {
+  log "Fetching latest from origin"
+  (${git} pull |& indent) ||
+    die "Failed fetch latest from origin"
+  log "Working directory up-to-date"
+}
 if (${git} branch -a | grep "${hostname}") &>/dev/null &&
      [[ ! $(${git} branch --show-current 2>/dev/null) = "${hostname}" ]] &&
      confirm "Checkout '${hostname}' branch?"
 then
   log "Checking out '${hostname}' branch"
-  ${git} checkout ${hostname} |& indent
-  log "Fetching latest from origin"
-  ${git} pull |& indent
-  log "Working directory up-to-date"
-  log "Exec'ing into new script"
-  exec $(realpath ${0}) "${@}"
+  (${git} checkout ${hostname} |& indent) ||
+    die "Failed to checkout '${hostname}' branch"
+  pull_latest
+  log "Exec'ing new script"
+  exec $(realpath ${0}) "${@}" ||
+    die "Failed to exec new script"
 else
-  log "Fetching latest from origin"
-  ${git} pull |& indent
-  log "Working directory up-to-date"
+  log "Remaining on current branch"
+  pull_latest
 fi
-
 ### SCRIPT IS RELOADED ###
-## STAGE 2 ##
+
 # Validate ip argument
 ([[ -v 2 ]] && (ping -c1 "${2}" &>/dev/null)) ||
   die "Expected IP address as second argument"
@@ -79,10 +83,10 @@ ip="${2}"
 
 # Confirm ssh access to machine
 ssh="ssh nixos@${ip} -qt"
+
 if ${ssh} : &>/dev/null; then
   log "Confirmed SSH access to machine"
 else
-  # Manually enable ssh access with password or ssh key
   die "Set up SSH access to '${ip}' (either password or public key)"
 fi
 
@@ -117,61 +121,83 @@ if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
 
   if really_sure "erase and partition '${disk}'"; then
     log "Creating partition table"
-    ${ssh} sudo parted -fs ${disk} mklabel gpt |& indent
+    parted="${ssh} sudo parted -fs ${disk}"
+    (${parted} mklabel gpt |& indent) ||
+      die "Failed to create partition table"
     log "Creating boot partition (1G)"
-    ${ssh} sudo parted -fs ${disk} mkpart ${boot_name} fat32 1MiB 1GiB 2>&1 |
-      indent
-    ${ssh} sudo parted -fs ${disk} set 1 esp |& indent
-    log "Creating luks partition with free space"
-    ${ssh} sudo parted -fs ${disk} mkpart ${crypt_name} 1GiB 100% |& indent
+    (${parted} mkpart ${boot_name} fat32 1MiB 1GiB |&
+     indent) ||
+      die "Failed to create boot partition"
+    (${parted} set 1 esp |& indent) ||
+      die "Failed to mark boot partition as ESP"
+    log "Creating LUKS partition with free space"
+    (${parted} mkpart ${crypt_name} 1GiB 100% |& indent) ||
+      die "Failed to create LUKS partition"
   fi
 fi
 
 # Verify partitions
-boot_device="/dev/disk/by-partlabel/${boot_name}"
 if has_partition "${boot_name}"; then
-  log "Using '${boot_device}' partition"
+  log "Using '${boot_name}' partition"
 else
   die "Missing '${boot_name}' partition"
 fi
-crypt_device="/dev/disk/by-partlabel/${crypt_name}"
+boot_device="/dev/disk/by-partlabel/${boot_name}"
+
 if has_partition "${crypt_name}"; then
-  log "Using '${crypt_device}' partition"
+  log "Using '${crypt_name}' partition"
 else
   die "Missing '${crypt_name}' partition"
 fi
+crypt_device="/dev/disk/by-partlabel/${crypt_name}"
 
 # Check boot filesystem
-file="nix --extra-experimental-features nix-command \
-          --extra-experimental-features flakes \
-          run nixpkgs#file -- -sL"
+file="${nix} run nixpkgs#file -- -sL"
 function is_fat32 {
   (${ssh} sudo ${file} "${1}" | grep "FAT (32 bit)") &>/dev/null
 }
 function mkfat32 { ${ssh} sudo mkfs.fat -F 32 "${1}" -n BOOT |& indent; }
-if ! is_fat32 "${boot_device}" &&
-    confirm "Format '${boot_device}' as FAT32 filesystem?"
-then
-  log "Formatting '${boot_device}' as FAT32 filesystem"
-  mkfat32 "${boot_device}" ||
-    die "Failed to format '${boot_device}'"
-elif is_fat32 "${boot_device}" && confirm "Re-format '${boot_device}'?"; then
-  really_sure "erase all data on '${boot_device}' and re-format it" &&
+if ! is_fat32 "${boot_device}"; then
+  if confirm "Format '${boot_device}' as FAT32 filesystem?"; then
+    log "Formatting '${boot_device}' as FAT32 filesystem"
     mkfat32 "${boot_device}" ||
       die "Failed to format '${boot_device}'"
+  fi
+else
+  if confirm "Re-format '${boot_device}' as FAT32 filesystem?"; then
+    really_sure "erase all data on '${boot_device}' and re-format it"
+    log "Re-formatting '${boot_device}' as FAT32 filesystem"
+    mkfat32 "${boot_device}" ||
+      die "Failed to format '${boot_device}'"
+  fi
 fi
 
 # Check luks partition
 function is_luks { ${ssh} sudo cryptsetup isLuks "${1}"; }
+function wait_for() {
+  if [[ ! -e "${1}" ]]; then
+    log "Waiting for '${1}'..."
+    while [[ ! -e ${1} ]]; do
+      sleep 1
+    done
+  fi
+}
+function is_swapon { ${ssh} sudo swapon | grep "$(realpath ${1})" &/dev/null; }
+function ensure_swapoff {
+  is_swapon "${1}"
+  ${ssh} sudo swapoff "$(realpath ${1})" &>/dev/null
+}
 function mkluks {
   # TODO unmount
+  ensure_swapoff
   # TODO remove LVM
   # TODO close LUKS
-  ask_no_echo "Please enter your passphrase:" PASS &&
-    ask_no_echo "Please confirm your passphrase:" CONFIRM
+  ask_no_echo "Please enter your passphrase:" PASS
+  ask_no_echo "Please confirm your passphrase:" CONFIRM
   if [[ "${PASS}" = "${CONFIRM}" ]]; then
-    (echo "${PASS}" | ${ssh} sudo cryptsetup luksFormat "${1}" |& indent) &&
-      (echo "${PASS}" | ${ssh} sudo cryptsetup open "${1}" "${2}" |& indent)
+    (echo "${PASS}" | ${ssh} sudo cryptsetup luksFormat "${1}" |& indent)
+    (echo "${PASS}" | ${ssh} sudo cryptsetup open "${1}" "${2}" |& indent)
+    wait_for "/dev/mapper/${2}"
   else
     die "Passphrase does not match"
   fi
@@ -183,21 +209,28 @@ function ask_no_echo() {
   echo
 }
 lvm_name="${hostname}-lvm"
-if ! is_luks "${crypt_device}" &&
-    confirm "Format '${crypt_device}' as LUKS container?"
-then
-  log "Formatting '${crypt_device}' as LUKS container"
-  if really_sure "erase all data on '${crypt_device}' and re-format it"; then
+if ! is_luks "${crypt_device}"; then
+  if confirm "Format '${crypt_device}' as LUKS container?"; then
+    log "Formatting '${crypt_device}' as LUKS container"
+    mkluks "${crypt_device}" "${lvm_name}" ||
+      die "Failed to format '${crypt_device}'"
+  fi
+else
+  if confirm "Re-format '${crypt_device}' as LUKS container?"; then
+    really_sure "erase all data on '${crypt_device}' and re-format it"
+    log "Re-ormatting '${crypt_device}' as LUKS container"
     mkluks "${crypt_device}" "${lvm_name}" ||
       die "Failed to re-format '${crypt_device}'"
   fi
-elif is_luks "${crypt_device}" &&
-    confirm "Re-format '${crypt_device}'"
-then
-  if really_sure "erase all data on '${crypt_device}' and re-format it"; then
-    mkluks "${crypt_device}" "${lvm_name}" ||
-      die "Failed to re-format '${crypt_device}'"
-  fi
+fi
+
+if [[ ! -e "/dev/mapper/${lvm_name}" ]]; then
+  (ask_no_echo "Please enter your passphrase:" PASS
+   (echo "${PASS}" |
+      ${ssh} sudo cryptsetup open "${crypt_device}" "${lvm_name}" |&
+      indent)
+   wait_for "/dev/mapper/${lvm_name}") ||
+    die "Failed to open '${crypt_device}'"
 fi
 
 # Check LVM physical volume
@@ -220,9 +253,43 @@ else
   log "Using '${vg_name}' LVM volume group"
 fi
 
-# Check LVM logical volumes
-
 # Check swap logical volume filesystem
+function has_swap {
+  (${ssh} sudo lvs -S "vg_name=${1} && lv_name=swap" |
+     grep swap) &>/dev/null
+}
+function mkswap {
+  if confirm "Should 'swap' be large enough for hibertation?"; then
+    swap_factor=3
+  else
+    swap_factor=2
+  fi
+  mem_total=$(($(grep MemTotal /proc/meminfo |\
+                   grep -o [[:digit:]]\*)/1000000))
+  swap_size=$((${mem_total}*${swap_factor}))
+  log "Creating '${1}-swap' with ${swap_size}G"
+  sudo lvcreate --size ${swap_size}G --name swap ${1} |& indent
+  wait_for "/dev/mapper/${1}-swap"
+}
+if ! has_swap "${vg_name}"; then
+  log "Creating 'swap' LVM volume"
+  mkswap "${vg_name}"
+else
+  confirm "Re-create 'swap' LVM volume"
+  log "Re-creating 'swap' LVM volume"
+  (ensure_swapoff "${swap_device}" &&
+     ${ssh} sudo vgremove "${vg_name}/swap" &&
+     mkswap "${vg-name}") ||
+    die "Failed to re-create 'swap' LVM volume"
+fi
+
+log "Using 'swap' LVM volume"
+
+swap_device="/dev/mapper/${vg_name}-swap"
+if ! is_swapon "${swap_device}"; then
+  log "Enabling swap '${swap_device}'"
+  sudo swapon ${swap_device}
+fi
 
 # Check root logical volume filesystem
 
