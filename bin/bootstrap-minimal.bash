@@ -95,7 +95,7 @@ function has_device {
   ${ssh} "[[ -b \"${1}\" ]]" &>/dev/null
 }
 function has_partition {
-  has_device "/dev/mapper/${1}"
+  has_device "/dev/disk/by-partlabel/${1}"
 }
 boot_name="${hostname}-boot"
 has_partition "${boot_name}" || log "Missing '${boot_name}' partition"
