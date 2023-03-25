@@ -168,13 +168,10 @@ function mkluks {
     ask_no_echo "Please confirm your passphrase:" CONFIRM
   if [[ "${PASS}" = "${CONFIRM}" ]]; then
     (echo "YES" | ${ssh} sudo cryptsetup luksFormat "${1}" 2>&1 | indent) &&
-      (echo "${PASS}" | openluks "${1}" "${2}" 2>&1 | indent)
+      (echo "${PASS}" | ${ssh} sudo cryptsetup open "${1}" "${2}" 2>&1 | indent)
   else
     die "Passphrase does not match"
   fi
-}
-function openluks {
-  ${ssh} sudo cryptsetup open "${1}" "${2}"
 }
 function ask_no_echo() {
   msg="??? ${1} "
