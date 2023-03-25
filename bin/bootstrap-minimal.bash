@@ -145,7 +145,7 @@ file="nix --extra-experimental-features nix-command \
           --extra-experimental-features flakes \
           run nixpkgs#file -- -sL"
 function is_fat32 {
-  (${ssh} sudo ${file} ${boot_device} | grep "FAT (32 bit)")
+  (${ssh} sudo ${file} ${boot_device} | grep "FAT (32 bit)") &>/dev/null
 }
 function mkfat32 { ${ssh} sudo mkfs.fat -F 32 "${1}" -n BOOT 2>&1; }
 if ! is_fat32 "${boot_device}" &&
@@ -154,7 +154,7 @@ then
   log "Formatting '${boot_device}' as FAT32 filesystem"
   mkfat32 "${boot_device}" | indent
 elif is_fat32 "${boot_device}" &&
-    confirm "'${boot_device}' is a FAT32 filesystem, re-format it?"
+    confirm "Re-format '${boot_device}'?"
 then
   really_sure "erase all data on '${boot_device}' and re-format it" &&
     mkfat32 "${boot_device}" | indent
