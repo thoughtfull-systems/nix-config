@@ -203,14 +203,20 @@ fi
 # Check LVM physical volume
 lvm_device="/dev/mapper/${lvm_name}"
 if ! (${ssh} sudo pvs | grep "${lvm_device}") &>/dev/null; then
-  log "Creating LVM physical volume"
-  ${ssh} sudo pvcreate "${lvm_device}" |& indent
+  log "Creating '${lvm_device}' LVM physical volume"
+  (${ssh} sudo pvcreate "${lvm_device}" |& indent) ||
+    die "Failed to create '${lvm_device}' LVM physical volume"
+else
+  log "Using '${lvm_device}' LVM physical volume"
 fi
 
 # Check LVM volume group
 if ! (${ssh} sudo vgs | grep "${lvm_device}") &>/dev/null; then
-  log "Creating LVM volume group"
-  ${ssh} sudo vgcreate "${hostname}" "${lvm_device}" |& indent
+  log "Creating '${hostname}' LVM volume group"
+  (${ssh} sudo vgcreate "${hostname}" "${lvm_device}" |& indent) ||
+    die "Failed to create '${hostname}' LVM volume group"
+else
+  log "Using '${hostname}' LVM volume group"
 fi
 
 # Check LVM logical volumes
