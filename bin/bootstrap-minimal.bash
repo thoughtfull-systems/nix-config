@@ -161,25 +161,40 @@ fi
 
 # Check luks partition
 function is_luks { ${ssh} sudo cryptsetup isLuks "${1}"; }
-function mkluks { ${ssh} sudo cryptsetup luksFormat "${1}"; }
+function mkluks {
+  ask_no_echo "Please enter your passphrase:" PASS &&
+    ask_no_echo "Please confirm your passphrase:" CONFIRM
+  if [[ "${PASS}" = "${CONFIRM}" ]]; then
+    (echo "YES" | ${ssh} sudo cryptsetup luksFormat "${1}" 2>&1 | indent) &&
+      (echo "${PASS}" | openluks "${1}" "${2}" 2>&1 | indent)
+  else
+    die "Passphrase does not match"
+  fi
+}
+function openluks {
+  ${ssh} sudo cryptsetup open "${1}" "${2}"
+}
+function ask_no_echo() {
+  msg="??? ${1} "
+  read -sp "${msg}" ${2}
+  # prevents bunching in the log (because input is not logged)
+  echo
+}
+lvm_name="${hostname}-lvm"
 if ! is_luks "${crypt_device}" &&
     confirm "Format '${crypt_device}' as LUKS container?"
 then
   log "Formatting '${crypt_device}' as LUKS container"
-  really_sure "erase all data on '${crypt_device}' and re-format it" &&
-    (echo "YES" | mkluks "${crypt_device}" 2>&1 | indent)
+  if really_sure "erase all data on '${crypt_device}' and re-format it"; then
+    mkluks "${crypt_device}" "${lvm_name}"
+  fi
 elif is_luks "${crypt_device}" &&
     confirm "Re-format '${crypt_device}'"
 then
-  really_sure "erase all data on '${crypt_device}' and re-format it" &&
-    ask "Please enter your passphrase:" PASS &&
-    ask "Please confirm your passphrase:" CONFIRM &&
-    [[ "${PASS}" = "${CONFIRM}" ]] &&
-    (echo "${PASS}" | mkluks "${crypt_device}" 2>&1 | indent)
+  if really_sure "erase all data on '${crypt_device}' and re-format it"; then
+    mkluks "${crypt_device}" "${lvm_name}"
+  fi
 fi
-
-lvm_name="${hostname}-lvm"
-${ssh} sudo cryptsetup open "${crypt_device}" "${lvm_name}"
 
 # Check LVM physical volume
 
