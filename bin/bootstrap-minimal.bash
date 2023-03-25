@@ -141,7 +141,7 @@ else
 fi
 
 # Check boot filesystem
-file="nix run nixpkgs#file --"
+file="nix --extra-experimental-features nix-command run nixpkgs#file --"
 function is_fat32 {
   (${file} ${boot_device} | grep "FAT (32 bit)") &>/dev/null
 }
