@@ -168,6 +168,11 @@ then
   log "Formatting '${crypt_device}' as LUKS container"
   really_sure "erase all data on '${crypt_device}' and re-format it" &&
     (echo "YES" | mkluks "${crypt_device}" 2>&1 | indent)
+elif is_luks "${crypt_device}" &&
+    confirm "Re-format '${crypt_device}'"
+then
+  really_sure "erase all data on '${crypt_device}' and re-format it" &&
+    (echo "YES" | mkluks "${crypt_device}" 2>&1 | indent)
 fi
 
 # Check LVM physical volume
