@@ -166,7 +166,7 @@ if ! is_luks "${crypt_device}" &&
     confirm "Format '${crypt_device}' as LUKS container?"
 then
   log "Formatting '${crypt_device}' as LUKS container"
-  mkluks "${crypt_device}" 2>&1 | indent
+  mkluks "${crypt_device}" 2>&1
 fi
 
 # Check LVM physical volume
