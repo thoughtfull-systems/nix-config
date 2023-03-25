@@ -50,8 +50,7 @@ fi
 [[ -v 1 ]] || die "Expected hostname as first argument"
 hostname="${1}"
 
-# function indent { sed -uE 's/\r$//g;s/\r/\n/g' | sed -uE "s/^/    /g"; }
-function indent { sed -uE "s/^/    /g"; }
+function indent { sed -uE 's/\r$//g;s/\r/\n/g' | sed -uE "s/^/    /g"; }
 
 # Checkout hostname branch?
 if (${git} branch -a | grep "${hostname}") &>/dev/null &&
@@ -167,7 +166,8 @@ if ! is_luks "${crypt_device}" &&
     confirm "Format '${crypt_device}' as LUKS container?"
 then
   log "Formatting '${crypt_device}' as LUKS container"
-  mkluks "${crypt_device}" 2>&1 | indent
+  # needs input, and indent is not helpful
+  mkluks "${crypt_device}" 2>&1
 fi
 
 # Check LVM physical volume
