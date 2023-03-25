@@ -201,6 +201,7 @@ then
 fi
 
 # Check LVM physical volume
+lvm_device="/dev/mapper/${lvm_name}"
 if ! (${ssh} sudo pvs | grep "${lvm_device}") &>/dev/null; then
   log "Creating LVM physical volume"
   ${ssh} sudo pvcreate "${lvm_device}" |& indent
