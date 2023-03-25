@@ -38,8 +38,9 @@ function confirm {
 git="nix run nixpkgs#git --"
 
 # Verify git working dir is clean
-if (output=$(${git} status --porcelain 2>/dev/null)\
-      && [[ -z "${output}" ]]); then
+if (output=$(${git} status --porcelain 2>/dev/null) &&
+      [[ -z "${output}" ]])
+then
   log "Working directory is clean"
 else
   die "Working directory is dirty"
@@ -53,8 +54,9 @@ function indent { sed -E 's/\r$//g;s/\r/\n/g' | sed -E "s/^/    /g"; }
 
 # Checkout hostname branch?
 if (${git} branch -a | grep "${hostname}") &>/dev/null &&
-     [[ ! $(${git} branch --show-current 2>/dev/null) = "${hostname}" ]]\
-       && confirm "Checkout '${hostname}' branch?"; then
+     [[ ! $(${git} branch --show-current 2>/dev/null) = "${hostname}" ]] &&
+     confirm "Checkout '${hostname}' branch?"
+then
   log "Checking out '${hostname}' branch"
   ${git} checkout ${hostname} 2>&1 | indent
   log "Fetching latest from origin"
@@ -71,18 +73,20 @@ fi
 ### SCRIPT IS RELOADED ###
 ## STAGE 2 ##
 # Validate ip argument
-([[ -v 2 ]] && (ping -c1 "${2}" &>/dev/null))\
-  || die "Expected IP address as second argument"
+([[ -v 2 ]] && (ping -c1 "${2}" &>/dev/null)) ||
+  die "Expected IP address as second argument"
 ip="${2}"
 
+# Confirm ssh access to machine
 ssh="ssh nixos@${ip} -qt"
 if ${ssh} : &>/dev/null; then
   log "Confirmed SSH access to machine"
 else
-  # (manual) Enable ssh access with password or ssh key
+  # Manually enable ssh access with password or ssh key
   die "Set up SSH access to '${ip}' (either password or public key)"
 fi
 
+# Check for partitions
 function has_partition {
   ${ssh} "[[ -b \"/dev/disk/by-partlabel/${1}\" ]]" &>/dev/null
 }
@@ -92,25 +96,37 @@ crypt_name="${hostname}-lvm-crypt"
 has_partition "${crypt_name}" || log "Missing '${crypt_name}' partition"
 
 ${ssh} sudo parted -l 2>&1 | indent
+
+function really_sure {
+  echo "??? Are your REALLY sure you want to ${1}?"
+  ask "(Please enter YES in all caps):"
+
+  if [[ $REPLY = "YES" ]]; then
+    return 0;
+  else
+    return 1;
+  fi
+}
 # Create new partition table?
 if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
   ask "Partition which disk?" disk
   while ! ${ssh} sudo parted -s "${disk}" print &>/dev/null; do
     ask "'${disk}' does not exist; partition which disk?" disk
   done
-  echo "??? Are your REALLY sure you want to erase and partition '${disk}'?"
-  if ask "(Please enter YES in all caps):" && [[ $REPLY = "YES" ]]; then
+
+  if really_sure "erase and partition '${disk}'"; then
     log "Creating partition table"
     ${ssh} sudo parted -fs ${disk} mklabel gpt 2>&1 | indent
     log "Creating boot partition (1G)"
-    ${ssh} sudo parted -fs ${disk} mkpart ${boot_name} fat32 1MiB 1GiB 2>&1\
-      | indent
+    ${ssh} sudo parted -fs ${disk} mkpart ${boot_name} fat32 1MiB 1GiB 2>&1 |
+      indent
     ${ssh} sudo parted -fs ${disk} set 1 esp 2>&1 | indent
     log "Creating luks partition with free space"
     ${ssh} sudo parted -fs ${disk} mkpart ${crypt_name} 1GiB 100% 2>&1 | indent
   fi
 fi
 
+# Verify partitions
 boot_device="/dev/disk/by-partlabel/${boot_name}"
 if has_partition "${boot_name}"; then
   log "Using '${boot_device}' partition"
@@ -124,24 +140,51 @@ else
   die "Missing '${crypt_name}' partition"
 fi
 
-# - scp host public key -> age/keys/bootstrap.pub
+# Check boot filesystem
+file="nix run nixpkg#file --"
+function is_fat32 { (${file} ${boot_device} | grep "FAT (32 bit)") &/dev/null; }
+function mkfat32 { ${ssh} sudo mkfs.fat -F 32 "${1}" -n BOOT 2>&1; }
+if ! is_fat32 "${boot_device}" &&
+    confirm "Format '${boot_device}' as FAT32 filesystem?"
+then
+  log "Formatting '${boot_device}' as FAT32 filesystem"
+  mkfat32 "${boot_device}" | indent
+elif is_fat32 "${boot_device}" &&
+    confirm "'${boot_device}' is a FAT32 filesystem, re-format it?"
+then
+  really_sure "erase all data on '${boot_device}' and re-format it" &&
+    mkfat32 "${boot_device}" | indent
+fi
 
-# - re-encrypt secrets
+# Check luks partition
 
-# - (confirm) create a temporary branch
+# Check LVM physical volume
 
-# - commit and push secrets
+# Check LVM volume group
 
-# - scp script
+# Check LVM logical volumes
 
-# - scp log
+# Check swap logical volume filesystem
 
-# - remotely execute script in phase 2 with log redirection
+# Check root logical volume filesystem
 
+# Mount root filesystem
 
-## Phose 2
+# Mount boot filesystem
 
-# - validate arguments: hostname
+# Turn on swap
+
+# scp host public key
+
+# Re-encrypt secrets
+
+# Create temporary branch?
+
+# Commit and push secrets
+
+# Generate NixOS config
+
+# Install NixOS
 
 # - (confirm) format unformatted boot partition, or re-format formatted boot
 # partition?
@@ -150,85 +193,6 @@ fi
 
 # - (confirm) luksFormat unformatted luks partition, or re-luksFormat formatted
 # luks partition?
-
-
-
-
-
-
-
-
-# function die {
-#   echo "${1}"
-#   exit 1
-# }
-
-# function heading {
-#   echo "== ${1}"
-# }
-
-# function log {
-#   echo "-- ${1}"
-# }
-
-# function ask() {
-#   msg="?? ${1} "
-#   if [[ -v 2 ]]; then
-#     read -p "${msg}" ${2}
-#   else
-#     read -p "${msg}"
-#   fi
-#   # prevents bunching in the log (because input is not logged)
-#   echo
-# }
-
-# function confirm () {
-#   ask "${1} (y/N)"
-#   if [[ ${REPLY} =~ ^[Yy].* ]]; then
-#     return 0
-#   else
-#     return 1
-#   fi
-# }
-
-# function confirm_confirm () {
-#   ask "${1} (yes/NO)"
-#   if [[ ! ${REPLY} =~ ^[Yy][Ee][Ss]$ ]]; then
-#     return 1
-#   fi
-#   return 0
-# }
-
-# scriptdir=$(dirname $(realpath "${0}"))
-# agenix="github:ryantm/agenix?rev=03b51fe8e459a946c4b88dcfb6446e45efb2c24e"
-# scpargs=("-o UserKnownHostsFile /dev/null" "-o StrictHostKeyChecking no")
-# ###
-# ## Validate arguments
-# ###
-# ([[ -v 1 ]] && ping -c 1 "${1}" &>/dev/null)\
-  #   || die "Expected IP address as first argument"
-# [[ -v 2 ]] || die "Expected hostname as second argument"
-# ([[ -v 3 ]] && [[ -f "${scriptdir}/${3}" ]]) ||\
-  #   die "Expected config script as third argument"
-
-# ip="${1}"
-# hostname="${2}"
-# configscript="${3}"
-
-# ## Verify clean git status
-# if (output=$(git status --porcelain) && [[ -z "${output}" ]]) &>/dev/null; then
-#   log "Working directory is clean"
-# else
-#   die "Working directory is not clean"
-# fi
-
-# ## Use host branch, if available
-# if (git branch -a --list | grep "${hostname}") &>/dev/null; then
-#   log "Checking out ${hostname} branch"
-#   git checkout "${hostname}"
-# else
-#   log "Already on ${hostname} branch"
-# fi
 
 # heading "BEGIN bootstrapping $(date)"
 
