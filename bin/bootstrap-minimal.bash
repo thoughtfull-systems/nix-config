@@ -148,15 +148,17 @@ file="nix --extra-experimental-features nix-command \
 function is_fat32 {
   (${ssh} sudo ${file} "${1}" | grep "FAT (32 bit)") &>/dev/null
 }
-function mkfat32 { ${ssh} sudo mkfs.fat -F 32 "${1}" -n BOOT 2>&1; }
+function mkfat32 { ${ssh} sudo mkfs.fat -F 32 "${1}" -n BOOT 2>&1 | indent; }
 if ! is_fat32 "${boot_device}" &&
     confirm "Format '${boot_device}' as FAT32 filesystem?"
 then
   log "Formatting '${boot_device}' as FAT32 filesystem"
-  mkfat32 "${boot_device}" | indent
+  mkfat32 "${boot_device}" ||
+    die "Failed to format '${boot_device}'"
 elif is_fat32 "${boot_device}" && confirm "Re-format '${boot_device}'?"; then
   really_sure "erase all data on '${boot_device}' and re-format it" &&
-    mkfat32 "${boot_device}" | indent
+    mkfat32 "${boot_device}" ||
+      die "Failed to format '${boot_device}'"
 fi
 
 # Check luks partition
@@ -186,13 +188,15 @@ if ! is_luks "${crypt_device}" &&
 then
   log "Formatting '${crypt_device}' as LUKS container"
   if really_sure "erase all data on '${crypt_device}' and re-format it"; then
-    mkluks "${crypt_device}" "${lvm_name}"
+    mkluks "${crypt_device}" "${lvm_name}" ||
+      die "Failed to re-format '${crypt_devices}'"
   fi
 elif is_luks "${crypt_device}" &&
     confirm "Re-format '${crypt_device}'"
 then
   if really_sure "erase all data on '${crypt_device}' and re-format it"; then
-    mkluks "${crypt_device}" "${lvm_name}"
+    mkluks "${crypt_device}" "${lvm_name}" ||
+      die "Failed to re-format '${crypt_devices}'"
   fi
 fi
 
