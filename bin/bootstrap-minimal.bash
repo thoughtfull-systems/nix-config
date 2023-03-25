@@ -58,15 +58,15 @@ if (${git} branch -a | grep "${hostname}") &>/dev/null &&
      confirm "Checkout '${hostname}' branch?"
 then
   log "Checking out '${hostname}' branch"
-  ${git} checkout ${hostname} 2>&1 | indent
+  ${git} checkout ${hostname} |& indent
   log "Fetching latest from origin"
-  ${git} pull 2>&1 | indent
+  ${git} pull |& indent
   log "Working directory up-to-date"
   log "Exec'ing into new script"
   exec $(realpath ${0}) "${@}"
 else
   log "Fetching latest from origin"
-  ${git} pull 2>&1 | indent
+  ${git} pull |& indent
   log "Working directory up-to-date"
 fi
 
@@ -95,7 +95,7 @@ has_partition "${boot_name}" || log "Missing '${boot_name}' partition"
 crypt_name="${hostname}-lvm-crypt"
 has_partition "${crypt_name}" || log "Missing '${crypt_name}' partition"
 
-${ssh} sudo parted -l 2>&1 | indent
+${ssh} sudo parted -l |& indent
 
 function really_sure {
   echo "??? Are your REALLY sure you want to ${1}?"
@@ -117,13 +117,13 @@ if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
 
   if really_sure "erase and partition '${disk}'"; then
     log "Creating partition table"
-    ${ssh} sudo parted -fs ${disk} mklabel gpt 2>&1 | indent
+    ${ssh} sudo parted -fs ${disk} mklabel gpt |& indent
     log "Creating boot partition (1G)"
     ${ssh} sudo parted -fs ${disk} mkpart ${boot_name} fat32 1MiB 1GiB 2>&1 |
       indent
-    ${ssh} sudo parted -fs ${disk} set 1 esp 2>&1 | indent
+    ${ssh} sudo parted -fs ${disk} set 1 esp |& indent
     log "Creating luks partition with free space"
-    ${ssh} sudo parted -fs ${disk} mkpart ${crypt_name} 1GiB 100% 2>&1 | indent
+    ${ssh} sudo parted -fs ${disk} mkpart ${crypt_name} 1GiB 100% |& indent
   fi
 fi
 
@@ -148,7 +148,7 @@ file="nix --extra-experimental-features nix-command \
 function is_fat32 {
   (${ssh} sudo ${file} "${1}" | grep "FAT (32 bit)") &>/dev/null
 }
-function mkfat32 { ${ssh} sudo mkfs.fat -F 32 "${1}" -n BOOT 2>&1 | indent; }
+function mkfat32 { ${ssh} sudo mkfs.fat -F 32 "${1}" -n BOOT |& indent; }
 if ! is_fat32 "${boot_device}" &&
     confirm "Format '${boot_device}' as FAT32 filesystem?"
 then
@@ -167,8 +167,8 @@ function mkluks {
   ask_no_echo "Please enter your passphrase:" PASS &&
     ask_no_echo "Please confirm your passphrase:" CONFIRM
   if [[ "${PASS}" = "${CONFIRM}" ]]; then
-    (echo "${PASS}" | ${ssh} sudo cryptsetup luksFormat "${1}" 2>&1 | indent) &&
-      (echo "${PASS}" | ${ssh} sudo cryptsetup open "${1}" "${2}" 2>&1 | indent)
+    (echo "${PASS}" | ${ssh} sudo cryptsetup luksFormat "${1}" |& indent) &&
+      (echo "${PASS}" | ${ssh} sudo cryptsetup open "${1}" "${2}" |& indent)
   else
     die "Passphrase does not match"
   fi
