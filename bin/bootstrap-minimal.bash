@@ -211,12 +211,13 @@ else
 fi
 
 # Check LVM volume group
-if ! (${ssh} sudo vgs | grep "${lvm_device}") &>/dev/null; then
-  log "Creating '${hostname}' LVM volume group"
-  (${ssh} sudo vgcreate "${hostname}" "${lvm_device}" |& indent) ||
-    die "Failed to create '${hostname}' LVM volume group"
+vg_name="${hostname}"
+if ! (${ssh} sudo vgs | grep "${vg_name}") &>/dev/null; then
+  log "Creating '${vg_name}' LVM volume group"
+  (${ssh} sudo vgcreate "${vg_name}" "${lvm_device}" |& indent) ||
+    die "Failed to create '${vg_name}' LVM volume group"
 else
-  log "Using '${hostname}' LVM volume group"
+  log "Using '${vg_name}' LVM volume group"
 fi
 
 # Check LVM logical volumes
