@@ -179,7 +179,7 @@ then
 fi
 
 lvm_name="${hostname}-lvm"
-${ssh} cryptsetup open "${crypt_device}" "${lvm_name}"
+${ssh} sudo cryptsetup open "${crypt_device}" "${lvm_name}"
 
 # Check LVM physical volume
 
