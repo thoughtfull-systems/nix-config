@@ -257,6 +257,7 @@ else
 fi
 
 # Check swap logical volume filesystem
+swap_device="/dev/mapper/${vg_name}-swap"
 function has_swap {
   (${ssh} sudo lvs -S "vg_name=${1} && lv_name=swap" |
      grep swap) &>/dev/null
@@ -276,7 +277,7 @@ function mkswap {
 }
 if ! has_swap "${vg_name}"; then
   log "Creating 'swap' LVM volume"
-  ${ssh} mkswap "${vg_name}"
+  ${ssh} mkswap "${swap_device}"
 else
   confirm "Re-create 'swap' LVM volume"
   log "Re-creating 'swap' LVM volume"
@@ -285,10 +286,8 @@ else
      ${ssh} mkswap "${vg-name}") ||
     die "Failed to re-create 'swap' LVM volume"
 fi
-
 log "Using 'swap' LVM volume"
 
-swap_device="/dev/mapper/${vg_name}-swap"
 if ! is_swapon "${swap_device}"; then
   log "Enabling swap '${swap_device}'"
   ${ssh} sudo swapon ${swap_device}
