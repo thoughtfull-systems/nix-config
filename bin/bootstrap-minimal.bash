@@ -160,12 +160,12 @@ elif is_fat32 "${boot_device}" && confirm "Re-format '${boot_device}'?"; then
 fi
 
 # Check luks partition
-function is_luks { ${ssh} cryptsetup isLuks "${1}"; }
+function is_luks { ${ssh} sudo cryptsetup isLuks "${1}"; }
 function mkluks { ${ssh} sudo cryptsetup luksFormat "${1}"; }
 if ! is_luks "${crypt_device}" &&
     confirm "Format '${crypt_device}' as LUKS container?"
 then
-  log "Formatting '${}' as LUKS container"
+  log "Formatting '${crypt_device}' as LUKS container"
   mkluks "${crypt_device}"
 fi
 
