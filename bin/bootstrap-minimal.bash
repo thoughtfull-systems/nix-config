@@ -189,14 +189,14 @@ then
   log "Formatting '${crypt_device}' as LUKS container"
   if really_sure "erase all data on '${crypt_device}' and re-format it"; then
     mkluks "${crypt_device}" "${lvm_name}" ||
-      die "Failed to re-format '${crypt_devices}'"
+      die "Failed to re-format '${crypt_device}'"
   fi
 elif is_luks "${crypt_device}" &&
     confirm "Re-format '${crypt_device}'"
 then
   if really_sure "erase all data on '${crypt_device}' and re-format it"; then
     mkluks "${crypt_device}" "${lvm_name}" ||
-      die "Failed to re-format '${crypt_devices}'"
+      die "Failed to re-format '${crypt_device}'"
   fi
 fi
 
