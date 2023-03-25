@@ -91,8 +91,11 @@ else
 fi
 
 # Check for partitions
+function has_device {
+  ${ssh} "[[ -b \"${1}\" ]]" &>/dev/null
+}
 function has_partition {
-  ${ssh} "[[ -b \"/dev/disk/by-partlabel/${1}\" ]]" &>/dev/null
+  has_device "/dev/mapper/${1}"
 }
 boot_name="${hostname}-boot"
 has_partition "${boot_name}" || log "Missing '${boot_name}' partition"
@@ -175,9 +178,9 @@ fi
 # Check luks partition
 function is_luks { ${ssh} sudo cryptsetup isLuks "${1}"; }
 function wait_for() {
-  if [[ ! -e "${1}" ]]; then
+  if ${ssh} "[[ ! -e \"${1}\" ]]"; then
     log "Waiting for '${1}'..."
-    while [[ ! -e ${1} ]]; do
+    while ${ssh} "[[ ! -e \"${1}\" ]]"; do
       sleep 1
     done
   fi
@@ -224,7 +227,7 @@ else
   fi
 fi
 
-if [[ ! -b "/dev/mapper/${lvm_name}" ]]; then
+if has_device "/dev/mapper/${lvm_name}"; then
   (ask_no_echo "Please enter your passphrase:" PASS
    (echo "${PASS}" |
       ${ssh} sudo cryptsetup open "${crypt_device}" "${lvm_name}" |&
