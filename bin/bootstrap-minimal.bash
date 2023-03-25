@@ -142,7 +142,9 @@ fi
 
 # Check boot filesystem
 file="nix run nixpkgs#file --"
-function is_fat32 { (${file} ${boot_device} | grep "FAT (32 bit)") &/dev/null; }
+function is_fat32 {
+  (${file} ${boot_device} | grep "FAT (32 bit)") &>/dev/null
+}
 function mkfat32 { ${ssh} sudo mkfs.fat -F 32 "${1}" -n BOOT 2>&1; }
 if ! is_fat32 "${boot_device}" &&
     confirm "Format '${boot_device}' as FAT32 filesystem?"
