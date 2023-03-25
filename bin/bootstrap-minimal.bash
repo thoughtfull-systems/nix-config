@@ -172,8 +172,14 @@ elif is_luks "${crypt_device}" &&
     confirm "Re-format '${crypt_device}'"
 then
   really_sure "erase all data on '${crypt_device}' and re-format it" &&
-    (mkluks "${crypt_device}" 2>&1)
+    ask "Please enter your passphrase:" PASS &&
+    ask "Please confirm your passphrase:" CONFIRM &&
+    [[ "${PASS}" = "${CONFIRM}" ]] &&
+    (echo "${PASS}" | mkluks "${crypt_device}" 2>&1 | indent)
 fi
+
+lvm_name="${hostname}-lvm"
+${ssh} cryptsetup open "${crypt_device}" "${lvm_name}"
 
 # Check LVM physical volume
 
