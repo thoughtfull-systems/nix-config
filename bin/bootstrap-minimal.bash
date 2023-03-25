@@ -248,7 +248,7 @@ fi
 
 # Check LVM volume group
 vg_name="${hostname}"
-if ! (${ssh} sudo vgs | grep "${vg_name}"); then
+if ! (${ssh} sudo vgs | grep "${vg_name}") &>/dev/null; then
   log "Creating '${vg_name}' LVM volume group"
   (${ssh} sudo vgcreate "${vg_name}" "${lvm_device}" |& indent) ||
     die "Failed to create '${vg_name}' LVM volume group"
@@ -267,22 +267,22 @@ function mkswap {
   else
     swap_factor=2
   fi
-  mem_total=$(($(grep MemTotal /proc/meminfo |\
-                   grep -o [[:digit:]]\*)/1000000))
+  mem_total=$(($(${ssh} 'grep MemTotal /proc/meminfo |\
+                         grep -o [[:digit:]]\*')/1000000))
   swap_size=$((${mem_total}*${swap_factor}))
   log "Creating '${1}-swap' with ${swap_size}G"
-  sudo lvcreate --size ${swap_size}G --name swap ${1} |& indent
+  ${ssh} sudo lvcreate --size ${swap_size}G --name swap ${1} |& indent
   wait_for "/dev/mapper/${1}-swap"
 }
 if ! has_swap "${vg_name}"; then
   log "Creating 'swap' LVM volume"
-  mkswap "${vg_name}"
+  ${ssh} mkswap "${vg_name}"
 else
   confirm "Re-create 'swap' LVM volume"
   log "Re-creating 'swap' LVM volume"
   (ensure_swapoff "${swap_device}" &&
      ${ssh} sudo vgremove "${vg_name}/swap" &&
-     mkswap "${vg-name}") ||
+     ${ssh} mkswap "${vg-name}") ||
     die "Failed to re-create 'swap' LVM volume"
 fi
 
@@ -291,7 +291,7 @@ log "Using 'swap' LVM volume"
 swap_device="/dev/mapper/${vg_name}-swap"
 if ! is_swapon "${swap_device}"; then
   log "Enabling swap '${swap_device}'"
-  sudo swapon ${swap_device}
+  ${ssh} sudo swapon ${swap_device}
 fi
 
 # Check root logical volume filesystem
