@@ -201,15 +201,15 @@ then
 fi
 
 # Check LVM physical volume
-if ! pvs | grep "${lvm_device}"; then
+if ! (${ssh} sudo pvs | grep "${lvm_device}") &>/dev/null; then
   log "Creating LVM physical volume"
-  pvcreate "${lvm_device}" |& indent
+  ${ssh} sudo pvcreate "${lvm_device}" |& indent
 fi
 
 # Check LVM volume group
-if ! vgs | grep "${lvm_device}"; then
+if ! (${ssh} sudo vgs | grep "${lvm_device}") &>/dev/null; then
   log "Creating LVM volume group"
-  vgcreate "${hostname}" "${lvm_device}" |& indent
+  ${ssh} sudo vgcreate "${hostname}" "${lvm_device}" |& indent
 fi
 
 # Check LVM logical volumes
