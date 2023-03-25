@@ -238,7 +238,7 @@ fi
 
 # Check LVM physical volume
 lvm_device="/dev/mapper/${lvm_name}"
-if ! (${ssh} sudo pvs | grep "${lvm_device}"); then
+if ! (${ssh} sudo pvs | grep "${lvm_device}") &>/dev/null; then
   log "Creating '${lvm_device}' LVM physical volume"
   (${ssh} sudo pvcreate "${lvm_device}" |& indent) ||
     die "Failed to create '${lvm_device}' LVM physical volume"
@@ -248,7 +248,7 @@ fi
 
 # Check LVM volume group
 vg_name="${hostname}"
-if ! (${ssh} sudo vgs | grep "${vg_name}") &>/dev/null; then
+if ! (${ssh} sudo vgs | grep "${vg_name}"); then
   log "Creating '${vg_name}' LVM volume group"
   (${ssh} sudo vgcreate "${vg_name}" "${lvm_device}" |& indent) ||
     die "Failed to create '${vg_name}' LVM volume group"
