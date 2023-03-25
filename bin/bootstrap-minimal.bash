@@ -164,6 +164,9 @@ fi
 # Check luks partition
 function is_luks { ${ssh} sudo cryptsetup isLuks "${1}"; }
 function mkluks {
+  # TODO unmount
+  # TODO remove LVM
+  # TODO close LUKS
   ask_no_echo "Please enter your passphrase:" PASS &&
     ask_no_echo "Please confirm your passphrase:" CONFIRM
   if [[ "${PASS}" = "${CONFIRM}" ]]; then
@@ -198,8 +201,16 @@ then
 fi
 
 # Check LVM physical volume
+if ! pvs | grep "${lvm_device}"; then
+  log "Creating LVM physical volume"
+  pvcreate "${lvm_device}" |& indent
+fi
 
 # Check LVM volume group
+if ! vgs | grep "${lvm_device}"; then
+  log "Creating LVM volume group"
+  vgcreate "${hostname}" "${lvm_device}" |& indent
+fi
 
 # Check LVM logical volumes
 
