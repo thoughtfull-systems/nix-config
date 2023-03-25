@@ -166,8 +166,8 @@ if ! is_luks "${crypt_device}" &&
     confirm "Format '${crypt_device}' as LUKS container?"
 then
   log "Formatting '${crypt_device}' as LUKS container"
-  # needs input, and indent is not helpful
-  mkluks "${crypt_device}" 2>&1
+  really_sure "erase all data on '${crypt_device}' and re-format it" &&
+    echo "YES" | mkluks "${crypt_device}" 2>&1 | indent
 fi
 
 # Check LVM physical volume
