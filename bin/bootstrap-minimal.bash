@@ -227,7 +227,7 @@ else
   fi
 fi
 
-if has_device "/dev/mapper/${lvm_name}"; then
+if ! has_device "/dev/mapper/${lvm_name}"; then
   (ask_no_echo "Please enter your passphrase:" PASS
    (echo "${PASS}" |
       ${ssh} sudo cryptsetup open "${crypt_device}" "${lvm_name}" |&
