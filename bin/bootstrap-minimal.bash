@@ -169,7 +169,7 @@ function format_luks {
   if [[ "${PASS}" = "${CONFIRM}" ]]; then
     echo "${PASS}" | ${ssh} sudo cryptsetup luksFormat "${1}" |& indent
     log "Using LUKS device '${1}'"
-    open_luks "${1}" "${2}" "${3}"
+    open_luks "${1}" "${2}" "${PASS}"
   else
     die "Passphrase does not match"
   fi
