@@ -286,7 +286,7 @@ if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
     ensure_lv_removed "${vg_name}" "root"
     ensure_vg_removed "${vg_name}"
     ensure_pv_removed "${luks_device}"
-    ensure_luks_closed "${luks_device}"
+    ensure_luks_closed "${lvm_device}"
     log "Creating partition table"
     parted="${ssh} sudo parted -fs ${disk}"
     ${parted} mklabel gpt |& indent || die "Failed to create partition table"
