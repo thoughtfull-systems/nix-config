@@ -269,7 +269,7 @@ function mkswap {
     swap_factor=2
   fi
   mem_total=$(($(${ssh} 'grep MemTotal /proc/meminfo |\
-                         grep -o [[:digit:]]\*')/1000000))
+                         grep -o [[:digit:]]\*') / 1000000))
   swap_size=$((${mem_total}*${swap_factor}))
   log "Creating '${1}-swap' with ${swap_size}G"
   ${ssh} sudo lvcreate --size ${swap_size}G --name swap ${1} |& indent
