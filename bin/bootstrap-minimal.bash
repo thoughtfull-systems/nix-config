@@ -221,7 +221,7 @@ if ! is_luks "${crypt_device}"; then
 else
   if confirm "Re-format '${crypt_device}' as LUKS container?"; then
     really_sure "erase all data on '${crypt_device}' and re-format it"
-    log "Re-ormatting '${crypt_device}' as LUKS container"
+    log "Re-formatting '${crypt_device}' as LUKS container"
     mkluks "${crypt_device}" "${lvm_name}" ||
       die "Failed to re-format '${crypt_device}'"
   fi
@@ -277,12 +277,12 @@ function mkswap {
 }
 if ! has_swap "${vg_name}"; then
   log "Creating 'swap' LVM volume"
-  ${ssh} mkswap "${swap_device}"
+  mkswap "${vg_name}"
 else
   confirm "Re-create 'swap' LVM volume"
   log "Re-creating 'swap' LVM volume"
   (ensure_swapoff "${swap_device}" &&
-     ${ssh} sudo vgremove "${vg_name}/swap" &&
+     ${ssh} sudo lvremove "${vg_name}/swap" &&
      ${ssh} mkswap "${vg-name}") ||
     die "Failed to re-create 'swap' LVM volume"
 fi
@@ -294,6 +294,25 @@ if ! is_swapon "${swap_device}"; then
 fi
 
 # Check root logical volume filesystem
+root_device="/dev/mapper/${hostname}-root"
+function mkroot {
+  log "Creating '${1}-root'"
+  ${ssh} sudo lvcreate --extends 100%FREE --name root ${1} |& indent
+  wait_for "/dev/mapper/${1}-root"
+}
+if ! has_partition ${root_name}; then
+  log "Creating 'root' LVM volume"
+  mkroot "${vg_name}"
+else
+  log "Using '${root_device}' root partition"
+  if confirm "Re-create 'root' LVM volume"; then
+    really_sure "erase all data on '${root_device}' and re-format it"
+    log "Re-creating '${root_device}' LVM volume"
+    ${ssh} sudo lvremove ${vg_name}/root |& indent
+    mkroot "${vg_name}" ||
+      die "Failed to re-format '${crypt_device}'"
+  fi
+fi
 
 # Mount root filesystem
 
