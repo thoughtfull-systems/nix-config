@@ -183,7 +183,7 @@ function has_pv {
 function ensure_pv_removed {
   if has_pv "${1}"; then
     log "Removing physical volume '${1}'"
-    ${ssh} sudo pvremove "${1}" |& indent
+    ${ssh} sudo pvremove -y "${1}" |& indent
   fi
 }
 
@@ -194,7 +194,7 @@ function has_vg {
 function ensure_vg_removed {
   if has_vg "${1}"; then
     log "Removing volume group '${1}'"
-    ${ssh} sudo vgremove "${1}"
+    ${ssh} sudo vgremove -y "${1}"
   fi
 }
 
@@ -205,7 +205,7 @@ function has_lv {
 function ensure_lv_removed {
   if has_lv "${1}" "${2}"; then
     log "Removing volume '${2}'"
-    ${ssh} sudo lvremove "${1}/${2}" |& indent
+    ${ssh} sudo lvremove -y "${1}/${2}" |& indent
   fi
 }
 
