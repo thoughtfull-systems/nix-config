@@ -344,13 +344,15 @@ else
   if confirm "Re-format as LUKS '${luks_device}'?"; then
     really_sure "re-format as LUKS '${luks_device}' (ALL DATA WILL BE LOST)"
     log "Re-formatting as LUKS '${luks_device}'"
-    ensure_unmounted "${boot_device}"
-    # TODO ensure_unmounted "${root_device}"
-    ensure_swapoff
-    ensure_pv_removed "${lvm_device}"
-    # TODO remove LVM
-    # TODO close LUKS
-    format_luks "${luks_device}" "${lvm_name}" ||
+    (ensure_unmounted "${boot_device}"
+     ensure_unmounted "${root_device}"
+     ensure_swapoff "${swap_device}"
+     ensure_lv_removed "${vg_name}" "swap"
+     ensure_lv_removed "${vg_name}" "root"
+     ensure_vg_removed "${vg_name}"
+     ensure_pv_removed "${luks_device}"
+     ensure_luks_closed "${lvm_device}"
+     format_luks "${luks_device}" "${lvm_name}") ||
       die "Failed to re-format as LUKS '${luks_device}'"
   fi
 fi
