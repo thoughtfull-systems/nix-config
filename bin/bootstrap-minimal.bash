@@ -185,7 +185,7 @@ function wait_for() {
     done
   fi
 }
-function is_swapon { ${ssh} sudo swapon | grep "$(realpath ${1})" &/dev/null; }
+function is_swapon { ${ssh} sudo swapon | grep "$(realpath ${1})" &>/dev/null; }
 function ensure_swapoff {
   is_swapon "${1}"
   ${ssh} sudo swapoff "$(realpath ${1})" &>/dev/null
