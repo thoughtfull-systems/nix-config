@@ -217,25 +217,20 @@ function is_fat32 {
 
 function mkfat32 {
   ensure_unmounted "${1}"
-  ${ssh} sudo mkfs.fat -F 32 "${1}" -n BOOT |& indent;
 }
 
 # Swap
-function has_swap {
-  (${ssh} sudo lvs -S "vg_name=${1} && lv_name=swap" |
-     grep swap) &>/dev/null
-}
-
 function mkswap {
   if confirm "Should 'swap' be large enough for hibertation?"; then
     swap_factor=3
   else
     swap_factor=2
   fi
-  mem_total=$(($(${ssh} grep MemTotal /proc/meminfo | grep -o [[:digit:]]\*) / 1000000))
+  mem_total=$(($(${ssh} grep MemTotal /proc/meminfo | grep -o [[:digit:]]\*) \
+                 / 1000000))
   swap_size=$((${mem_total}*${swap_factor}))
   log "Creating '${1}-swap' with ${swap_size}G"
-  ${ssh} sudo lvcreate --size ${swap_size}G --name swap ${1} |& indent
+  ${ssh} sudo lvcreate --size "${swap_size}G" --name swap "${1}" |& indent
   wait_for "/dev/mapper/${1}-swap"
 }
 
@@ -285,11 +280,11 @@ if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
     parted="${ssh} sudo parted -fs ${disk}"
     ${parted} mklabel gpt |& indent || die "Failed to create partition table"
     log "Creating boot partition (1G)"
-    ${parted} mkpart ${boot_name} fat32 1MiB 1GiB |& indent ||
+    ${parted} mkpart "${boot_name}" fat32 1MiB 1GiB |& indent ||
       die "Failed to create boot partition"
     ${parted} set 1 esp |& indent || die "Failed to mark boot partition as ESP"
     log "Creating LUKS partition with free space"
-    ${parted} mkpart ${luks_name} 1GiB 100% |& indent ||
+    ${parted} mkpart "${luks_name}" 1GiB 100% |& indent ||
       die "Failed to create LUKS partition"
   fi
 fi
@@ -300,18 +295,21 @@ has_partition "${luks_name}" || die "Missing LUKS partition '${luks_name}'"
 
 ### BOOT DEVICE ###
 if ! is_fat32 "${boot_device}"; then
-  (confirm "Format as FAT32 '${boot_device}'?"
-   ensure_unmounted "${boot_device}"
-   log "Formatting as FAT32 '${boot_device}'"
-   mkfat32 "${boot_device}") ||
-    die "Failed to format as FAT32 '${boot_device}'"
+  if confirm "Format as FAT32 '${boot_device}'?"; then
+    ensure_unmounted "${boot_device}"
+    log "Formatting as FAT32 '${boot_device}'"
+    ${ssh} sudo mkfs.fat -F 32 "${1}" -n BOOT |& indent ||
+      die "Failed to format as FAT32 '${boot_device}'"
+  fi
 else
-  (confirm "Re-format as FAT32 '${boot_device}'?"
-   really_sure "re-format as FAT 32 '${boot_device}' (ALL DATA WILL BE LOST)"
-   ensure_unmounted "${boot_device}"
-   log "Re-formatting as FAT32 '${boot_device}'"
-   mkfat32 "${boot_device}") ||
-    die "Failed to re-format as FAT32 '${boot_device}'"
+  if confirm "Re-format as FAT32 '${boot_device}'?" &&
+      really_sure "re-format as FAT32 '${boot_device}' (ALL DATA WILL BE LOST)";
+  then
+    ensure_unmounted "${boot_device}"
+    log "Re-formatting as FAT32 '${boot_device}'"
+    ${ssh} sudo mkfs.fat -F 32 "${1}" -n BOOT |& indent ||
+      die "Failed to re-format as FAT32 '${boot_device}'"
+  fi
 fi
 
 if is_fat32 "${boot_device}"; then
@@ -328,31 +326,32 @@ if ! is_luks "${luks_device}"; then
       die "Failed to format as LUKS '${luks_device}'"
   fi
 else
-  if confirm "Re-format as LUKS '${luks_device}'?"; then
-    really_sure "re-format as LUKS '${luks_device}' (ALL DATA WILL BE LOST)"
+  if confirm "Re-format as LUKS '${luks_device}'?" &&
+      really_sure "re-format as LUKS '${luks_device}' (ALL DATA WILL BE LOST)";
+  then
+    ensure_unmounted "${boot_device}"
+    ensure_unmounted "${root_device}"
+    ensure_lv_removed "${vg_name}" "${root_name}"
+    ensure_swapoff "${swap_device}"
+    ensure_lv_removed "${vg_name}" "${swap_name}"
+    ensure_vg_removed "${vg_name}"
+    ensure_pv_removed "${luks_device}"
+    ensure_luks_closed "${lvm_device}"
     log "Re-formatting as LUKS '${luks_device}'"
-    (ensure_unmounted "${boot_device}"
-     ensure_unmounted "${root_device}"
-     ensure_swapoff "${swap_device}"
-     ensure_lv_removed "${vg_name}" "swap"
-     ensure_lv_removed "${vg_name}" "root"
-     ensure_vg_removed "${vg_name}"
-     ensure_pv_removed "${luks_device}"
-     ensure_luks_closed "${lvm_device}"
-     format_luks "${luks_device}" "${lvm_name}") ||
+    format_luks "${luks_device}" "${lvm_name}" ||
       die "Failed to re-format as LUKS '${luks_device}'"
   fi
 fi
 
 if ! has_device "${lvm_device}"; then
-  log "Using LUKS device '${1}'"
+  log "Using LUKS device '${luks_device}'"
   ask_no_echo "Please enter your passphrase:" PASS
   open_luks "${luks_device}" "${lvm_name}" "${PASS}"
 fi
 
 ### LVM ###
 # Check LVM physical volume
-if ! (${ssh} sudo pvs | grep "${lvm_device}") &>/dev/null; then
+if ! has_pv "${lvm_device}"; then
   log "Creating '${lvm_device}' LVM physical volume"
   ${ssh} sudo pvcreate "${lvm_device}" |& indent ||
     die "Failed to create '${lvm_device}' LVM physical volume"
@@ -361,7 +360,7 @@ else
 fi
 
 # Check LVM volume group
-if ! (${ssh} sudo vgs | grep "${vg_name}") &>/dev/null; then
+if ! has_vg "${vg_name}"; then
   log "Creating '${vg_name}' LVM volume group"
   (${ssh} sudo vgcreate "${vg_name}" "${lvm_device}" |& indent) ||
     die "Failed to create '${vg_name}' LVM volume group"
@@ -371,24 +370,28 @@ fi
 
 ## SWAP ##
 # Create swap LVM volume
-if ! has_swap "${vg_name}"; then
-  log "Creating 'swap' LVM volume"
-  mkswap "${vg_name}"
+if ! has_lv "${vg_name}" "${swap_name}"; then
+  log "Creating '${swap_name}' LVM volume"
+  mkswap "${vg_name}" "${swap_name}" ||
+    die "Failed to re-create '${swap_name}' LVM volume"
 else
-  if confirm "Re-create 'swap' LVM volume"; then
-    log "Re-creating 'swap' LVM volume"
-    (ensure_swapoff "${swap_device}"
-     ${ssh} sudo lvremove "${vg_name}/swap"
-     ${ssh} mkswap "${vg-name}") ||
-      die "Failed to re-create 'swap' LVM volume"
+  if confirm "Re-create '${swap_name}' LVM volume"; then
+    log "Re-creating '${swap_name}' LVM volume"
+    ensure_swapoff "${swap_device}"
+    ensure_lv_removed "${vg_name}" "${swap_name}"
+    mkswap "${vg-name}" "${swap_name}" ||
+      die "Failed to re-create '${swap_name}' LVM volume"
   fi
 fi
-log "Using 'swap' LVM volume"
+log "Using '${swap_name}' LVM volume"
 
 # Format swap volume
 if ! is_swap "${swap_device}"; then
   if confirm "Format as swap '${swap_device}'?"; then
-    ${ssh} sudo mkswap -L swap "${swap_device}" |& indent
+    log "Formatting as swap '${swap_device}'"
+    ensure_swapoff "${swap_device}"
+    ${ssh} sudo mkswap -L "${swap_name}" "${swap_device}" |& indent ||
+      die "Failed to format as swap '${swap_device}'"
   fi
 fi
 
