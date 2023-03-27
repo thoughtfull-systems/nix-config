@@ -306,8 +306,9 @@ if ! is_fat32 "${boot_device}"; then
    mkfat32 "${boot_device}") ||
     die "Failed to format as FAT32 '${boot_device}'"
 else
-  if confirm "Re-format as FAT32 '${boot_device}'?"; then
-    really_sure "re-format as FAT 32 '${boot_device}' (ALL DATA WILL BE LOST)"
+  if confirm "Re-format as FAT32 '${boot_device}'?" &&
+      really_sure "re-format as FAT 32 '${boot_device}' (ALL DATA WILL BE LOST)";
+  then
     (ensure_unmounted "${boot_device}"
      log "Re-formatting as FAT32 '${boot_device}'"
      mkfat32 "${boot_device}") ||
