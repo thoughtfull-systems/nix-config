@@ -398,7 +398,7 @@ fi
 log "Using 'swap' LVM volume"
 
 # Format swap volume
-if !is_swap "${swap_device}"; then
+if ! is_swap "${swap_device}"; then
   if confirm "Format as swap '${swap_device}'?"; then
     ${ssh} sudo mkswap -L swap "${swap_device}"
   fi
