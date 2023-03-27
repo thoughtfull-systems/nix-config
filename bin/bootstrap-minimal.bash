@@ -95,8 +95,8 @@ lvm_device="/dev/mapper/${lvm_name}"
 vg_name="${hostname}"
 swap_name="swap"
 swap_device="/dev/mapper/${vg_name}-${swap_name}"
-root_name="${hostname}-root"
-root_device="/dev/mapper/${hostname}-root"
+root_name="root"
+root_device="/dev/mapper/${hostname}-${root_name}"
 
 ### FUNCTIONS ##################################################################
 # General
@@ -256,12 +256,9 @@ function ensure_swapoff {
 
 # EXT4
 function mkroot {
-  log "Creating '${1}-root'"
-  ${ssh} sudo lvcreate --extents 100%FREE --name root ${1} |& indent
-  wait_for "/dev/mapper/${1}-root"
 }
 
-### SETUP ###
+### SETUP ######################################################################
 # Confirm ssh access to machine
 if ${ssh} : &>/dev/null; then
   log "Confirmed SSH access to machine"
@@ -282,9 +279,9 @@ if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
   if really_sure "erase and partition '${disk}'"; then
     ensure_unmounted "${boot_device}"
     ensure_unmounted "${root_device}"
+    ensure_lv_removed "${vg_name}" "${root_name}"
     ensure_swapoff "${swap_device}"
-    ensure_lv_removed "${vg_name}" "swap"
-    ensure_lv_removed "${vg_name}" "root"
+    ensure_lv_removed "${vg_name}" "${swap_name}"
     ensure_vg_removed "${vg_name}"
     ensure_pv_removed "${luks_device}"
     ensure_luks_closed "${lvm_device}"
@@ -306,15 +303,16 @@ has_partition "${boot_name}" || die "Missing boot partition '${boot_name}'"
 has_partition "${luks_name}" || die "Missing LUKS partition '${luks_name}'"
 
 ### BOOT DEVICE ###
-ensure_unmounted "${boot_device}"
 if ! is_fat32 "${boot_device}"; then
   (confirm "Format as FAT32 '${boot_device}'?"
+   ensure_unmounted "${boot_device}"
    log "Formatting as FAT32 '${boot_device}'"
    mkfat32 "${boot_device}") ||
     die "Failed to format as FAT32 '${boot_device}'"
 else
   if confirm "Re-format as FAT32 '${boot_device}'?"; then
     (really_sure "re-format as FAT 32 '${boot_device}' (ALL DATA WILL BE LOST)"
+     ensure_unmounted "${boot_device}"
      log "Re-formatting as FAT32 '${boot_device}'"
      mkfat32 "${boot_device}") ||
       die "Failed to re-format as FAT32 '${boot_device}'"
@@ -376,6 +374,7 @@ else
   log "Using '${vg_name}' LVM volume group"
 fi
 
+## SWAP ##
 # Create swap LVM volume
 if ! has_swap "${vg_name}"; then
   log "Creating 'swap' LVM volume"
@@ -400,21 +399,25 @@ fi
 
 if ! is_swapon "${swap_device}"; then
   log "Enabling swap '${swap_device}'"
-  ${ssh} sudo swapon ${swap_device} |& indent
+  ${ssh} sudo swapon "${swap_device}" |& indent
 fi
 
+## ROOT ##
 # Check root logical volume filesystem
-if ! has_partition ${root_name}; then
-  log "Creating 'root' LVM volume"
-  mkroot "${vg_name}" || die "Failed to format '${root_device}'"
+if ! has_lv "${vg_name}" "${root_name}"; then
+  log "Creating '${root_name}' LVM volume"
+  (${ssh} sudo lvcreate --extents 100%FREE --name root ${1} |& indent
+   wait_for "${root_device}") || die "Failed to format '${root_device}'"
 else
   log "Using '${root_device}' root partition"
-  if confirm "Re-create 'root' LVM volume"; then
+  if confirm "Re-create '${root_name}' LVM volume"; then
     really_sure "erase all data on '${root_device}' and re-format it"
-    log "Re-creating '${root_device}' LVM volume"
-    ${ssh} sudo lvremove ${vg_name}/root |& indent
-    mkroot "${vg_name}" ||
-      die "Failed to re-format '${root_device}'"
+    log "Re-creating '${root_name}' LVM volume"
+    ${ssh} sudo lvremove "${vg_name}/${root_name}" |& indent
+    log "Creating '${root_name}' LVM volume"
+    (${ssh} sudo lvcreate --extents 100%FREE --name root ${1} |& indent
+     wait_for "/dev/mapper/${1}-root") ||
+      die "Failed to re-format '${root_name}'"
   fi
 fi
 
