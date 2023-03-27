@@ -95,6 +95,7 @@ lvm_device="/dev/mapper/${lvm_name}"
 vg_name="${hostname}"
 swap_name="swap"
 swap_device="/dev/mapper/${vg_name}-${swap_name}"
+root_name="${hostname}-root"
 root_device="/dev/mapper/${hostname}-root"
 
 ### FUNCTIONS ##################################################################
