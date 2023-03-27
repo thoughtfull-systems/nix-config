@@ -239,7 +239,7 @@ function mkswap {
 }
 
 function is_swap {
-  ${ssh} sudo swaplabel "${1}"
+  ${ssh} sudo swaplabel "${1}" &>/dev/null
 }
 
 function is_swapon {
@@ -400,7 +400,7 @@ log "Using 'swap' LVM volume"
 # Format swap volume
 if !is_swap "${swap_device}"; then
   if confirm "Format as swap '${swap_device}'?"; then
-    ${ssh} sudo mkswap -L
+    ${ssh} sudo mkswap -L swap "${swap_device}"
   fi
 fi
 
