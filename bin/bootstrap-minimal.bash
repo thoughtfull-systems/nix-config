@@ -252,6 +252,10 @@ function ensure_swapoff {
   fi
 }
 
+function is_ext4() {
+  (sudo file -sL "${1}" | grep "ext4 filesystem") &>/dev/null
+}
+
 ### SETUP ######################################################################
 # Confirm ssh access to machine
 if ${ssh} : &>/dev/null; then
@@ -424,7 +428,32 @@ else
   fi
 fi
 
-log "Using '${root_name}' LVM volume"
+# format root
+if ! is_ext4 "${root_device}"; then
+  if confirm "Format as ext4 '${root_device}'"; then
+    ensure_unmounted "${boot_device}"
+    ensure_unmounted "${root_device}"
+    log "Formatting as ext4 '${root_device}'"
+    ${ssh} sudo mkfs.ext4 -L "${root_name}" |& indent ||
+      die "Failed to format as ext4 '${root_device}'"
+  fi
+else
+  if confirm "Re-format as ext4 '${root_device}'" &&
+      really_sure "re-format as ext4 '${root_device}' (ALL DATA WILL BE LOST"
+  then
+    ensure_unmounted "${boot_device}"
+    ensure_unmounted "${root_device}"
+    log "Re-formatting as ext4 '${root_device}'"
+    ${ssh} sudo mkfs.ext4 -L "${root_name}" |& indent ||
+      die "Failed to re-format as ext4 '${root_device}'"
+  fi
+fi
+
+if is_ext4 "${root_device}"; then
+  log "Using root LVM volume '${root_name}'"
+else
+  die "Unsuitable root LVM volume '${root_name}'"
+fi
 
 # Mount root filesystem
 if ! is_mounted "${root_device}"; then
