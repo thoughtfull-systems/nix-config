@@ -253,7 +253,7 @@ function ensure_swapoff {
 }
 
 function is_ext4() {
-  (sudo file -sL "${1}" | grep "ext4 filesystem") &>/dev/null
+  ${ssh} sudo ${file} -sL "${1}" | grep "ext4 filesystem" &>/dev/null
 }
 
 ### SETUP ######################################################################
@@ -500,7 +500,7 @@ ${ssh} sudo git add hosts/${hostname}/hardware-configuration.nix |& indent
 # Install NixOS
 log "Installing NixOS..."
 confirm "Continue?"
-sudo nixos-install --no-root-password --flake .#${host} |& indent ||
+${ssh} sudo nixos-install --no-root-password --flake .#${host} |& indent ||
   die "Failed to install NixOS"
 
 # copy log
