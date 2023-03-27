@@ -429,7 +429,7 @@ log "Using '${root_name}' LVM volume"
 # Mount root filesystem
 if ! is_mounted "${root_device}"; then
   log "Mounting '${root_device}'"
-  ${ssh} sudo mount "${root_device}" /mnt |& ident ||
+  ${ssh} sudo mount "${root_device}" /mnt |& indent ||
     die "Failed to mount '${root_device}'"
 fi
 
