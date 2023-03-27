@@ -397,33 +397,53 @@ fi
 
 if ! is_swapon "${swap_device}"; then
   log "Enabling swap '${swap_device}'"
-  ${ssh} sudo swapon "${swap_device}" |& indent
+  ${ssh} sudo swapon "${swap_device}" |& indent ||
+    die "Failed to enable swap '${swap_device}'"
 fi
 
 ## ROOT ##
 # Check root logical volume filesystem
 if ! has_lv "${vg_name}" "${root_name}"; then
   log "Creating '${root_name}' LVM volume"
-  (${ssh} sudo lvcreate --extents 100%FREE --name root ${1} |& indent
-   wait_for "${root_device}") || die "Failed to format '${root_device}'"
+  ${ssh} sudo lvcreate --extents 100%FREE --name "${root_name}" "${vg_name}" |&
+  indent || die "Failed to create '${root_name}' LVM volume"
+  wait_for "${root_device}"
 else
-  log "Using '${root_device}' root partition"
-  if confirm "Re-create '${root_name}' LVM volume"; then
-    really_sure "erase all data on '${root_device}' and re-format it"
+  if confirm "Re-create '${root_name}' LVM volume" &&
+      really_sure "re-create '${root_name}' LVM volume (ALL DATA WILL BE LOST)";
+  then
     log "Re-creating '${root_name}' LVM volume"
     ${ssh} sudo lvremove "${vg_name}/${root_name}" |& indent
     log "Creating '${root_name}' LVM volume"
     (${ssh} sudo lvcreate --extents 100%FREE --name root ${1} |& indent
      wait_for "/dev/mapper/${1}-root") ||
-      die "Failed to re-format '${root_name}'"
+      die "Failed to re-create '${root_name}' LVM volume"
   fi
 fi
 
+log "Using '${root_name}' LVM volume"
+
 # Mount root filesystem
+if ! is_mounted "${root_device}"; then
+  log "Mounting '${root_device}'"
+  ${ssh} sudo mount "${root_device}" /mnt |& ident ||
+    die "Failed to mount '${root_device}'"
+fi
 
 # Mount boot filesystem
+if ! is_mounted "${boot_device}"; then
+  log "Mounting '${boot_device}'"
+  (${ssh} sudo mkdir -p /mnt/boot |& indent
+   ${ssh} sudo mount "${boot_device}" /mnt |& indent) ||
+    die "Failed to mount '${boot_device}'"
+fi
 
 # Turn on swap
+if ! is_swapon "${swap_device}"; then
+  log "Enabling '${swap_device}'"
+  ${ssh} sudo swapon "${swap_device}" |& indent ||
+    die "Failed to enable '${swap_device}'"
+fi
 
 # scp host public key
 
