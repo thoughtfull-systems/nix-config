@@ -381,13 +381,13 @@ if ! has_swap "${vg_name}"; then
   log "Creating 'swap' LVM volume"
   mkswap "${vg_name}"
 else
-  confirm "Re-create 'swap' LVM volume"
-  log "Re-creating 'swap' LVM volume"
-  (ensure_swapoff "${swap_device}"
-   remove_lv "${vg_name}" "swap"
-   ${ssh} sudo lvremove "${vg_name}/swap"
-   ${ssh} mkswap "${vg-name}") ||
-    die "Failed to re-create 'swap' LVM volume"
+  if confirm "Re-create 'swap' LVM volume"; then
+    log "Re-creating 'swap' LVM volume"
+    (ensure_swapoff "${swap_device}"
+     ${ssh} sudo lvremove "${vg_name}/swap"
+     ${ssh} mkswap "${vg-name}") ||
+      die "Failed to re-create 'swap' LVM volume"
+  fi
 fi
 log "Using 'swap' LVM volume"
 
