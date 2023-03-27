@@ -400,13 +400,13 @@ log "Using 'swap' LVM volume"
 # Format swap volume
 if ! is_swap "${swap_device}"; then
   if confirm "Format as swap '${swap_device}'?"; then
-    ${ssh} sudo mkswap -L swap "${swap_device}"
+    ${ssh} sudo mkswap -L swap "${swap_device}" |& indent
   fi
 fi
 
 if ! is_swapon "${swap_device}"; then
   log "Enabling swap '${swap_device}'"
-  ${ssh} sudo swapon ${swap_device}
+  ${ssh} sudo swapon ${swap_device} |& indent
 fi
 
 # Check root logical volume filesystem
