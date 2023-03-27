@@ -328,13 +328,6 @@ else
 fi
 
 ### LUKS DEVICE ###
-ensure_unmounted "${boot_device}"
-ensure_unmounted "${root_device}"
-ensure_swapoff "${swap_device}"
-if has_device "${lvm_device}"; then
-  ${ssh} sudo cryptsetup
-fi
-
 if ! is_luks "${luks_device}"; then
   if confirm "Format as LUKS '${luks_device}'?"; then
     log "Formatting as LUKS '${luks_device}'"
