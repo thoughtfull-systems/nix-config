@@ -257,7 +257,7 @@ function ensure_swapoff {
 # EXT4
 function mkroot {
   log "Creating '${1}-root'"
-  ${ssh} sudo lvcreate --extends 100%FREE --name root ${1} |& indent
+  ${ssh} sudo lvcreate --extents 100%FREE --name root ${1} |& indent
   wait_for "/dev/mapper/${1}-root"
 }
 
