@@ -254,10 +254,6 @@ function ensure_swapoff {
   fi
 }
 
-# EXT4
-function mkroot {
-}
-
 ### SETUP ######################################################################
 # Confirm ssh access to machine
 if ${ssh} : &>/dev/null; then
