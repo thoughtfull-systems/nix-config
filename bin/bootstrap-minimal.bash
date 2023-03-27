@@ -37,6 +37,7 @@ function confirm {
 nix="nix --extra-experimental-features nix-command \
          --extra-experimental-features flakes"
 git="${nix} run nixpkgs#git --"
+agenix="${nix} run github:ryantm/agenix --"
 
 # Verify git working dir is clean
 if output=$(${git} status --porcelain 2>/dev/null) && [[ -z "${output}" ]]; then
@@ -81,6 +82,8 @@ fi
 ip="${2}"
 
 ### VARIABLES ##################################################################
+scriptdir="$(dirname $(realpath ${0}))"
+
 # programs
 ssh="ssh nixos@${ip} -qt"
 file="${nix} run nixpkgs#file -- -sL"
@@ -446,55 +449,29 @@ if ! is_swapon "${swap_device}"; then
 fi
 
 # scp host public key
+${scp} "nixos@${ip}:/etc/ssh/ssh_host_ed25519_key.pub" \
+       "${scriptdir}/../age/keys/bootstrap.pub"
 
 # Re-encrypt secrets
-
-# Create temporary branch?
+pushd "${scriptdir}/../age"
+${agenix} -r -i "decrypt-identity.txt" |& indent
 
 # Commit and push secrets
+# Create temporary branch?
+git add . |& indent
+git commit -m"Bootstrapping ${hostname}" |& indent
+git push |& indent
+popd
 
 # Generate NixOS config
+${ssh} sudo nixos-generate-config --root /mnt |& indent
+${ssh} sudo mv hardware-configuration.nix hosts/${hostname}/ |& indent
+${ssh} sudo git add hosts/${hostname}/hardware-configuration.nix |& indent
 
 # Install NixOS
+log "Installing NixOS..."
+confirm "Continue?"
+sudo nixos-install --no-root-password --flake .#${host} |& indent ||
+  die "Failed to install NixOS"
 
-# - (confirm) format unformatted boot partition, or re-format formatted boot
-# partition?
-
-#   - format boot parition as FAT32
-
-# - (confirm) luksFormat unformatted luks partition, or re-luksFormat formatted
-# luks partition?
-
-# heading "BEGIN bootstrapping $(date)"
-
-# ## Download SSH host public key
-# tempdir=$(mktemp -d)
-# tempfile="${tempdir}/ssh_host_ed25519_key.pub"
-# bootstrapfile="${scriptdir}/../age/keys/bootstrap.pub"
-# log "Copying bootstrap key to ${tempfile}"
-# scp "${scpargs[@]}" "nixos@${ip}:/etc/ssh/ssh_host_ed25519_key.pub" "${tempdir}"
-# if [[ $(cat "${tempfile}") != $(cat "${bootstrapfile}") ]]; then
-#   log "Replacing ${bootstrapfile} with ${tempfile}"
-#   mv "${tempfile}" "${bootstrapfile}"
-
-#   ## Re-key secrets
-#   pushd "${scriptdir}/../age"
-#   nix run "${agenix}" -- -r -i "decrypt-identity.txt"
-#   popd
-
-#   ## Commit and push new secrets
-#   git add "${scriptdir}/../age"
-#   git commit -m"Bootstrapping ${hostname}"
-#   git push
-# else
-#   log "Using ${bootstrapfile} as is"
-#   rm "${tempfile}"
-# fi
-
-# ## SCP bootstrap script
-# scp "${scpargs[@]}" "${scriptdir}/${configscript}" "nixos@${ip}:${configscript}"
-
-# heading "END bootstrapping $(date)"
-
-# ## SSH and execute bootstrap script
-# ssh "${scpargs[@]}" -t "nixos@${ip}" sudo bash "${configscript}" "${hostname}"
+# copy log
