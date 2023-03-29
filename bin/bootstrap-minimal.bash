@@ -478,8 +478,8 @@ if ! is_swapon "${swap_device}"; then
 fi
 
 # scp host public key
-${scp} "nixos@${ip}:/etc/ssh/ssh_host_ed25519_key.pub" \
-       "${scriptdir}/../age/keys/bootstrap.pub"
+scp "nixos@${ip}:/etc/ssh/ssh_host_ed25519_key.pub" \
+    "${scriptdir}/../age/keys/bootstrap.pub"
 
 # Re-encrypt secrets
 pushd "${scriptdir}/../age"
