@@ -472,7 +472,7 @@ fi
 if ! is_mounted "\$(realpath ${boot_device})"; then
   log "Mounting '${boot_device}'"
   (${ssh} sudo mkdir -p /mnt/boot |& indent
-   ${ssh} sudo mount "${boot_device}" /mnt |& indent) ||
+   ${ssh} sudo mount "${boot_device}" /mnt/boot |& indent) ||
     die "Failed to mount '${boot_device}'"
 fi
 
