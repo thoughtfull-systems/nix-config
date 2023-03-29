@@ -132,7 +132,7 @@ function has_partition {
 }
 
 function is_mounted {
-  ${ssh} mount \| grep "\$(realpath ${1})" &>/dev/null
+  ${ssh} mount \| grep \""${1}"\" &>/dev/null
 }
 
 function ensure_unmounted {
