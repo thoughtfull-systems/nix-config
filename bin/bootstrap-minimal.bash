@@ -270,12 +270,6 @@ else
   die "Set up SSH access to '${ip}' (either password or public key)"
 fi
 
-### INSTALL GIT ###
-# nixos-install requires git on the PATH
-if ${ssh} \[\[ ! -x git  \]\]; then
-  ${ssh} sudo nix-env -iA nixos.git
-fi
-
 ### PARTITION TABLE ###
 ${ssh} sudo parted -l |& indent
 
@@ -509,11 +503,18 @@ if [[ ! -e "${scriptdir}/../age/keys/bootstrap.pub" ]]; then
   popd
 fi
 
+### INSTALL GIT ###
+# nixos-install requires git on the PATH
+if ${ssh} \[\[ ! -x git  \]\]; then
+  log "Installing git"
+  ${ssh} sudo nix-env -iA nixos.git
+fi
+
 # checkout repository
 ${ssh} sudo mkdir -p /mnt/etc |& indent
 if ! ${ssh} \[\[ -e /mnt/etc/nixos/ \]\]; then
   log "Cloning repository '${repo}'"
-  ${ssh} sudo ${git} clone ${repo} /mnt/etc/nixos/ |& indent
+  ${ssh} sudo git clone ${repo} /mnt/etc/nixos/ |& indent
 fi
 
 # Generate NixOS config
@@ -524,7 +525,7 @@ ${ssh} sudo mkdir -p "/mnt/etc/nixos/hosts/${hostname}" |& indent
 ${ssh} sudo mv /mnt/etc/nixos/hardware-configuration.nix \
        "/mnt/etc/nixos/hosts/${hostname}/" |& indent
 ${ssh} sudo bash -c cd /mnt/etc/nixos/; \
-  ${git} add hosts/${hostname}/hardware-configuration.nix |&
+  git add hosts/${hostname}/hardware-configuration.nix |&
   indent
 
 # Install NixOS
