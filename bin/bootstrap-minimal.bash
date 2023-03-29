@@ -525,6 +525,7 @@ if (${ssh_nixos} sudo git branch -a | grep "${hostname}") &>/dev/null &&
      confirm "Checkout '${hostname}' branch?"
 then
   log "Checking out '${hostname}' branch"
+  ${ssh_nixos} pwd
   ${ssh_nixos} sudo git checkout ${hostname} |& indent ||
     die "Failed to checkout '${hostname}' branch"
   ${ssh_nixos} sudo git pull
