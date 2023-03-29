@@ -505,7 +505,7 @@ popd
 
 # checkout repository
 log "Cloning repository"
-mkdir -p /mnt/etc
+${ssh} mkdir -p /mnt/etc
 if ! ${ssh} \[\[ -e /mnt/etc/nixos/ \]\]; then
   ${ssh} ${git} clone ${repo} /mnt/etc/nixos/
 fi
