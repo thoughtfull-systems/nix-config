@@ -522,7 +522,7 @@ ${ssh} sudo ${git} add hosts/${hostname}/hardware-configuration.nix |& indent
 # Install NixOS
 log "Installing NixOS..."
 confirm "Continue?"
-${ssh} sudo nixos-install --no-root-password --flake .#${host} |& indent ||
+${ssh} sudo nixos-install --no-root-password --flake .#${hostname} |& indent ||
   die "Failed to install NixOS"
 
 # copy log
