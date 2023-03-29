@@ -79,16 +79,16 @@ else
   pull_latest
 fi
 ### SCRIPT IS RELOADED #########################################################
+scriptdir="$(dirname $(realpath ${0}))"
 
 # Validate ip argument
 ([[ -v 2 ]] && (ping -c1 "${2}" &>/dev/null)) ||
   die "Expected IP address as second argument"
 ip="${2}"
 
-### VARIABLES ##################################################################
-scriptdir="$(dirname $(realpath ${0}))"
-repo="https://github.com/thoughtfull-systems/nix-config"
+repo="${3:-https://github.com/thoughtfull-systems/nix-config}"
 
+### VARIABLES ##################################################################
 # programs
 ssh="ssh nixos@${ip} -qt"
 file="${nix} run nixpkgs#file -- -sL"
@@ -484,24 +484,24 @@ if ! is_swapon "${swap_device}"; then
 fi
 
 # scp host public key
-log "Copying host public key"
-scp "nixos@${ip}:/etc/ssh/ssh_host_ed25519_key.pub" \
-    "${scriptdir}/../age/keys/bootstrap.pub"
+if [[ ! -e "${scriptdr}/../age/keys/bootstrap.pub" ]]; then
+  log "Copying host public key"
+  scp "nixos@${ip}:/etc/ssh/ssh_host_ed25519_key.pub" \
+      "${scriptdir}/../age/keys/bootstrap.pub"
 
-# Re-encrypt secrets
-log "Re-encrpting secrets"
-pushd "${scriptdir}/../age"
-${agenix} -r -i "decrypt-identity.txt" |& indent
+  # Re-encrypt secrets
+  log "Re-encrpting secrets"
+  pushd "${scriptdir}/../age"
+  ${agenix} -r -i "decrypt-identity.txt" |& indent
 
-# Commit and push secrets
-# Create temporary branch?
-if ! is_git_clean; then
+  # Commit and push secrets
+  # Create temporary branch?
   log "Commit and push secrets"
   git add . |& indent
   git commit -m"Bootstrapping ${hostname}" |& indent
   git push |& indent
+  popd
 fi
-popd
 
 # checkout repository
 log "Cloning repository"
