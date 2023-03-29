@@ -524,18 +524,18 @@ log "Copy hardware config"
 ${ssh} sudo mkdir -p "/mnt/etc/nixos/hosts/${hostname}" |& indent
 ${ssh} sudo mv /mnt/etc/nixos/hardware-configuration.nix \
        "/mnt/etc/nixos/hosts/${hostname}/" |& indent
-${ssh} sudo cd /mnt/etc/nixos/\; \
+${ssh} sudo -D /mnt/etc/nixos/ \
        git add hosts/${hostname}/hardware-configuration.nix |&
 indent
 
 # Install NixOS
 log "Installing NixOS..."
 confirm "Continue?"
-${ssh} sudo cd /mnt/etc/nixos\; \
-  nixos-install \
-    --no-root-password \
-    --flake .#${hostname} |& \
+${ssh} sudo -D /mnt/etc/nixos \
+       nixos-install \
+       --no-root-password \
+       --flake .#${hostname} |& \
   indent ||
-    die "Failed to install NixOS"
+  die "Failed to install NixOS"
 
 # copy log
