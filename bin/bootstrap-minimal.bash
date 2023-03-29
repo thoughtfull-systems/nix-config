@@ -502,6 +502,10 @@ if ! is_git_clean; then
 fi
 popd
 
+# checkout repository
+log "Cloning repository"
+${ssh} ${git} clone ${repo} /mnt/etc/nixos/
+
 # Generate NixOS config
 log "Generate NixOS config"
 ${ssh} sudo nixos-generate-config --root /mnt |& indent
