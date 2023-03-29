@@ -510,11 +510,27 @@ if ${ssh} \[\[ ! -x git  \]\]; then
   ${ssh} sudo nix-env -iA nixos.git
 fi
 
-# checkout repository
+# clone repository
 ${ssh} sudo mkdir -p /mnt/etc |& indent
 if ! ${ssh} \[\[ -e /mnt/etc/nixos/ \]\]; then
   log "Cloning repository '${repo}'"
   ${ssh} sudo git clone ${repo} /mnt/etc/nixos/ |& indent
+fi
+
+ssh_nixos="${ssh} cd /mnt/etc/nixos\;"
+# checkout host branch
+if (${ssh_nixos} sudo git branch -a | grep "${hostname}") &>/dev/null &&
+     [[ ! $(${ssh_nixos} sudo git branch --show-current 2>/dev/null) = \
+          "${hostname}" ]] &&
+     confirm "Checkout '${hostname}' branch?"
+then
+  log "Checking out '${hostname}' branch"
+  ${ssh_nixos} sudo git checkout ${hostname} |& indent ||
+    die "Failed to checkout '${hostname}' branch"
+  ${ssh_nixos} sudo git pull
+else
+  log "Remaining on current branch"
+  ${ssh_nixos} sudo git pull
 fi
 
 # Generate NixOS config
@@ -524,15 +540,13 @@ log "Copy hardware config"
 ${ssh} sudo mkdir -p "/mnt/etc/nixos/hosts/${hostname}" |& indent
 ${ssh} sudo mv /mnt/etc/nixos/hardware-configuration.nix \
        "/mnt/etc/nixos/hosts/${hostname}/" |& indent
-${ssh} cd /mnt/etc/nixos\; \
-       sudo git add hosts/${hostname}/hardware-configuration.nix |&
+${ssh_nixos} sudo git add hosts/${hostname}/hardware-configuration.nix |&
 indent
 
 # Install NixOS
 log "Installing NixOS..."
 confirm "Continue?"
-${ssh} cd /mnt/etc/nixos\; \
-       sudo nixos-install --no-root-password --flake .#${hostname} |& \
+${ssh_nixos} sudo nixos-install --no-root-password --flake .#${hostname} |& \
   indent ||
   die "Failed to install NixOS"
 
