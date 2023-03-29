@@ -434,7 +434,7 @@ if ! is_ext4 "${root_device}"; then
     ensure_unmounted "${boot_device}"
     ensure_unmounted "${root_device}"
     log "Formatting as ext4 '${root_device}'"
-    ${ssh} sudo mkfs.ext4 -L "${root_device}" |& indent ||
+    ${ssh} sudo mkfs.ext4 -L "${root_name}" "${root_device}" |& indent ||
       die "Failed to format as ext4 '${root_device}'"
   fi
 else
@@ -444,7 +444,7 @@ else
     ensure_unmounted "${boot_device}"
     ensure_unmounted "${root_device}"
     log "Re-formatting as ext4 '${root_device}'"
-    ${ssh} sudo mkfs.ext4 -L "${root_device}" |& indent ||
+    ${ssh} sudo mkfs.ext4 -L "${root_name}" "${root_device}" |& indent ||
       die "Failed to re-format as ext4 '${root_device}'"
   fi
 fi
