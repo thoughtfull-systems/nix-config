@@ -505,16 +505,16 @@ fi
 
 # checkout repository
 log "Cloning repository"
-${ssh} mkdir -p /mnt/etc
+${ssh} sudo mkdir -p /mnt/etc |& indent
 if ! ${ssh} \[\[ -e /mnt/etc/nixos/ \]\]; then
-  ${ssh} ${git} clone ${repo} /mnt/etc/nixos/
+  ${ssh} sudo ${git} clone ${repo} /mnt/etc/nixos/ |& indent
 fi
 
 # Generate NixOS config
 log "Generate NixOS config"
 ${ssh} sudo nixos-generate-config --root /mnt |& indent
 log "Copy hardware config"
-${ssh} mkdir -p "/etc/nixos/hosts/${hostname}"
+${ssh} mkdir -p "/etc/nixos/hosts/${hostname}" |& indent
 ${ssh} sudo mv /mnt/etc/nixos/hardware-configuration.nix \
        "/mnt/etc/nixos/hosts/${hostname}/" |& indent
 ${ssh} sudo git add hosts/${hostname}/hardware-configuration.nix |& indent
