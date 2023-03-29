@@ -34,13 +34,17 @@ function confirm {
   fi
 }
 
+function is_git_clean {
+  output=$(${git} status --porcelain 2>/dev/null) && [[ -z "${output}" ]]
+}
+
+
 nix="nix --extra-experimental-features nix-command \
          --extra-experimental-features flakes"
 git="${nix} run nixpkgs#git --"
-agenix="${nix} run github:ryantm/agenix --"
 
 # Verify git working dir is clean
-if output=$(${git} status --porcelain 2>/dev/null) && [[ -z "${output}" ]]; then
+if is_git_clean; then
   log "Working directory is clean"
 else
   die "Working directory is dirty"
@@ -87,6 +91,7 @@ scriptdir="$(dirname $(realpath ${0}))"
 # programs
 ssh="ssh nixos@${ip} -qt"
 file="${nix} run nixpkgs#file -- -sL"
+agenix="${nix} run github:ryantm/agenix --"
 
 # devices
 boot_name="${hostname}-boot"
@@ -489,10 +494,12 @@ ${agenix} -r -i "decrypt-identity.txt" |& indent
 
 # Commit and push secrets
 # Create temporary branch?
-log "Commit and push secrets"
-git add . |& indent
-git commit -m"Bootstrapping ${hostname}" |& indent
-git push |& indent
+if ! is_git_clean; then
+  log "Commit and push secrets"
+  git add . |& indent
+  git commit -m"Bootstrapping ${hostname}" |& indent
+  git push |& indent
+fi
 popd
 
 # Generate NixOS config
