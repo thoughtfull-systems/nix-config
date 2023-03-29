@@ -506,7 +506,8 @@ popd
 log "Generate NixOS config"
 ${ssh} sudo nixos-generate-config --root /mnt |& indent
 log "Copy hardware config"
-${ssh} sudo mv hardware-configuration.nix hosts/${hostname}/ |& indent
+${ssh} sudo mv /mnt/etc/nixos/hardware-configuration.nix \
+       "/mnt/etc/nixos/hosts/${hostname}/" |& indent
 ${ssh} sudo git add hosts/${hostname}/hardware-configuration.nix |& indent
 
 # Install NixOS
