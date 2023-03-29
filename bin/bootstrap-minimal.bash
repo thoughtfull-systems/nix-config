@@ -87,6 +87,7 @@ ip="${2}"
 
 ### VARIABLES ##################################################################
 scriptdir="$(dirname $(realpath ${0}))"
+repo="https://github.com/thoughtfull-systems/nix-config"
 
 # programs
 ssh="ssh nixos@${ip} -qt"
@@ -504,7 +505,10 @@ popd
 
 # checkout repository
 log "Cloning repository"
-${ssh} ${git} clone ${repo} /mnt/etc/nixos/
+mkdir -p /mnt/etc
+if ! ${ssh} \[\[ -e /mnt/etc/nixos/ \]\]; then
+  ${ssh} ${git} clone ${repo} /mnt/etc/nixos/
+fi
 
 # Generate NixOS config
 log "Generate NixOS config"
