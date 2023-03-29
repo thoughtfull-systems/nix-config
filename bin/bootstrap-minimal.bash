@@ -504,9 +504,9 @@ if [[ ! -e "${scriptdir}/../age/keys/bootstrap.pub" ]]; then
 fi
 
 # checkout repository
-log "Cloning repository '${repo}'"
 ${ssh} sudo mkdir -p /mnt/etc |& indent
 if ! ${ssh} \[\[ -e /mnt/etc/nixos/ \]\]; then
+  log "Cloning repository '${repo}'"
   ${ssh} sudo ${git} clone ${repo} /mnt/etc/nixos/ |& indent
 fi
 
