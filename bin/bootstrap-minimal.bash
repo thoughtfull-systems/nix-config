@@ -518,7 +518,7 @@ ${ssh} sudo mkdir -p "/mnt/etc/nixos/hosts/${hostname}" |& indent
 ${ssh} sudo mv /mnt/etc/nixos/hardware-configuration.nix \
        "/mnt/etc/nixos/hosts/${hostname}/" |& indent
 ${ssh} sudo bash -c cd /mnt/etc/nixos/; \
-  ${git} add /mnt/etc/nixos/hosts/${hostname}/hardware-configuration.nix |&
+  ${git} add hosts/${hostname}/hardware-configuration.nix |&
   indent
 
 # Install NixOS
