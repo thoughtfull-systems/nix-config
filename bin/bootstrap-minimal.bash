@@ -517,7 +517,7 @@ log "Copy hardware config"
 ${ssh} sudo mkdir -p "/mnt/etc/nixos/hosts/${hostname}" |& indent
 ${ssh} sudo mv /mnt/etc/nixos/hardware-configuration.nix \
        "/mnt/etc/nixos/hosts/${hostname}/" |& indent
-${ssh} sudo git add hosts/${hostname}/hardware-configuration.nix |& indent
+${ssh} sudo ${git} add hosts/${hostname}/hardware-configuration.nix |& indent
 
 # Install NixOS
 log "Installing NixOS..."
