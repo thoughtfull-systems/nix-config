@@ -484,7 +484,7 @@ if ! is_swapon "${swap_device}"; then
 fi
 
 # scp host public key
-if [[ ! -e "${scriptdr}/../age/keys/bootstrap.pub" ]]; then
+if [[ ! -e "${scriptdir}/../age/keys/bootstrap.pub" ]]; then
   log "Copying host public key"
   scp "nixos@${ip}:/etc/ssh/ssh_host_ed25519_key.pub" \
       "${scriptdir}/../age/keys/bootstrap.pub"
@@ -504,7 +504,7 @@ if [[ ! -e "${scriptdr}/../age/keys/bootstrap.pub" ]]; then
 fi
 
 # checkout repository
-log "Cloning repository"
+log "Cloning repository '${repo}'"
 ${ssh} sudo mkdir -p /mnt/etc |& indent
 if ! ${ssh} \[\[ -e /mnt/etc/nixos/ \]\]; then
   ${ssh} sudo ${git} clone ${repo} /mnt/etc/nixos/ |& indent
