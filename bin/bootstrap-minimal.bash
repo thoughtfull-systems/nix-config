@@ -264,7 +264,7 @@ function is_ext4() {
 
 ### SETUP ######################################################################
 # Confirm ssh access to machine
-if ${ssh} : &>/dev/null; then
+if ${ssh} : 1>/dev/null; then
   log "Confirmed SSH access to machine"
 else
   die "Set up SSH access to '${ip}' (either password or public key)"
@@ -311,7 +311,7 @@ if ! is_fat32 "${boot_device}"; then
   if confirm "Format as FAT32 '${boot_device}'?"; then
     ensure_unmounted "${boot_device}"
     log "Formatting as FAT32 '${boot_device}'"
-    ${ssh} sudo mkfs.fat -F 32 "${1}" -n BOOT |& indent ||
+    ${ssh} sudo mkfs.fat -F 32 -n BOOT "${boot_device}" |& indent ||
       die "Failed to format as FAT32 '${boot_device}'"
   fi
 else
@@ -320,7 +320,7 @@ else
   then
     ensure_unmounted "${boot_device}"
     log "Re-formatting as FAT32 '${boot_device}'"
-    ${ssh} sudo mkfs.fat -F 32 "${1}" -n BOOT |& indent ||
+    ${ssh} sudo mkfs.fat -F 32 -n BOOT "${boot_device}" |& indent ||
       die "Failed to re-format as FAT32 '${boot_device}'"
   fi
 fi
