@@ -270,6 +270,12 @@ else
   die "Set up SSH access to '${ip}' (either password or public key)"
 fi
 
+### INSTALL GIT ###
+# nixos-install requires git on the PATH
+if ${ssh} \[\[ ! -x git  \]\]; then
+  ${ssh} sudo nix-env -iA nixos.git
+fi
+
 ### PARTITION TABLE ###
 ${ssh} sudo parted -l |& indent
 
