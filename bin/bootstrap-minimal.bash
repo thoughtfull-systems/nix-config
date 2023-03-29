@@ -531,7 +531,9 @@ indent
 # Install NixOS
 log "Installing NixOS..."
 confirm "Continue?"
-${ssh} sudo nixos-install --no-root-password --flake /mnt/etc/nixos#${hostname} |& indent ||
+${ssh} cd /mnt/etc/nixos\; \
+       sudo nixos-install --no-root-password --flake .#${hostname} |& \
+  indent ||
   die "Failed to install NixOS"
 
 # copy log
