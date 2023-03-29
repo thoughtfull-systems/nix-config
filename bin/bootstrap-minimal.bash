@@ -478,22 +478,27 @@ if ! is_swapon "${swap_device}"; then
 fi
 
 # scp host public key
+log "Copying host public key"
 scp "nixos@${ip}:/etc/ssh/ssh_host_ed25519_key.pub" \
     "${scriptdir}/../age/keys/bootstrap.pub"
 
 # Re-encrypt secrets
+log "Re-encrpting secrets"
 pushd "${scriptdir}/../age"
 ${agenix} -r -i "decrypt-identity.txt" |& indent
 
 # Commit and push secrets
 # Create temporary branch?
+log "Commit and push secrets"
 git add . |& indent
 git commit -m"Bootstrapping ${hostname}" |& indent
 git push |& indent
 popd
 
 # Generate NixOS config
+log "Generate NixOS config"
 ${ssh} sudo nixos-generate-config --root /mnt |& indent
+log "Copy hardware config"
 ${ssh} sudo mv hardware-configuration.nix hosts/${hostname}/ |& indent
 ${ssh} sudo git add hosts/${hostname}/hardware-configuration.nix |& indent
 
