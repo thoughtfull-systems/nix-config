@@ -262,6 +262,10 @@ function is_ext4() {
   ${ssh} sudo ${file} -sL "${1}" | grep "ext4 filesystem" &>/dev/null
 }
 
+function is_partitioned {
+  [[ ${partitioned} -eq 0 ]]
+}
+
 ### SETUP ######################################################################
 # Confirm ssh access to machine
 if ${ssh} : 1>/dev/null; then
@@ -274,14 +278,15 @@ fi
 ${ssh} sudo parted -l |& indent
 
 # Create new partition table?
-is_partitioned=confirm "Create new partition table (ALL DATA WILL BE LOST)?"
-if $is_partitioned; then
+partitioned=1
+if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
   ask "Partition which disk?" disk
   while ! ${ssh} sudo parted -s "${disk}" print &>/dev/null; do
     ask "'${disk}' does not exist; partition which disk?" disk
   done
 
-  if is_partitioned=(really_sure "erase and partition '${disk}'"); then
+  if really_sure "erase and partition '${disk}'"; then
+    partitioned=0
     # TODO: make specific functions?
     ensure_unmounted "${boot_device}"
     ensure_unmounted "${root_device}"
@@ -309,9 +314,9 @@ has_partition "${boot_name}" || die "Missing boot partition '${boot_name}'"
 has_partition "${luks_name}" || die "Missing LUKS partition '${luks_name}'"
 
 ### BOOT DEVICE ###
-if ($is_partitioned || ! is_fat32 "${boot_device}") &&
+if (is_partitioned || ! is_fat32 "${boot_device}") &&
      confirm "Format as FAT32 '${boot_device}'?" &&
-     (! $is_partitioned ||
+     (! is_partitioned ||
         really_sure "format as FAT32 '${boot_device}' (ALL DATA WILL BE LOST)")
 then
   ensure_unmounted "${boot_device}"
@@ -327,34 +332,32 @@ else
 fi
 
 ### LUKS DEVICE ###
-if ! is_luks "${luks_device}"; then
-  if confirm "Format as LUKS '${luks_device}'?"; then
-    log "Formatting as LUKS '${luks_device}'"
-    format_luks "${luks_device}" "${lvm_name}" ||
-      die "Failed to format as LUKS '${luks_device}'"
-  fi
-else
-  if confirm "Re-format as LUKS '${luks_device}'?" &&
-      really_sure "re-format as LUKS '${luks_device}' (ALL DATA WILL BE LOST)";
-  then
-    ensure_unmounted "${boot_device}"
-    ensure_unmounted "${root_device}"
-    ensure_lv_removed "${vg_name}" "${root_name}"
-    ensure_swapoff "${swap_device}"
-    ensure_lv_removed "${vg_name}" "${swap_name}"
-    ensure_vg_removed "${vg_name}"
-    ensure_pv_removed "${luks_device}"
-    ensure_luks_closed "${lvm_device}"
-    log "Re-formatting as LUKS '${luks_device}'"
-    format_luks "${luks_device}" "${lvm_name}" ||
-      die "Failed to re-format as LUKS '${luks_device}'"
-  fi
+if (is_partitioned || ! is_luks "${luks_device}") &&
+     confirm "Format as LUKS '${luks_device}'?" &&
+     (! is_partitioned ||
+        really_sure "format as LUKS '${luks_device}' (ALL DATA WILL BE LOST)")
+then
+  ensure_unmounted "${boot_device}"
+  ensure_unmounted "${root_device}"
+  ensure_lv_removed "${vg_name}" "${root_name}"
+  ensure_swapoff "${swap_device}"
+  ensure_lv_removed "${vg_name}" "${swap_name}"
+  ensure_vg_removed "${vg_name}"
+  ensure_pv_removed "${luks_device}"
+  ensure_luks_closed "${lvm_device}"
+  log "Formatting as LUKS '${luks_device}'"
+  format_luks "${luks_device}" "${lvm_name}" ||
+    die "Failed to format as LUKS '${luks_device}'"
 fi
 
-if ! has_device "${lvm_device}"; then
+if is_luks "${luks_device}" &&
+    ! has_device "${lvm_device}"
+then
   log "Using LUKS device '${luks_device}'"
   ask_no_echo "Please enter your passphrase:" PASS
   open_luks "${luks_device}" "${lvm_name}" "${PASS}"
+else
+  die "Unsuitable LUKS device '${luks_device}'"
 fi
 
 ### LVM ###
@@ -378,82 +381,59 @@ fi
 
 ## SWAP ##
 # Create swap LVM volume
-if ! has_lv "${vg_name}" "${swap_name}"; then
+if is_partitioned || ! has_lv "${vg_name}" "${swap_name}"; then
   log "Creating '${swap_name}' LVM volume"
-  mkswap "${vg_name}" "${swap_name}" ||
-    die "Failed to re-create '${swap_name}' LVM volume"
-else
-  if confirm "Re-create '${swap_name}' LVM volume"; then
-    log "Re-creating '${swap_name}' LVM volume"
-    ensure_swapoff "${swap_device}"
-    ensure_lv_removed "${vg_name}" "${swap_name}"
-    mkswap "${vg-name}" "${swap_name}" ||
-      die "Failed to re-create '${swap_name}' LVM volume"
-  fi
+  ensure_swapoff "${swap_device}"
+  ensure_lv_removed "${vg_name}" "${swap_name}"
+  mkswap "${vg-name}" "${swap_name}" ||
+    die "Failed to create '${swap_name}' LVM volume"
 fi
-log "Using '${swap_name}' LVM volume"
 
 # Format swap volume
-if ! is_swap "${swap_device}"; then
-  if confirm "Format as swap '${swap_device}'?"; then
-    log "Formatting as swap '${swap_device}'"
-    ensure_swapoff "${swap_device}"
-    ${ssh} sudo mkswap -L "${swap_name}" "${swap_device}" |& indent ||
-      die "Failed to format as swap '${swap_device}'"
-  fi
+if is_partitioned ||
+    (! is_swap "${swap_device}" &&
+       confirm "Format as swap '${swap_device}'?")
+then
+  log "Formatting as swap '${swap_device}'"
+  ensure_swapoff "${swap_device}"
+  ${ssh} sudo mkswap -L "${swap_name}" "${swap_device}" |& indent ||
+    die "Failed to format as swap '${swap_device}'"
 fi
 
-if ! is_swapon "${swap_device}"; then
+if has_lv "${vg_name}" "${swap_name}" &&
+    is_swap "${swap_device}"; then
+  log "Using '${swap_name}' LVM volume"
   log "Enabling swap '${swap_device}'"
   ${ssh} sudo swapon "${swap_device}" |& indent ||
     die "Failed to enable swap '${swap_device}'"
+else
+  die "Unsuitable swap volume ${swap_name}"
 fi
 
 ## ROOT ##
 # Check root logical volume filesystem
-if ! has_lv "${vg_name}" "${root_name}"; then
+if is_partitioned || ! has_lv "${vg_name}" "${root_name}"; then
   log "Creating '${root_name}' LVM volume"
-  ${ssh} sudo lvcreate --extents 100%FREE --name "${root_name}" "${vg_name}" |&
-  indent || die "Failed to create '${root_name}' LVM volume"
-  wait_for "${root_device}"
-else
-  if confirm "Re-create '${root_name}' LVM volume" &&
-      really_sure "re-create '${root_name}' LVM volume (ALL DATA WILL BE LOST)";
-  then
-    log "Re-creating '${root_name}' LVM volume"
-    ${ssh} sudo lvremove "${vg_name}/${root_name}" |& indent
-    log "Creating '${root_name}' LVM volume"
-    (${ssh} sudo lvcreate --extents 100%FREE --name root ${1} |& indent
-     wait_for "/dev/mapper/${1}-root") ||
-      die "Failed to re-create '${root_name}' LVM volume"
-  fi
+  ensure_unmounted "${root_device}"
+  ensure_lv_removed "${vg_name}" "${root_name}"
+  log "Creating '${root_name}' LVM volume"
+  (${ssh} sudo lvcreate --extents 100%FREE --name root ${1} |& indent
+   wait_for "/dev/mapper/${vg_name}-root") ||
+    die "Failed to create '${root_name}' LVM volume"
 fi
 
 # format root
-if ! is_ext4 "${root_device}"; then
-  if confirm "Format as ext4 '${root_device}'"; then
-    ensure_unmounted "${boot_device}"
-    ensure_unmounted "${root_device}"
-    log "Formatting as ext4 '${root_device}'"
-    ${ssh} sudo mkfs.ext4 -L "${root_name}" "${root_device}" |& indent ||
-      die "Failed to format as ext4 '${root_device}'"
-  fi
-else
-  if confirm "Re-format as ext4 '${root_device}'" &&
-      really_sure "re-format as ext4 '${root_device}' (ALL DATA WILL BE LOST"
-  then
-    ensure_unmounted "${boot_device}"
-    ensure_unmounted "${root_device}"
-    log "Re-formatting as ext4 '${root_device}'"
-    ${ssh} sudo mkfs.ext4 -L "${root_name}" "${root_device}" |& indent ||
-      die "Failed to re-format as ext4 '${root_device}'"
-  fi
-fi
-
-if is_ext4 "${root_device}"; then
+if is_partitioned ||
+    (! is_ext4 "${root_device}" &&
+       confirm "Format as ext4 '${root_device}'")
+then
   log "Using root LVM volume '${root_name}'"
+  ensure_unmounted "${root_device}"
+  log "Formatting as ext4 '${root_device}'"
+  ${ssh} sudo mkfs.ext4 -L "${root_name}" "${root_device}" |& indent ||
+    die "Failed to format as ext4 '${root_device}'"
 else
-  die "Unsuitable root LVM volume '${root_name}'"
+  log "Unsuitable root LVM volume '${root_name}'"
 fi
 
 # Mount root filesystem
@@ -469,13 +449,6 @@ if ! is_mounted "\$(realpath ${boot_device})"; then
   (${ssh} sudo mkdir -p /mnt/boot |& indent
    ${ssh} sudo mount "${boot_device}" /mnt/boot |& indent) ||
     die "Failed to mount '${boot_device}'"
-fi
-
-# Turn on swap
-if ! is_swapon "${swap_device}"; then
-  log "Enabling '${swap_device}'"
-  ${ssh} sudo swapon "${swap_device}" |& indent ||
-    die "Failed to enable '${swap_device}'"
 fi
 
 # scp host public key
@@ -506,8 +479,8 @@ if ${ssh} \[\[ ! -x git  \]\]; then
 fi
 
 # clone repository
-${ssh} sudo mkdir -p /mnt/etc |& indent
 if ! ${ssh} \[\[ -e /mnt/etc/nixos/ \]\]; then
+  ${ssh} sudo mkdir -p /mnt/etc |& indent
   log "Cloning repository '${repo}'"
   ${ssh} sudo git clone ${repo} /mnt/etc/nixos/ |& indent
 fi
@@ -520,7 +493,6 @@ if (${ssh_nixos} sudo git branch -a | grep "${hostname}") &>/dev/null &&
      confirm "Checkout '${hostname}' branch?"
 then
   log "Checking out '${hostname}' branch"
-  ${ssh_nixos} pwd
   ${ssh_nixos} sudo git checkout ${hostname} |& indent ||
     die "Failed to checkout '${hostname}' branch"
   ${ssh_nixos} sudo git pull
