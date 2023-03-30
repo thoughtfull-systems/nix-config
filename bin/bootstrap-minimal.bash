@@ -274,13 +274,15 @@ fi
 ${ssh} sudo parted -l |& indent
 
 # Create new partition table?
-if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
+if is_partitioned=confirm "Create new partition table (ALL DATA WILL BE LOST)?"
+then
   ask "Partition which disk?" disk
   while ! ${ssh} sudo parted -s "${disk}" print &>/dev/null; do
     ask "'${disk}' does not exist; partition which disk?" disk
   done
 
-  if really_sure "erase and partition '${disk}'"; then
+  if is_partitioned=really_sure "erase and partition '${disk}'"; then
+    # TODO: make specific functions?
     ensure_unmounted "${boot_device}"
     ensure_unmounted "${root_device}"
     ensure_lv_removed "${vg_name}" "${root_name}"
@@ -307,22 +309,15 @@ has_partition "${boot_name}" || die "Missing boot partition '${boot_name}'"
 has_partition "${luks_name}" || die "Missing LUKS partition '${luks_name}'"
 
 ### BOOT DEVICE ###
-if ! is_fat32 "${boot_device}"; then
-  if confirm "Format as FAT32 '${boot_device}'?"; then
-    ensure_unmounted "${boot_device}"
-    log "Formatting as FAT32 '${boot_device}'"
-    ${ssh} sudo mkfs.fat -F 32 -n BOOT "${boot_device}" |& indent ||
-      die "Failed to format as FAT32 '${boot_device}'"
-  fi
-else
-  if confirm "Re-format as FAT32 '${boot_device}'?" &&
-      really_sure "re-format as FAT32 '${boot_device}' (ALL DATA WILL BE LOST)";
-  then
-    ensure_unmounted "${boot_device}"
-    log "Re-formatting as FAT32 '${boot_device}'"
-    ${ssh} sudo mkfs.fat -F 32 -n BOOT "${boot_device}" |& indent ||
-      die "Failed to re-format as FAT32 '${boot_device}'"
-  fi
+if ($is_partitioned || ! is_fat32 "${boot_device}") &&
+     confirm "Format as FAT32 '${boot_device}'?" &&
+     (! $is_partitioned ||
+        really_sure "format as FAT32 '${boot_device}' (ALL DATA WILL BE LOST)")
+then
+  ensure_unmounted "${boot_device}"
+  log "Formatting as FAT32 '${boot_device}'"
+  ${ssh} sudo mkfs.fat -F 32 -n BOOT "${boot_device}" |& indent ||
+    die "Failed to format as FAT32 '${boot_device}'"
 fi
 
 if is_fat32 "${boot_device}"; then
