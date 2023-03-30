@@ -274,7 +274,7 @@ fi
 ${ssh} sudo parted -l |& indent
 
 # Create new partition table?
-is_partitioned="confirm \"Create new partition table (ALL DATA WILL BE LOST)?\"
+is_partitioned="confirm \"Create new partition table (ALL DATA WILL BE LOST)?\""
 if $is_partitioned; then
   ask "Partition which disk?" disk
   while ! ${ssh} sudo parted -s "${disk}" print &>/dev/null; do
