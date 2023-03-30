@@ -350,12 +350,12 @@ then
     die "Failed to format as LUKS '${luks_device}'"
 fi
 
-if is_luks "${luks_device}" &&
-    ! has_device "${lvm_device}"
-then
+if is_luks "${luks_device}"; then
   log "Using LUKS device '${luks_device}'"
-  ask_no_echo "Please enter your passphrase:" PASS
-  open_luks "${luks_device}" "${lvm_name}" "${PASS}"
+  if ! has_device "${luks_device}" ; then
+    ask_no_echo "Please enter your passphrase:" PASS
+    open_luks "${luks_device}" "${lvm_name}" "${PASS}"
+  fi
 else
   die "Unsuitable LUKS device '${luks_device}'"
 fi
