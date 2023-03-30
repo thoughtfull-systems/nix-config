@@ -385,7 +385,7 @@ if is_partitioned || ! has_lv "${vg_name}" "${swap_name}"; then
   log "Creating '${swap_name}' LVM volume"
   ensure_swapoff "${swap_device}"
   ensure_lv_removed "${vg_name}" "${swap_name}"
-  mkswap "${vg-name}" "${swap_name}" ||
+  mkswap "${vg_name}" "${swap_name}" ||
     die "Failed to create '${swap_name}' LVM volume"
 fi
 
