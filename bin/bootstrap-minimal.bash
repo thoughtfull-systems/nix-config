@@ -274,14 +274,14 @@ fi
 ${ssh} sudo parted -l |& indent
 
 # Create new partition table?
-if is_partitioned=confirm "Create new partition table (ALL DATA WILL BE LOST)?"
-then
+is_partitioned=(confirm "Create new partition table (ALL DATA WILL BE LOST)?")
+if $is_partitioned; then
   ask "Partition which disk?" disk
   while ! ${ssh} sudo parted -s "${disk}" print &>/dev/null; do
     ask "'${disk}' does not exist; partition which disk?" disk
   done
 
-  if is_partitioned=really_sure "erase and partition '${disk}'"; then
+  if is_partitioned=(really_sure "erase and partition '${disk}'"); then
     # TODO: make specific functions?
     ensure_unmounted "${boot_device}"
     ensure_unmounted "${root_device}"
