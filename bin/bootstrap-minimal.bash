@@ -534,6 +534,13 @@ else
   ${ssh_nixos} sudo git pull
 fi
 
+if ${ssh} \[\[ ! -f /mnt/tmp/bootstrap.key \]\]; then
+  log "Copying ssh host key to '/mnt/tmp/bootstrap.key'"
+  ${ssh} sudo cp /etc/ssh/ssh_host_ed25519_key /mnt/tmp/bootstrap.key
+else
+  log "Using existing '/mnt/tmp/bootstrap.key'"
+fi
+
 # Generate NixOS config
 log "Generate NixOS config"
 ${ssh} sudo nixos-generate-config --root /mnt |& indent
