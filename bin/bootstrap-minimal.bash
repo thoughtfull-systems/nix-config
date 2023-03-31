@@ -262,7 +262,7 @@ function is_ext4() {
   ${ssh} sudo ${file} -sL "${1}" | grep "ext4 filesystem" &>/dev/null
 }
 
-function is_partitioned {
+function was_partitioned {
   [[ ${partitioned} -eq 0 ]]
 }
 
@@ -314,9 +314,9 @@ has_partition "${boot_name}" || die "Missing boot partition '${boot_name}'"
 has_partition "${luks_name}" || die "Missing LUKS partition '${luks_name}'"
 
 ### BOOT DEVICE ###
-if (is_partitioned || ! is_fat32 "${boot_device}") &&
+if (was_partitioned || ! is_fat32 "${boot_device}") &&
      confirm "Format as FAT32 '${boot_device}'?" &&
-     (! is_partitioned ||
+     (! was_partitioned ||
         really_sure "format as FAT32 '${boot_device}' (ALL DATA WILL BE LOST)")
 then
   ensure_unmounted "${boot_device}"
@@ -332,9 +332,9 @@ else
 fi
 
 ### LUKS DEVICE ###
-if (is_partitioned || ! is_luks "${luks_device}") &&
+if (was_partitioned || ! is_luks "${luks_device}") &&
      confirm "Format as LUKS '${luks_device}'?" &&
-     (! is_partitioned ||
+     (! was_partitioned ||
         really_sure "format as LUKS '${luks_device}' (ALL DATA WILL BE LOST)")
 then
   ensure_unmounted "${boot_device}"
@@ -381,7 +381,7 @@ fi
 
 ## SWAP ##
 # Create swap LVM volume
-if is_partitioned || ! has_lv "${vg_name}" "${swap_name}"; then
+if was_partitioned || ! has_lv "${vg_name}" "${swap_name}"; then
   log "Creating '${swap_name}' LVM volume"
   ensure_swapoff "${swap_device}"
   ensure_lv_removed "${vg_name}" "${swap_name}"
@@ -390,7 +390,7 @@ if is_partitioned || ! has_lv "${vg_name}" "${swap_name}"; then
 fi
 
 # Format swap volume
-if is_partitioned ||
+if was_partitioned ||
     (! is_swap "${swap_device}" &&
        confirm "Format as swap '${swap_device}'?")
 then
@@ -412,7 +412,7 @@ fi
 
 ## ROOT ##
 # Check root logical volume filesystem
-if is_partitioned || ! has_lv "${vg_name}" "${root_name}"; then
+if was_partitioned || ! has_lv "${vg_name}" "${root_name}"; then
   log "Creating '${root_name}' LVM volume"
   ensure_unmounted "${root_device}"
   ensure_lv_removed "${vg_name}" "${root_name}"
@@ -423,7 +423,7 @@ if is_partitioned || ! has_lv "${vg_name}" "${root_name}"; then
 fi
 
 # format root
-if is_partitioned ||
+if was_partitioned ||
     (! is_ext4 "${root_device}" &&
        confirm "Format as ext4 '${root_device}'")
 then
