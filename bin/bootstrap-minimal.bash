@@ -288,7 +288,7 @@ if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
   if really_sure "erase and partition '${disk}'"; then
     partitioned=0
     # TODO: make specific functions?
-    ensure_unmounted "${boot_device}"
+    ensure_unmounted "\$(realpath ${boot_device})"
     ensure_unmounted "${root_device}"
     ensure_lv_removed "${vg_name}" "${root_name}"
     ensure_swapoff "${swap_device}"
