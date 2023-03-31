@@ -117,7 +117,7 @@ function ask_no_echo() {
 }
 
 function really_sure {
-  echo "??? Are your REALLY sure you want to ${1}?"
+  echo "??? Are your REALLY sure you want to ${1}? (ALL DATA WILL BE LOST)"
   ask "(Please enter YES in all caps):"
 
   # TODO: do I need the if???
@@ -168,6 +168,7 @@ function ensure_luks_closed {
 }
 
 function open_luks {
+  log "Using LUKS device '${1}'"
   echo "${3}" | ${ssh} sudo cryptsetup open "${1}" "${2}" |& indent ||
     die "Failed to open '${luks_device}'"
   wait_for "/dev/mapper/${2}"
@@ -178,7 +179,6 @@ function format_luks {
   ask_no_echo "Please confirm your passphrase:" CONFIRM
   if [[ "${PASS}" = "${CONFIRM}" ]]; then
     echo "${PASS}" | ${ssh} sudo cryptsetup luksFormat "${1}" |& indent
-    log "Using LUKS device '${1}'"
     open_luks "${1}" "${2}" "${PASS}"
   else
     die "Passphrase does not match"
@@ -314,10 +314,10 @@ has_partition "${boot_name}" || die "Missing boot partition '${boot_name}'"
 has_partition "${luks_name}" || die "Missing LUKS partition '${luks_name}'"
 
 ### BOOT DEVICE ###
-if (was_partitioned || ! is_fat32 "${boot_device}") &&
-     confirm "Format as FAT32 '${boot_device}'?" &&
-     (was_partitioned ||
-        really_sure "format as FAT32 '${boot_device}' (ALL DATA WILL BE LOST)")
+if was_partitioned ||
+    ! is_fat32 "${boot_device}" &&
+      confirm "Format as FAT32 '${boot_device}'?" &&
+      really_sure "format as FAT32 '${boot_device}'"
 then
   ensure_unmounted "${boot_device}"
   log "Formatting as FAT32 '${boot_device}'"
@@ -332,10 +332,10 @@ else
 fi
 
 ### LUKS DEVICE ###
-if (was_partitioned || ! is_luks "${luks_device}") &&
-     confirm "Format as LUKS '${luks_device}'?" &&
-     (was_partitioned ||
-        really_sure "format as LUKS '${luks_device}' (ALL DATA WILL BE LOST)")
+if was_partitioned ||
+    ! is_luks "${luks_device}" &&
+      confirm "Format as LUKS '${luks_device}'?" &&
+      really_sure "format as LUKS '${luks_device}'"
 then
   ensure_unmounted "${boot_device}"
   ensure_unmounted "${root_device}"
@@ -352,7 +352,6 @@ fi
 
 if is_luks "${luks_device}"; then
   if ! has_device "${luks_device}" ; then
-    log "Using LUKS device '${luks_device}'"
     ask_no_echo "Please enter your passphrase:" PASS
     open_luks "${luks_device}" "${lvm_name}" "${PASS}"
   fi
@@ -391,7 +390,9 @@ fi
 
 # Format swap volume
 if was_partitioned ||
-    (! is_swap "${swap_device}" && confirm "Format as swap '${swap_device}'?")
+    (! is_swap "${swap_device}" &&
+       confirm "Format as swap '${swap_device}'?" &&
+       really_sure "format as swap '${swap_device}'")
 then
   log "Formatting as swap '${swap_device}'"
   ensure_swapoff "${swap_device}"
@@ -424,7 +425,8 @@ fi
 # format root
 if was_partitioned ||
     (! is_ext4 "${root_device}" &&
-       confirm "Format as ext4 '${root_device}'")
+       confirm "Format as ext4 '${root_device}'" &&
+       really_sure "format as ext4 '${root_device}'")
 then
   log "Using root LVM volume '${root_name}'"
   ensure_unmounted "${root_device}"
