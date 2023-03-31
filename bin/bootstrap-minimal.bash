@@ -403,9 +403,11 @@ fi
 if has_lv "${vg_name}" "${swap_name}" &&
     is_swap "${swap_device}"; then
   log "Using '${swap_name}' LVM volume"
-  log "Enabling swap '${swap_device}'"
-  ${ssh} sudo swapon "${swap_device}" |& indent ||
-    die "Failed to enable swap '${swap_device}'"
+  if ! is_swapon "${swap_device}"; then
+    log "Enabling swap '${swap_device}'"
+    ${ssh} sudo swapon "${swap_device}" |& indent ||
+      die "Failed to enable swap '${swap_device}'"
+  fi
 else
   die "Unsuitable swap volume ${swap_name}"
 fi
