@@ -351,8 +351,8 @@ then
 fi
 
 if is_luks "${luks_device}"; then
-  log "Using LUKS device '${luks_device}'"
   if ! has_device "${luks_device}" ; then
+    log "Using LUKS device '${luks_device}'"
     ask_no_echo "Please enter your passphrase:" PASS
     open_luks "${luks_device}" "${lvm_name}" "${PASS}"
   fi
@@ -503,6 +503,7 @@ fi
 
 if ${ssh} \[\[ ! -f /mnt/tmp/bootstrap.key \]\]; then
   log "Copying ssh host key to '/mnt/tmp/bootstrap.key'"
+  ${ssh} sudo mkdir -p /mnt/tmp
   ${ssh} sudo cp /etc/ssh/ssh_host_ed25519_key /mnt/tmp/bootstrap.key
 else
   log "Using existing '/mnt/tmp/bootstrap.key'"
