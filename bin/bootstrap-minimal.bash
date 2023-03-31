@@ -542,5 +542,5 @@ log "Copying log file"
 log "Installation complete $(date)"
 scp "${logfile}" \
     "nixos@${ip}:/tmp/logfile.log"
-${ssh} sudo cat /tmp/logfile.log \>\> \
+${ssh} sudo cat /tmp/logfile.log \\\>\\\> \
        "/mnt/etc/nixos/hosts/${hostname}/install.log"
