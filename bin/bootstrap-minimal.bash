@@ -413,7 +413,6 @@ fi
 ## ROOT ##
 # Check root logical volume filesystem
 if was_partitioned || ! has_lv "${vg_name}" "${root_name}"; then
-  log "Creating '${root_name}' LVM volume"
   ensure_unmounted "${root_device}"
   ensure_lv_removed "${vg_name}" "${root_name}"
   log "Creating '${root_name}' LVM volume"
