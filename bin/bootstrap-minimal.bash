@@ -434,16 +434,18 @@ then
   log "Formatting as ext4 '${root_device}'"
   ${ssh} sudo mkfs.ext4 -L "${root_name}" "${root_device}" |& indent ||
     die "Failed to format as ext4 '${root_device}'"
-else
-  log "Unsuitable root LVM volume '${root_name}'"
 fi
 
-## MOUNT FILESYSTEMS ##
-# Mount root
-if ! is_mounted "${root_device}"; then
-  log "Mounting '${root_device}'"
-  ${ssh} sudo mount "${root_device}" /mnt |& indent ||
-    die "Failed to mount '${root_device}'"
+if is_ext4 "${root_device}"; then
+  log "Using root device '${boot_device}'"
+  # Mount root
+  if ! is_mounted "${root_device}"; then
+    log "Mounting '${root_device}'"
+    ${ssh} sudo mount "${root_device}" /mnt |& indent ||
+      die "Failed to mount '${root_device}'"
+  fi
+else
+  die "Unsuitable root device '${root_device}'"
 fi
 
 # Mount boot
@@ -453,7 +455,6 @@ if ! is_mounted "\$(realpath ${boot_device})"; then
    ${ssh} sudo mount "${boot_device}" /mnt/boot |& indent) ||
     die "Failed to mount '${boot_device}'"
 fi
-
 
 ## RE-ENCRYPT SECRETS ##
 # scp host public key
