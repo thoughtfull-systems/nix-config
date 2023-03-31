@@ -14,6 +14,8 @@ set -euo pipefail
 function die { echo "!!! ${1}" >&2; exit 1; }
 function log { echo "=== ${1}"; }
 
+log "===== Beginning install $(date) ====="
+
 function ask() {
   msg="??? ${1} "
   if [[ -v 2 ]]; then
@@ -536,3 +538,8 @@ ${ssh_nixos} sudo nixos-install --no-root-password --flake .#${hostname} |& \
 
 ## COPY LOG ##
 # TODO: copy log
+log "Copying log file"
+log "===== Install complete $(date) ====="
+scp "${logfile}" \
+    "nixos@${ip}:/tmp/logfile.log" \
+${ssh} cat /tmp/logfile.log \>\> "/mnt/etc/nixos/hosts/${hostname}/install.log"
