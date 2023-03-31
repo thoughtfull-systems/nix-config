@@ -315,9 +315,9 @@ has_partition "${luks_name}" || die "Missing LUKS partition '${luks_name}'"
 
 ### BOOT DEVICE ###
 if was_partitioned ||
-    ! is_fat32 "${boot_device}" &&
-      confirm "Format as FAT32 '${boot_device}'?" &&
-      really_sure "format as FAT32 '${boot_device}'"
+    (! is_fat32 "${boot_device}" &&
+       confirm "Format as FAT32 '${boot_device}'?" &&
+       really_sure "format as FAT32 '${boot_device}'")
 then
   ensure_unmounted "${boot_device}"
   log "Formatting as FAT32 '${boot_device}'"
@@ -333,9 +333,9 @@ fi
 
 ### LUKS DEVICE ###
 if was_partitioned ||
-    ! is_luks "${luks_device}" &&
-      confirm "Format as LUKS '${luks_device}'?" &&
-      really_sure "format as LUKS '${luks_device}'"
+    (! is_luks "${luks_device}" &&
+       confirm "Format as LUKS '${luks_device}'?" &&
+       really_sure "format as LUKS '${luks_device}'")
 then
   ensure_unmounted "${boot_device}"
   ensure_unmounted "${root_device}"
