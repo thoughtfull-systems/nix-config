@@ -316,7 +316,7 @@ has_partition "${luks_name}" || die "Missing LUKS partition '${luks_name}'"
 ### BOOT DEVICE ###
 if (was_partitioned || ! is_fat32 "${boot_device}") &&
      confirm "Format as FAT32 '${boot_device}'?" &&
-     (! was_partitioned ||
+     (was_partitioned ||
         really_sure "format as FAT32 '${boot_device}' (ALL DATA WILL BE LOST)")
 then
   ensure_unmounted "${boot_device}"
@@ -334,7 +334,7 @@ fi
 ### LUKS DEVICE ###
 if (was_partitioned || ! is_luks "${luks_device}") &&
      confirm "Format as LUKS '${luks_device}'?" &&
-     (! was_partitioned ||
+     (was_partitioned ||
         really_sure "format as LUKS '${luks_device}' (ALL DATA WILL BE LOST)")
 then
   ensure_unmounted "${boot_device}"
@@ -391,8 +391,7 @@ fi
 
 # Format swap volume
 if was_partitioned ||
-    (! is_swap "${swap_device}" &&
-       confirm "Format as swap '${swap_device}'?")
+    (! is_swap "${swap_device}" && confirm "Format as swap '${swap_device}'?")
 then
   log "Formatting as swap '${swap_device}'"
   ensure_swapoff "${swap_device}"
@@ -436,14 +435,15 @@ else
   log "Unsuitable root LVM volume '${root_name}'"
 fi
 
-# Mount root filesystem
+## MOUNT FILESYSTEMS ##
+# Mount root
 if ! is_mounted "${root_device}"; then
   log "Mounting '${root_device}'"
   ${ssh} sudo mount "${root_device}" /mnt |& indent ||
     die "Failed to mount '${root_device}'"
 fi
 
-# Mount boot filesystem
+# Mount boot
 if ! is_mounted "\$(realpath ${boot_device})"; then
   log "Mounting '${boot_device}'"
   (${ssh} sudo mkdir -p /mnt/boot |& indent
@@ -451,6 +451,8 @@ if ! is_mounted "\$(realpath ${boot_device})"; then
     die "Failed to mount '${boot_device}'"
 fi
 
+
+## RE-ENCRYPT SECRETS ##
 # scp host public key
 if [[ ! -e "${scriptdir}/../age/keys/bootstrap.pub" ]]; then
   log "Copying host public key"
@@ -485,8 +487,8 @@ if ! ${ssh} \[\[ -e /mnt/etc/nixos/ \]\]; then
   ${ssh} sudo git clone ${repo} /mnt/etc/nixos/ |& indent
 fi
 
-ssh_nixos="${ssh} cd /mnt/etc/nixos;"
 # checkout host branch
+ssh_nixos="${ssh} cd /mnt/etc/nixos;"
 if (${ssh_nixos} sudo git branch -a | grep "${hostname}") &>/dev/null &&
      [[ ! $(${ssh_nixos} sudo git branch --show-current 2>/dev/null) = \
           "${hostname}" ]] &&
@@ -501,6 +503,7 @@ else
   ${ssh_nixos} sudo git pull
 fi
 
+# copy ssh key for install
 if ${ssh} \[\[ ! -f /mnt/tmp/bootstrap.key \]\]; then
   log "Copying ssh host key to '/mnt/tmp/bootstrap.key'"
   ${ssh} sudo mkdir -p /mnt/tmp
@@ -509,6 +512,7 @@ else
   log "Using existing '/mnt/tmp/bootstrap.key'"
 fi
 
+## NIXOS INSTALL ##
 # Generate NixOS config
 log "Generate NixOS config"
 ${ssh} sudo nixos-generate-config --root /mnt |& indent
@@ -526,4 +530,5 @@ ${ssh_nixos} sudo nixos-install --no-root-password --flake .#${hostname} |& \
   indent ||
   die "Failed to install NixOS"
 
-# copy log
+## COPY LOG ##
+# TODO: copy log
