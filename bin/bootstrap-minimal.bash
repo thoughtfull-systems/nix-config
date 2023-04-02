@@ -309,6 +309,8 @@ if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
     ${parted} mkpart "${luks_name}" 1GiB 100% |& indent ||
       die "Failed to create LUKS partition"
   fi
+else
+  log "Using existing partition table"
 fi
 
 # Verify partitions
@@ -530,8 +532,9 @@ ${ssh_nixos} sudo git add hosts/${hostname}/hardware-configuration.nix |&
 indent
 
 # Install NixOS
-log "Installing NixOS..."
+log "Ready to install NixOS..."
 confirm "Continue?"
+log "Installing NixOS"
 ${ssh_nixos} sudo nixos-install --no-root-password --flake .#${hostname} |& \
   indent ||
   die "Failed to install NixOS"
