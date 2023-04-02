@@ -501,7 +501,7 @@ echo "${curr}"
 [[ "${curr}" != "${hostname}" ]]; echo $?
 [[ "${curr}" != "${hostname}\
 " ]]; echo $?
-if [[ "${curr}" != "${hostname}" ]] &&
+if [[ "tatenen" != "${hostname}" ]] &&
      ${ssh_nixos} sudo git branch -a | grep "${hostname}" &>/dev/null &&
      confirm "Checkout '${hostname}' branch?"
 then
