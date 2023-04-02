@@ -92,7 +92,7 @@ repo="${3:-https://github.com/thoughtfull-systems/nix-config}"
 
 ### VARIABLES ##################################################################
 # programs
-ssh="ssh nixos@${ip} -qt"
+ssh="ssh nixos@${ip} -q"
 file="${nix} run nixpkgs#file -- -sL"
 agenix="${nix} run github:ryantm/agenix --"
 
@@ -171,7 +171,7 @@ function ensure_luks_closed {
 
 function open_luks {
   log "Using LUKS device '${1}'"
-  echo "${3}" | ${ssh} sudo cryptsetup open "${1}" "${2}" |& indent ||
+  echo "${3}" | ${ssh} -t sudo cryptsetup open "${1}" "${2}" |& indent ||
     die "Failed to open '${luks_device}'"
   wait_for "/dev/mapper/${2}"
 }
@@ -180,7 +180,7 @@ function format_luks {
   ask_no_echo "Please enter your passphrase:" PASS
   ask_no_echo "Please confirm your passphrase:" CONFIRM
   if [[ "${PASS}" = "${CONFIRM}" ]]; then
-    echo "${PASS}" | ${ssh} sudo cryptsetup luksFormat "${1}" |& indent
+    echo "${PASS}" | ${ssh} -t sudo cryptsetup luksFormat "${1}" |& indent
     open_luks "${1}" "${2}" "${PASS}"
   else
     die "Passphrase does not match"
