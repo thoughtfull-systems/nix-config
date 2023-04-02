@@ -1,10 +1,6 @@
 #!/usr/bin/env -S bash -euo pipefail
 logfile=$(mktemp)
 echo "### Temporary log file '${logfile}'"
-# Save reference to stdout and stderr
-exec 3>&1 4>&2
-# Restore stdout and stderr on signal
-# trap 'exec 2>&4 1>&3' 0 1 2 3
 # Redirect tee stdout and stderr to logfile
 exec 1> >(tee ${logfile}) 2>&1
 
@@ -29,11 +25,7 @@ function ask() {
 
 function confirm {
   ask "${1} (y/N)"
-  if [[ ${REPLY} =~ ^[Yy].* ]]; then
-    return 0
-  else
-    return 1
-  fi
+  [[ ${REPLY} =~ ^[Yy].* ]]
 }
 
 function is_git_clean {
