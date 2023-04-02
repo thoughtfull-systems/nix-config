@@ -494,9 +494,8 @@ if ! ${ssh} \[\[ -e /mnt/etc/nixos/ \]\]; then
 fi
 
 # checkout host branch
-ssh_nixos="${ssh} cd /mnt/etc/nixos\;"
-${ssh_nixos} sudo git branch --show-current
-$(${ssh_nixos} sudo git branch --show-current) | grep "${hostname}"
+ssh_nixos="${ssh} cd /mnt/etc/nixos;"
+${ssh_nixos} pwd
 if (${ssh_nixos} sudo git branch -a | grep "${hostname}") &>/dev/null &&
      [[ $(${ssh_nixos} sudo git branch --show-current 2>/dev/null) != \
           "${hostname}" ]] &&
