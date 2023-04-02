@@ -496,13 +496,13 @@ fi
 # checkout host branch
 ssh_nixos="${ssh} cd /mnt/etc/nixos;"
 curr=$(${ssh_nixos} sudo git branch --show-current 2>/dev/null)
-echo ${curr}
+echo "${curr}"
 echo "${hostname}"
-[[ ${curr} = "${hostname}" ]]; echo $?
-[[ ${curr} != "${hostname}" ]]; echo $?
-[[ ${curr} != "${hostname}\
+[[ "${curr}" = "${hostname}" ]]; echo $?
+[[ "${curr}" != "${hostname}" ]]; echo $?
+[[ "${curr}" != "${hostname}\
 " ]]; echo $?
-if [[ ${curr} != "${hostname}" ]] &&
+if [[ "${curr}" != "${hostname}" ]] &&
      ${ssh_nixos} sudo git branch -a | grep "${hostname}" &>/dev/null &&
      confirm "Checkout '${hostname}' branch?"
 then
