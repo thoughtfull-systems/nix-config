@@ -496,8 +496,8 @@ fi
 # checkout host branch
 ssh_nixos="${ssh} cd /mnt/etc/nixos;"
 curr=$(${ssh_nixos} sudo git branch --show-current 2>/dev/null)
-echo "${curr}"
-echo "tatenen"
+echo -n "${curr}"
+echo -n "tatenen"
 #curr="tatenen"
 if [[ "${curr}" != "${hostname}" ]] &&
      ${ssh_nixos} sudo git branch -a | grep "${hostname}" &>/dev/null &&
