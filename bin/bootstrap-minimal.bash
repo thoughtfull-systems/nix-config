@@ -28,17 +28,12 @@ function confirm {
   [[ ${REPLY} =~ ^[Yy].* ]]
 }
 
-function is_git_clean {
-  output=$(${git} status --porcelain 2>/dev/null) && [[ -z "${output}" ]]
-}
-
-
 nix="nix --extra-experimental-features nix-command \
          --extra-experimental-features flakes"
 git="${nix} run nixpkgs#git --"
 
 # Verify git working dir is clean
-if is_git_clean; then
+if output=$(${git} status --porcelain 2>/dev/null) && [[ -z "${output}" ]]; then
   log "Working directory is clean"
 else
   die "Working directory is dirty"
