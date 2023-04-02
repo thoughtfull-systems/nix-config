@@ -501,9 +501,9 @@ echo "${hostname}"
 [[ ${curr} != "${hostname}" ]]; echo $?
 [[ ${curr} != "${hostname}\
 " ]]; echo $?
-if ${ssh_nixos} sudo git branch -a | grep "${hostname}" &>/dev/null &&
-    [[ ${curr} != "${hostname}" ]] &&
-    confirm "Checkout '${hostname}' branch?"
+if [[ ${curr} != "${hostname}" ]] &&
+     ${ssh_nixos} sudo git branch -a | grep "${hostname}" &>/dev/null &&
+     confirm "Checkout '${hostname}' branch?"
 then
   log "Checking out '${hostname}' branch"
   ${ssh_nixos} sudo git checkout ${hostname} |& indent ||
