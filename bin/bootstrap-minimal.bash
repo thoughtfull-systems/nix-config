@@ -114,12 +114,7 @@ function really_sure {
   echo "??? Are your REALLY sure you want to ${1}? (ALL DATA WILL BE LOST)"
   ask "(Please enter YES in all caps):"
 
-  # TODO: do I need the if???
-  if [[ $REPLY = "YES" ]]; then
-    return 0;
-  else
-    return 1;
-  fi
+  [[ $REPLY = "YES" ]]
 }
 
 # Partitions & devices
