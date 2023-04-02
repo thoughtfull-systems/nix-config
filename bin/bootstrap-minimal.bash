@@ -537,10 +537,9 @@ ${ssh_nixos} sudo nixos-install --no-root-password --flake .#${hostname} |& \
   die "Failed to install NixOS"
 
 ## COPY LOG ##
-# TODO: copy log
 log "Copying log file"
 log "Installation complete $(date)"
 scp "${logfile}" \
-    "nixos@${ip}:/tmp/logfile.log"
-${ssh} sudo cat /tmp/logfile.log \>\> \
-       "/mnt/etc/nixos/hosts/${hostname}/install.log"
+    "nixos@${ip}:/tmp/install.log"
+${ssh} sudo rm "/mnt/etc/nixos/hosts/${hostname}/install.log"
+${ssh} sudo mv /tmp/install.log "/mnt/etc/nixos/hosts/${hostname}"
