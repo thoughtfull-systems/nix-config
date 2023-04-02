@@ -496,8 +496,8 @@ fi
 # checkout host branch
 ssh_nixos="${ssh} cd /mnt/etc/nixos;"
 curr=$(${ssh_nixos} sudo git branch --show-current 2>/dev/null)
-echo "${curr}"
-echo "${hostname}"
+echo -n "${curr}"
+echo -n "${hostname}"
 [[ "${curr}" = "${hostname}" ]]; echo $?
 [[ "${curr}" != "${hostname}" ]]; echo $?
 [[ "${curr}" != "${hostname}\
