@@ -66,7 +66,7 @@ function pull_latest {
   log "Working directory up-to-date"
 }
 if (${git} branch -a | grep "${hostname}") &>/dev/null &&
-     [[ ! $(${git} branch --show-current 2>/dev/null) = "${hostname}" ]] &&
+     [[ $(${git} branch --show-current 2>/dev/null) != "${hostname}" ]] &&
      confirm "Checkout '${hostname}' branch?"
 then
   log "Checking out '${hostname}' branch"
@@ -494,7 +494,7 @@ if ! ${ssh} \[\[ -e /mnt/etc/nixos/ \]\]; then
 fi
 
 # checkout host branch
-ssh_nixos="${ssh} cd /mnt/etc/nixos;"
+ssh_nixos="${ssh} cd /mnt/etc/nixos\;"
 ${ssh_nixos} sudo git branch --show-current
 $(${ssh_nixos} sudo git branch --show-current) | grep "${hostname}"
 if (${ssh_nixos} sudo git branch -a | grep "${hostname}") &>/dev/null &&
