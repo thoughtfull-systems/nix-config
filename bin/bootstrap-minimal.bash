@@ -270,7 +270,8 @@ function was_partitioned {
 
 ### SETUP ######################################################################
 # Confirm ssh access to machine
-if ${ssh} : 1>/dev/null; then
+log "Checking ssh access to machine"
+if ${ssh} : ; then
   log "Confirmed SSH access to machine"
 else
   die "Set up SSH access to '${ip}' (either password or public key)"
