@@ -495,6 +495,8 @@ fi
 
 # checkout host branch
 ssh_nixos="${ssh} cd /mnt/etc/nixos;"
+${ssh_nixos} sudo git branch -a | grep "${hostname}") &>/dev/null
+${ssh_nixos} sudo git branch --show-current 2>/dev/null
 if (${ssh_nixos} sudo git branch -a | grep "${hostname}") &>/dev/null &&
      [[ $(${ssh_nixos} sudo git branch --show-current 2>/dev/null) != \
           "${hostname}" ]] &&
