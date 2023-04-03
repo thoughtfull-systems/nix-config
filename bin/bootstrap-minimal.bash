@@ -238,7 +238,7 @@ function was_partitioned {
 ### SETUP ######################################################################
 # Confirm ssh access to machine
 log "Checking ssh access to machine"
-if ssh : ; then
+if ssh nixos@${ip} : ; then
   log "Confirmed SSH access to machine"
 else
   die "Set up SSH access to '${ip}' (either password or public key)"
