@@ -120,7 +120,7 @@ function has_partition {
 }
 
 function is_mounted {
-  ${ssh} mount \| grep \""${1}"\" &>/dev/null
+  ${ssh} mount \| grep \""${1}"\"
 }
 
 function ensure_unmounted {
