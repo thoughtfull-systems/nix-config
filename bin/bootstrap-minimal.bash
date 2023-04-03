@@ -135,14 +135,10 @@ function ensure_unmounted {
 }
 
 function ensure_mounted {
-  if ! is_mounted "${1}"; then
-    log "Mounting '${1}'"
-    ${ssh} sudo mount "${1}" "${2}" |& indent ||
-      die "Failed to mount '${1}'"
-  fi
   if ! is_mounted "${1}" && ! is_mounted "\$(realpath ${1})"; then
     log "Mounting '${1}'"
-    ${ssh} sudo mount "\$(realpath ${1})" "${2}" |& indent ||
+    (${ssh} sudo mount "${1}" "${2}" 2>/dev/null ||
+       ${ssh} sudo mount "\$(realpath ${1})" "${2}") |& indent ||
       die "Failed to mount '${1}'"
   fi
 }
