@@ -139,7 +139,7 @@ function ensure_mounted {
     ${ssh} sudo mount "${1}" "${2}" |& indent ||
       die "Failed to mount '${1}'"
   fi
-  if ! is_mounted "${1}" && ! is_mounted "\$realpath ${1})"; then
+  if ! is_mounted "${1}" && ! is_mounted "\$(realpath ${1})"; then
     log "Mounting '${1}'"
     ${ssh} sudo mount "\$(realpath ${1})" "${2}" |& indent ||
       die "Failed to mount '${1}'"
