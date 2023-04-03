@@ -127,7 +127,8 @@ function ensure_unmounted {
   if is_mounted "${1}"; then
     log "Unmounting '${1}'"
     ${ssh} sudo umount "${1}" |& indent
-  elif is_mounted "\$(realpath ${1})"; then
+  fi
+  if is_mounted "${1}" && is_mounted "\$(realpath ${1})"; then
     log "Unmounting '${1}'"
     ${ssh} sudo umount "\$(realpath ${1})" |& indent
   fi
