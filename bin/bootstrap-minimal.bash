@@ -136,11 +136,11 @@ function ensure_unmounted {
 function ensure_mounted {
   if ! is_mounted "${1}"; then
     log "Mounting '${1}'"
-    ${ssh} sudo mount "${1}" /mnt |& indent ||
+    ${ssh} sudo mount "${1}" "${2}" |& indent ||
       die "Failed to mount '${1}'"
   elif ! is_mounted "\$realpath ${1})"; then
     log "Mounting '${1}'"
-    ${ssh} sudo mount "\$(realpath ${1})" /mnt |& indent ||
+    ${ssh} sudo mount "\$(realpath ${1})" "${2}" |& indent ||
       die "Failed to mount '${1}'"
   fi
 }
@@ -427,14 +427,14 @@ fi
 if is_ext4 "${root_device}"; then
   log "Using root device '${root_device}'"
   # Mount root
-  ensure_mounted "${root_device}"
+  ensure_mounted "${root_device}" /mnt
 else
   die "Unsuitable root device '${root_device}'"
 fi
 
 # Mount boot
 ${ssh} sudo mkdir -p /mnt/boot |& indent
-ensure_mounted "${boot_device}"
+ensure_mounted "${boot_device}" /mnt/boot
 
 ## RE-ENCRYPT SECRETS ##
 # scp host public key
