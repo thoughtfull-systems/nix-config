@@ -49,7 +49,7 @@ function indent { sed -E 's/\r$//g;s/\r/\n/g' | sed -E "s/^/    /g"; }
 function pull_latest {
   log "Fetching latest from origin"
   ${git} pull |& indent ||
-    die "Failed fetch latest from origin"
+    die "Failed fetching latest from origin"
   log "Working directory up-to-date"
 }
 if (${git} branch -a | grep "${hostname}") &>/dev/null &&
@@ -91,10 +91,8 @@ luks_device="/dev/disk/by-partlabel/${luks_name}"
 lvm_name="${hostname}-lvm"
 lvm_device="/dev/mapper/${lvm_name}"
 vg_name="${hostname}"
-swap_name="swap"
-swap_device="/dev/mapper/${vg_name}-${swap_name}"
-root_name="root"
-root_device="/dev/mapper/${hostname}-${root_name}"
+swap_device="/dev/mapper/${vg_name}-swap"
+root_device="/dev/mapper/${vg_name}-root"
 
 ### FUNCTIONS ##################################################################
 # General
@@ -130,6 +128,23 @@ function ensure_unmounted {
     log "Unmounting '${1}'"
     ${ssh} sudo umount "${1}" |& indent
   fi
+  if is_mounted "\$\(realpath ${1}\)"; then
+    log "Unmounting '${1}'"
+    ${ssh} sudo umount "\$\(realpath ${1}\)" |& indent
+  fi
+}
+
+function ensure_mounted {
+  if ! is_mounted "${1}"; then
+    log "Mounting '${1}'"
+    ${ssh} sudo mount "${1}" /mnt |& indent ||
+      die "Failed to mount '${1}'"
+  fi
+  if ! is_mounted "\$\(realpath ${1}\)"; then
+    log "Mounting '${1}'"
+    ${ssh} sudo mount "\$\(realpath ${1}\)" /mnt |& indent ||
+      die "Failed to mount '${1}'"
+  fi
 }
 
 # LUKS
@@ -145,9 +160,9 @@ function wait_for() {
 }
 
 function ensure_luks_closed {
-  if has_device "${1}"; then
-    log "Closing LUKS device '${1}'"
-    ${ssh} sudo cryptsetup close "${1}"
+  if has_device "${lvm_device}"; then
+    log "Closing LUKS device '${lvm_device}'"
+    ${ssh} sudo cryptsetup close "${lvm_device}"
   fi
 }
 
@@ -158,48 +173,38 @@ function open_luks {
   wait_for "/dev/mapper/${2}"
 }
 
-function format_luks {
-  ask_no_echo "Please enter your passphrase:" PASS
-  ask_no_echo "Please confirm your passphrase:" CONFIRM
-  if [[ "${PASS}" = "${CONFIRM}" ]]; then
-    echo "${PASS}" | ${ssh} -t sudo cryptsetup luksFormat "${1}" |& indent
-    open_luks "${1}" "${2}" "${PASS}"
-  else
-    die "Passphrase does not match"
-  fi
-}
-
 # LVM
 function has_pv {
-  ${ssh} sudo pvs | grep "${1}" &>/dev/null
+  ${ssh} sudo pvs | grep "${lvm_device}" &>/dev/null
 }
 
 function ensure_pv_removed {
-  if has_pv "${1}"; then
-    log "Removing physical volume '${1}'"
-    ${ssh} sudo pvremove -y "${1}" |& indent
+  if has_pv; then
+    log "Removing physical volume '${lvm_device}'"
+    ${ssh} sudo pvremove -y "${lvm_device}" |& indent
   fi
 }
 
 function has_vg {
-  ${ssh} sudo vgs | grep "${1}" &>/dev/null
+  ${ssh} sudo vgs | grep "${vg_name}" &>/dev/null
 }
 
 function ensure_vg_removed {
-  if has_vg "${1}"; then
-    log "Removing volume group '${1}'"
-    ${ssh} sudo vgremove -y "${1}"
+  if has_vg; then
+    log "Removing volume group '${vg_name}'"
+    ${ssh} sudo vgremove -y "${vg_name}"
   fi
 }
 
 function has_lv {
-  ${ssh} sudo lvs -S "vg_name=${1} && lv_name=${2}" | grep "${2}" &>/dev/null
+  ${ssh} sudo lvs -S "vg_name=${vg_name} && lv_name=${1}" | \
+    grep "${1}" &>/dev/null
 }
 
 function ensure_lv_removed {
-  if has_lv "${1}" "${2}"; then
-    log "Removing volume '${2}'"
-    ${ssh} sudo lvremove -y "${1}/${2}" |& indent
+  if has_lv "${1}"; then
+    log "Removing volume '${1}'"
+    ${ssh} sudo lvremove -y "${vg_name}/${1}" |& indent
   fi
 }
 
@@ -208,37 +213,19 @@ function is_fat32 {
   (${ssh} sudo ${file} "${1}" | grep "FAT (32 bit)") &>/dev/null
 }
 
-function mkfat32 {
-  ensure_unmounted "${1}"
-}
-
 # Swap
-function mkswap {
-  if confirm "Should 'swap' be large enough for hibertation?"; then
-    swap_factor=3
-  else
-    swap_factor=2
-  fi
-  mem_total=$(($(${ssh} grep MemTotal /proc/meminfo | grep -o [[:digit:]]\*) \
-                 / 1000000))
-  swap_size=$((${mem_total}*${swap_factor}))
-  log "Creating '${1}-swap' with ${swap_size}G"
-  ${ssh} sudo lvcreate --size "${swap_size}G" --name swap "${1}" |& indent
-  wait_for "/dev/mapper/${1}-swap"
-}
-
 function is_swap {
   ${ssh} sudo swaplabel "${1}" &>/dev/null
 }
 
 function is_swapon {
-  ${ssh} sudo swapon \| grep "\$(realpath ${1})" &>/dev/null
+  ${ssh} sudo swapon \| grep "\$(realpath ${swap_device})" &>/dev/null
 }
 
 function ensure_swapoff {
-  if is_swapon "${1}"; then
-    ${ssh} sudo swapoff "\$(realpath ${1})" |& indent ||
-      die "Failed to disable swap '${1}'"
+  if is_swapon; then
+    ${ssh} sudo swapoff "\$(realpath ${swap_device})" |& indent ||
+      die "Failed to disable swap '${swap_device}'"
   fi
 }
 
@@ -272,15 +259,14 @@ if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
 
   if really_sure "erase and partition '${disk}'"; then
     partitioned=0
-    # TODO: make specific functions?
-    ensure_unmounted "\$(realpath ${boot_device})"
+    ensure_unmounted "${boot_device}"
     ensure_unmounted "${root_device}"
-    ensure_lv_removed "${vg_name}" "${root_name}"
-    ensure_swapoff "${swap_device}"
-    ensure_lv_removed "${vg_name}" "${swap_name}"
-    ensure_vg_removed "${vg_name}"
-    ensure_pv_removed "${luks_device}"
-    ensure_luks_closed "${lvm_device}"
+    ensure_lv_removed "root"
+    ensure_swapoff
+    ensure_lv_removed "swap"
+    ensure_vg_removed
+    ensure_pv_removed
+    ensure_luks_closed
     log "Creating partition table"
     parted="${ssh} sudo parted -fs ${disk}"
     ${parted} mklabel gpt |& indent || die "Failed to create partition table"
@@ -326,15 +312,22 @@ if was_partitioned ||
 then
   ensure_unmounted "${boot_device}"
   ensure_unmounted "${root_device}"
-  ensure_lv_removed "${vg_name}" "${root_name}"
-  ensure_swapoff "${swap_device}"
-  ensure_lv_removed "${vg_name}" "${swap_name}"
-  ensure_vg_removed "${vg_name}"
-  ensure_pv_removed "${luks_device}"
-  ensure_luks_closed "${lvm_device}"
+  ensure_lv_removed "root"
+  ensure_swapoff
+  ensure_lv_removed "swap"
+  ensure_vg_removed
+  ensure_pv_removed
+  ensure_luks_closed
   log "Formatting as LUKS '${luks_device}'"
-  format_luks "${luks_device}" "${lvm_name}" ||
-    die "Failed to format as LUKS '${luks_device}'"
+  (ask_no_echo "Please enter your passphrase:" PASS
+   ask_no_echo "Please confirm your passphrase:" CONFIRM
+   if [[ "${PASS}" = "${CONFIRM}" ]]; then
+     echo "${PASS}" | ${ssh} -t sudo cryptsetup luksFormat "${luks_device}" |&
+       indent
+     open_luks "${luks_device}" "${lvm_name}" "${PASS}"
+   else
+     die "Passphrase does not match"
+   fi) || die "Failed to format as LUKS '${luks_device}'"
 fi
 
 if is_luks "${luks_device}"; then
@@ -348,7 +341,7 @@ fi
 
 ### LVM ###
 # Check LVM physical volume
-if ! has_pv "${lvm_device}"; then
+if ! has_pv; then
   log "Creating '${lvm_device}' LVM physical volume"
   ${ssh} sudo pvcreate "${lvm_device}" |& indent ||
     die "Failed to create '${lvm_device}' LVM physical volume"
@@ -357,7 +350,7 @@ else
 fi
 
 # Check LVM volume group
-if ! has_vg "${vg_name}"; then
+if ! has_vg; then
   log "Creating '${vg_name}' LVM volume group"
   (${ssh} sudo vgcreate "${vg_name}" "${lvm_device}" |& indent) ||
     die "Failed to create '${vg_name}' LVM volume group"
@@ -367,12 +360,22 @@ fi
 
 ## SWAP ##
 # Create swap LVM volume
-if was_partitioned || ! has_lv "${vg_name}" "${swap_name}"; then
-  log "Creating '${swap_name}' LVM volume"
-  ensure_swapoff "${swap_device}"
-  ensure_lv_removed "${vg_name}" "${swap_name}"
-  mkswap "${vg_name}" "${swap_name}" ||
-    die "Failed to create '${swap_name}' LVM volume"
+if was_partitioned || ! has_lv "swap"; then
+  log "Creating 'swap' LVM volume"
+  ensure_swapoff
+  ensure_lv_removed "swap"
+  (if confirm "Should 'swap' be large enough for hibertation?"; then
+     swap_factor=3
+   else
+     swap_factor=2
+   fi
+   mem_total=$(($(${ssh} grep MemTotal /proc/meminfo | grep -o [[:digit:]]\*) \
+                  / 1000000))
+   swap_size=$((${mem_total}*${swap_factor}))
+   log "Creating '${vg_name}-swap' with ${swap_size}G"
+   ${ssh} sudo lvcreate --size "${swap_size}G" --name swap "${vg_name}" |& indent
+   wait_for "/dev/mapper/${vg_name}-swap")||
+    die "Failed to create 'swap' LVM volume"
 fi
 
 # Format swap volume
@@ -382,32 +385,32 @@ if was_partitioned ||
        really_sure "format as swap '${swap_device}'")
 then
   log "Formatting as swap '${swap_device}'"
-  ensure_swapoff "${swap_device}"
-  ${ssh} sudo mkswap -L "${swap_name}" "${swap_device}" |& indent ||
+  ensure_swapoff
+  ${ssh} sudo mkswap -L "swap" "${swap_device}" |& indent ||
     die "Failed to format as swap '${swap_device}'"
 fi
 
-if has_lv "${vg_name}" "${swap_name}" &&
+if has_lv "swap" &&
     is_swap "${swap_device}"; then
-  log "Using '${swap_name}' LVM volume"
-  if ! is_swapon "${swap_device}"; then
+  if ! is_swapon; then
     log "Enabling swap '${swap_device}'"
     ${ssh} sudo swapon "${swap_device}" |& indent ||
       die "Failed to enable swap '${swap_device}'"
   fi
+  log "Using 'swap' LVM volume"
 else
-  die "Unsuitable swap volume ${swap_name}"
+  die "Unsuitable swap volume 'swap'"
 fi
 
 ## ROOT ##
 # Check root logical volume filesystem
-if was_partitioned || ! has_lv "${vg_name}" "${root_name}"; then
+if was_partitioned || ! has_lv "root"; then
   ensure_unmounted "${root_device}"
-  ensure_lv_removed "${vg_name}" "${root_name}"
-  log "Creating '${root_name}' LVM volume"
+  ensure_lv_removed "root"
+  log "Creating 'root' LVM volume"
   (${ssh} sudo lvcreate --extents 100%FREE --name root ${1} |& indent
    wait_for "/dev/mapper/${vg_name}-root") ||
-    die "Failed to create '${root_name}' LVM volume"
+    die "Failed to create 'root' LVM volume"
 fi
 
 # format root
@@ -416,32 +419,24 @@ if was_partitioned ||
        confirm "Format as ext4 '${root_device}'" &&
        really_sure "format as ext4 '${root_device}'")
 then
-  log "Using root LVM volume '${root_name}'"
+  log "Using root LVM volume 'root'"
   ensure_unmounted "${root_device}"
   log "Formatting as ext4 '${root_device}'"
-  ${ssh} sudo mkfs.ext4 -L "${root_name}" "${root_device}" |& indent ||
+  ${ssh} sudo mkfs.ext4 -L "root" "${root_device}" |& indent ||
     die "Failed to format as ext4 '${root_device}'"
 fi
 
 if is_ext4 "${root_device}"; then
   log "Using root device '${boot_device}'"
   # Mount root
-  if ! is_mounted "${root_device}"; then
-    log "Mounting '${root_device}'"
-    ${ssh} sudo mount "${root_device}" /mnt |& indent ||
-      die "Failed to mount '${root_device}'"
-  fi
+  ensure_mounted "${root_device}"
 else
   die "Unsuitable root device '${root_device}'"
 fi
 
 # Mount boot
-if ! is_mounted "\$(realpath ${boot_device})"; then
-  log "Mounting '${boot_device}'"
-  (${ssh} sudo mkdir -p /mnt/boot |& indent
-   ${ssh} sudo mount "${boot_device}" /mnt/boot |& indent) ||
-    die "Failed to mount '${boot_device}'"
-fi
+${ssh} sudo mkdir -p /mnt/boot |& indent
+ensure_mounted "${boot_device}"
 
 ## RE-ENCRYPT SECRETS ##
 # scp host public key
