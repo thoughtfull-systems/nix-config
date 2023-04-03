@@ -128,9 +128,9 @@ function ensure_unmounted {
     log "Unmounting '${1}'"
     ${ssh} sudo umount "${1}" |& indent
   fi
-  if is_mounted "\$\(realpath ${1}\)"; then
+  if is_mounted "\$(realpath ${1})"; then
     log "Unmounting '${1}'"
-    ${ssh} sudo umount "\$\(realpath ${1}\)" |& indent
+    ${ssh} sudo umount "\$(realpath ${1})" |& indent
   fi
 }
 
