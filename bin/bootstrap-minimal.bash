@@ -127,8 +127,7 @@ function ensure_unmounted {
   if is_mounted "${1}"; then
     log "Unmounting '${1}'"
     ${ssh} sudo umount "${1}" |& indent
-  fi
-  if is_mounted "\$(realpath ${1})"; then
+  elif is_mounted "\$(realpath ${1})"; then
     log "Unmounting '${1}'"
     ${ssh} sudo umount "\$(realpath ${1})" |& indent
   fi
@@ -139,10 +138,9 @@ function ensure_mounted {
     log "Mounting '${1}'"
     ${ssh} sudo mount "${1}" /mnt |& indent ||
       die "Failed to mount '${1}'"
-  fi
-  if ! is_mounted "\$\(realpath ${1}\)"; then
+  elif ! is_mounted "\$realpath ${1})"; then
     log "Mounting '${1}'"
-    ${ssh} sudo mount "\$\(realpath ${1}\)" /mnt |& indent ||
+    ${ssh} sudo mount "\$(realpath ${1})" /mnt |& indent ||
       die "Failed to mount '${1}'"
   fi
 }
@@ -427,7 +425,7 @@ then
 fi
 
 if is_ext4 "${root_device}"; then
-  log "Using root device '${boot_device}'"
+  log "Using root device '${root_device}'"
   # Mount root
   ensure_mounted "${root_device}"
 else
