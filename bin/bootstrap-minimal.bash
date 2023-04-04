@@ -321,7 +321,7 @@ then
   (ask_no_echo "Please enter your passphrase:" PASS
    ask_no_echo "Please confirm your passphrase:" CONFIRM
    if [[ "${PASS}" = "${CONFIRM}" ]]; then
-     echo "${PASS}" | ${ssh} -t sudo cryptsetup luksFormat "${luks_device}"
+     ${ssh} -t sudo cryptsetup luksFormat "${luks_device}"
      open_luks "${PASS}"
    else
      die "Passphrase does not match"
