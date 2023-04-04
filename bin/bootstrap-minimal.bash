@@ -166,8 +166,7 @@ function open_luks {
   log "Using LUKS device '${luks_device}'"
   log "Opening LUKS device '${luks_device}' as '${lvm_name}'"
   echo "${1}" |
-    ${ssh} -t sudo cryptsetup open "${luks_device}" "${lvm_name}" |&
-    indent ||
+    ${ssh} sudo cryptsetup open "${luks_device}" "${lvm_name}" |& indent ||
     die "Failed to open '${luks_device}'"
   wait_for "/dev/mapper/${lvm_name}"
 }
@@ -196,7 +195,7 @@ function ensure_vg_removed {
 }
 
 function has_lv {
-  ${ssh} sudo lvs -S "vg_name=${vg_name} && lv_name=${1}" | \
+  ${ssh} sudo lvs -S "vg_name=${vg_name} && lv_name=${1}" |
     grep "${1}" &>/dev/null
 }
 
@@ -321,7 +320,7 @@ then
   (ask_no_echo "Please enter your passphrase:" PASS
    ask_no_echo "Please confirm your passphrase:" CONFIRM
    if [[ "${PASS}" = "${CONFIRM}" ]]; then
-     echo "${PASS}" | ${ssh} -t sudo cryptsetup luksFormat "${luks_device}" |&
+     echo "${PASS}" | ${ssh} sudo cryptsetup luksFormat "${luks_device}" |& \
        indent
      open_luks "${PASS}"
    else
@@ -372,7 +371,8 @@ if was_partitioned || ! has_lv "swap"; then
                   / 1000000))
    swap_size=$((${mem_total}*${swap_factor}))
    log "Creating '${vg_name}-swap' with ${swap_size}G"
-   ${ssh} sudo lvcreate --size "${swap_size}G" --name swap "${vg_name}" |& indent
+   ${ssh} sudo lvcreate --size "${swap_size}G" --name swap "${vg_name}" |& \
+     indent
    wait_for "/dev/mapper/${vg_name}-swap")||
     die "Failed to create 'swap' LVM volume"
 fi
@@ -476,7 +476,7 @@ fi
 
 # checkout host branch
 ssh_nixos="${ssh} cd /mnt/etc/nixos;"
-if [[ $(${ssh_nixos} sudo git branch --show-current 2>/dev/null)\
+if [[ $(${ssh_nixos} sudo git branch --show-current 2>/dev/null) \
         != "${hostname}" ]] &&
      ${ssh_nixos} sudo git branch -a | grep "${hostname}" &>/dev/null &&
      confirm "Checkout '${hostname}' branch?"
@@ -507,8 +507,8 @@ log "Copying hardware config to '/mnt/etc/nixos/hosts/${hostname}'"
 ${ssh} sudo mkdir -p "/mnt/etc/nixos/hosts/${hostname}" |& indent
 ${ssh} sudo mv /mnt/etc/nixos/hardware-configuration.nix \
        "/mnt/etc/nixos/hosts/${hostname}/" |& indent
-${ssh_nixos} sudo git add hosts/${hostname}/hardware-configuration.nix |&
-indent
+${ssh_nixos} sudo git add hosts/${hostname}/hardware-configuration.nix |& \
+  indent
 
 # Install NixOS
 log "Ready to install NixOS..."
@@ -521,7 +521,6 @@ ${ssh_nixos} sudo nixos-install --no-root-password --flake .#${hostname} |& \
 ## COPY LOG ##
 log "Copying log file"
 log "Installation complete $(date)"
-scp "${logfile}" \
-    "nixos@${ip}:/tmp/install.log"
+scp "${logfile}" "nixos@${ip}:/tmp/install.log"
 ${ssh} sudo rm -f "/mnt/etc/nixos/hosts/${hostname}/install.log"
 ${ssh} sudo mv /tmp/install.log "/mnt/etc/nixos/hosts/${hostname}"
