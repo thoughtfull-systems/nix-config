@@ -409,7 +409,7 @@ if was_partitioned || ! has_lv "root"; then
   log "Creating 'root' LVM volume"
   (${ssh} sudo lvcreate --extents 100%FREE --name root ${vg_name} |& indent
    log "Leaving 256M for LVM snapshots"
-   ${ssh} sudo lvreduce --size -256M ${vg_name}/root |& indent
+   ${ssh} sudo lvreduce -y --size -256M ${vg_name}/root |& indent
    wait_for "/dev/mapper/${vg_name}-root") ||
     die "Failed to create 'root' LVM volume"
 fi
