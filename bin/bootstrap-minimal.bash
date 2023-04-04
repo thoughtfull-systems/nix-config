@@ -163,10 +163,12 @@ function ensure_luks_closed {
 }
 
 function open_luks {
-  log "Using LUKS device '${1}'"
-  echo "${3}" | ${ssh} -t sudo cryptsetup open "${1}" "${2}" |& indent ||
+  log "Using LUKS device '${luks_device}'"
+  echo "${1}" |
+    ${ssh} -t sudo cryptsetup open "${luks_device}" "${lvm_name}" |&
+    indent ||
     die "Failed to open '${luks_device}'"
-  wait_for "/dev/mapper/${2}"
+  wait_for "/dev/mapper/${lvm_name}"
 }
 
 # LVM
@@ -205,13 +207,13 @@ function ensure_lv_removed {
 }
 
 # FAT32
-function is_fat32 {
-  (${ssh} sudo ${file} "${1}" | grep "FAT (32 bit)") &>/dev/null
+function is_boot_fat32 {
+  (${ssh} sudo ${file} "${boot_device}" | grep "FAT (32 bit)") &>/dev/null
 }
 
 # Swap
 function is_swap {
-  ${ssh} sudo swaplabel "${1}" &>/dev/null
+  ${ssh} sudo swaplabel "${swap_device}" &>/dev/null
 }
 
 function is_swapon {
@@ -225,8 +227,8 @@ function ensure_swapoff {
   fi
 }
 
-function is_ext4() {
-  ${ssh} sudo ${file} -sL "${1}" | grep "ext4 filesystem" &>/dev/null
+function is_root_ext4 {
+  ${ssh} sudo ${file} -sL "${root_device}" | grep "ext4 filesystem" &>/dev/null
 }
 
 function was_partitioned {
@@ -284,7 +286,7 @@ has_partition "${luks_name}" || die "Missing LUKS partition '${luks_name}'"
 
 ### BOOT DEVICE ###
 if was_partitioned ||
-    (! is_fat32 "${boot_device}" &&
+    (! is_boot_fat32 &&
        confirm "Format as FAT32 '${boot_device}'?" &&
        really_sure "format as FAT32 '${boot_device}'")
 then
@@ -294,7 +296,7 @@ then
     die "Failed to format as FAT32 '${boot_device}'"
 fi
 
-if is_fat32 "${boot_device}"; then
+if is_boot_fat32; then
   log "Using boot device '${boot_device}'"
 else
   die "Unsuitable boot device '${boot_device}'"
@@ -320,7 +322,7 @@ then
    if [[ "${PASS}" = "${CONFIRM}" ]]; then
      echo "${PASS}" | ${ssh} -t sudo cryptsetup luksFormat "${luks_device}" |&
        indent
-     open_luks "${luks_device}" "${lvm_name}" "${PASS}"
+     open_luks "${PASS}"
    else
      die "Passphrase does not match"
    fi) || die "Failed to format as LUKS '${luks_device}'"
@@ -329,7 +331,7 @@ fi
 if is_luks; then
   if ! has_device "${luks_device}" ; then
     ask_no_echo "Please enter your passphrase:" PASS
-    open_luks "${luks_device}" "${lvm_name}" "${PASS}"
+    open_luks "${PASS}"
   fi
 else
   die "Unsuitable LUKS device '${luks_device}'"
@@ -376,7 +378,7 @@ fi
 
 # Format swap volume
 if was_partitioned ||
-    (! is_swap "${swap_device}" &&
+    (! is_swap &&
        confirm "Format as swap '${swap_device}'?" &&
        really_sure "format as swap '${swap_device}'")
 then
@@ -387,7 +389,7 @@ then
 fi
 
 if has_lv "swap" &&
-    is_swap "${swap_device}"; then
+    is_swap; then
   if ! is_swapon; then
     log "Enabling swap '${swap_device}'"
     ${ssh} sudo swapon "${swap_device}" |& indent ||
@@ -411,7 +413,7 @@ fi
 
 # format root
 if was_partitioned ||
-    (! is_ext4 "${root_device}" &&
+    (! is_root_ext4 &&
        confirm "Format as ext4 '${root_device}'" &&
        really_sure "format as ext4 '${root_device}'")
 then
@@ -422,7 +424,7 @@ then
     die "Failed to format as ext4 '${root_device}'"
 fi
 
-if is_ext4 "${root_device}"; then
+if is_root_ext4; then
   log "Using root device '${root_device}'"
   # Mount root
   ensure_mounted "${root_device}" /mnt
