@@ -165,9 +165,12 @@ function ensure_luks_closed {
 function open_luks {
   log "Using LUKS device '${luks_device}'"
   log "Opening LUKS device '${luks_device}' as '${lvm_name}'"
-  echo "${1}" |
-    ${ssh} -t sudo cryptsetup open "${luks_device}" "${lvm_name}" |&
-    indent ||
+  # echo "${1}" |
+  #   ${ssh} -t sudo cryptsetup open "${luks_device}" "${lvm_name}" |&
+  #   indent ||
+  #   die "Failed to open '${luks_device}'"
+  ${ssh} -t sudo cryptsetup open "${luks_device}" "${lvm_name}" |&
+  indent ||
     die "Failed to open '${luks_device}'"
   wait_for "/dev/mapper/${lvm_name}"
 }
