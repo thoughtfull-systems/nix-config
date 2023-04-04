@@ -144,7 +144,7 @@ function ensure_mounted {
 }
 
 # LUKS
-function is_luks { ${ssh} sudo cryptsetup isLuks "${1}"; }
+function is_luks { ${ssh} sudo cryptsetup isLuks "${luks_device}"; }
 
 function wait_for() {
   if ${ssh} "[[ ! -e \"${1}\" ]]" &>/dev/null; then
@@ -302,7 +302,7 @@ fi
 
 ### LUKS DEVICE ###
 if was_partitioned ||
-    (! is_luks "${luks_device}" &&
+    (! is_luks &&
        confirm "Format as LUKS '${luks_device}'?" &&
        really_sure "format as LUKS '${luks_device}'")
 then
@@ -326,7 +326,7 @@ then
    fi) || die "Failed to format as LUKS '${luks_device}'"
 fi
 
-if is_luks "${luks_device}"; then
+if is_luks; then
   if ! has_device "${luks_device}" ; then
     ask_no_echo "Please enter your passphrase:" PASS
     open_luks "${luks_device}" "${lvm_name}" "${PASS}"
