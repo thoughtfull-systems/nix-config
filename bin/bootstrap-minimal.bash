@@ -165,7 +165,7 @@ function ensure_luks_closed {
 function open_luks {
   log "Using LUKS device '${luks_device}'"
   log "Opening LUKS device '${luks_device}' as '${lvm_name}'"
-  echo "${1}" | \
+  echo "${1}" |
     ${ssh} -t sudo cryptsetup open "${luks_device}" "${lvm_name}" |&
     indent ||
     die "Failed to open '${luks_device}'"
@@ -321,7 +321,8 @@ then
   (ask_no_echo "Please enter your passphrase:" PASS
    ask_no_echo "Please confirm your passphrase:" CONFIRM
    if [[ "${PASS}" = "${CONFIRM}" ]]; then
-     ${ssh} -t sudo cryptsetup luksFormat "${luks_device}"
+     echo "${PASS}" | ${ssh} -t sudo cryptsetup luksFormat "${luks_device}" |&
+       indent
      open_luks "${PASS}"
    else
      die "Passphrase does not match"
