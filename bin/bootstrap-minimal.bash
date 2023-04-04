@@ -136,7 +136,7 @@ function ensure_unmounted {
 
 function ensure_mounted {
   if ! is_mounted "${1}" && ! is_mounted "\$(realpath ${1})"; then
-    log "Mounting '${1}'"
+    log "Mounting '${1}' to '${2}'"
     (${ssh} sudo mount "${1}" "${2}" 2>/dev/null ||
        ${ssh} sudo mount "\$(realpath ${1})" "${2}") |& indent ||
       die "Failed to mount '${1}'"
@@ -164,6 +164,7 @@ function ensure_luks_closed {
 
 function open_luks {
   log "Using LUKS device '${luks_device}'"
+  log "Opening LUKS device '${luks_device}' as '${lvm_name}'"
   echo "${1}" |
     ${ssh} -t sudo cryptsetup open "${luks_device}" "${lvm_name}" |&
     indent ||
@@ -500,7 +501,7 @@ fi
 # Generate NixOS config
 log "Generate NixOS config"
 ${ssh} sudo nixos-generate-config --root /mnt |& indent
-log "Copy hardware config"
+log "Copying hardware config to '/mnt/etc/nixos/hosts/${hostname}'"
 ${ssh} sudo mkdir -p "/mnt/etc/nixos/hosts/${hostname}" |& indent
 ${ssh} sudo mv /mnt/etc/nixos/hardware-configuration.nix \
        "/mnt/etc/nixos/hosts/${hostname}/" |& indent
