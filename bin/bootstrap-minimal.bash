@@ -407,7 +407,7 @@ if was_partitioned || ! has_lv "root"; then
   ensure_unmounted "${root_device}"
   ensure_lv_removed "root"
   log "Creating 'root' LVM volume"
-  (${ssh} sudo lvcreate --extents 100%FREE --name root ${1} |& indent
+  (${ssh} sudo lvcreate --size -256M --name root ${1} |& indent
    wait_for "/dev/mapper/${vg_name}-root") ||
     die "Failed to create 'root' LVM volume"
 fi
