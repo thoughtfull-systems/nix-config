@@ -9,8 +9,8 @@
   };
   outputs = inputs: {
     nixosConfigurations = {
-      tatenen = inputs.nixpkgs.lib.nixosSystem {
-        modules = [ ./hosts/tatenen ];
+      tabal = inputs.nixpkgs.lib.nixosSystem {
+        modules = [ ./hosts/tabal ];
         specialArgs = {
           agenix = inputs.agenix;
           unstable = import inputs.unstable {
