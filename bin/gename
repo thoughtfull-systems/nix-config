@@ -1,4 +1,6 @@
+#!/usr/bin/env -S bash -euo pipefail
 # https://bible.knowing-jesus.com/names
+cat <<EOF | shuf -n 1
 aaron
 abaddon
 abagtha
@@ -3262,3 +3264,4 @@ ziphion
 zizah
 zoba
 zophai
+EOF
