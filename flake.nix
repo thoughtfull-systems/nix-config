@@ -1,7 +1,7 @@
 {
   description = "NixOS configuration";
   inputs = {
-    agenix.url = "github:thoughtfull-systems/agenix";
+    agenix.url = "github:ryantm/agenix";
     hardware.url = "github:nixos/nixos-hardware/master";
     nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
     # for some software I want the most recent version
