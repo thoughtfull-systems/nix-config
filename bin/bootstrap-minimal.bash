@@ -208,6 +208,8 @@ function ensure_lv_removed {
 
 # FAT32
 function is_boot_fat32 {
+  # https://wiki.archlinux.org/title/FAT#Detecting_FAT_type recommends either
+  # file or minfo
   (${ssh} sudo ${file} "${boot_device}" | grep "FAT (32 bit)") &>/dev/null
 }
 
@@ -408,6 +410,9 @@ if was_partitioned || ! has_lv "root"; then
   ensure_lv_removed "root"
   log "Creating 'root' LVM volume"
   (${ssh} sudo lvcreate --extents 100%FREE --name root ${vg_name} |& indent
+   # https://man.archlinux.org/man/e2scrub.8 says e2scrub needs at least 256MiB
+   # to create a snapshot in order to check the metadata of an LVM ext
+   # filesystem
    log "Leaving free space for e2scrub"
    ${ssh} sudo lvreduce -y --size -300M ${vg_name}/root |& indent
    wait_for "/dev/mapper/${vg_name}-root") ||
