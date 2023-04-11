@@ -329,7 +329,7 @@ then
 fi
 
 if is_luks; then
-  if ! has_device "${luks_device}" ; then
+  if ! has_device "${lvm_device}" ; then
     ask_no_echo "Please enter your passphrase:" PASS
     open_luks "${PASS}"
   fi
