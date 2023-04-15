@@ -1,1 +1,1 @@
-* NixOS Configuration
+* Configuration for NixOS and Home Manager
