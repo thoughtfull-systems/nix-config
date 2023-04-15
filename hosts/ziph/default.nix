@@ -41,6 +41,7 @@
     };
   };
   networking = {
+    domain = "stadig.name";
     hostName = "ziph";
     networkmanager.enable = true;
   };
