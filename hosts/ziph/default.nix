@@ -46,6 +46,10 @@
     networkmanager.enable = true;
   };
   nixpkgs.config.allowUnfree = true;
+  programs = {
+    git.enable = true;
+    zsh.enable = true;
+  };
   security.rtkit.enable = true;
   services = {
     pcscd.enable = true;
