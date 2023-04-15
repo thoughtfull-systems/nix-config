@@ -86,7 +86,7 @@ agenix="${nix} run github:ryantm/agenix --"
 # devices
 boot_name="${hostname}-boot"
 boot_device="/dev/disk/by-partlabel/${boot_name}"
-luks_name="${hostname}-lvm-luks"
+luks_name="${hostname}-luks"
 luks_device="/dev/disk/by-partlabel/${luks_name}"
 lvm_name="${hostname}-lvm"
 lvm_device="/dev/mapper/${lvm_name}"

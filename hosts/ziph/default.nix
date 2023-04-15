@@ -6,7 +6,7 @@
   boot = {
     initrd = {
       luks.devices."ziph-nixos" = {
-        device = "/dev/disk/by-partlabel/ziph-lvm-crypt";
+        device = "/dev/disk/by-partlabel/ziph-luks";
         preLVM = true;
       };
     };
