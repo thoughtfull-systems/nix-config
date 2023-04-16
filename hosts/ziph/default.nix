@@ -24,6 +24,7 @@
   };
   imports = [
     ./hardware-configuration.nix
+    ./paul
     agenix.nixosModules.default
   ];
   i18n = {
@@ -62,14 +63,14 @@
     };
     printing.enable = true;
     xserver = {
-      enable = true;
-      displayManager = {
-        autoLogin.enable = true;
-        autoLogin.user = "paul";
-        gdm.enable = true;
+      desktopManager.xfce.enable = true;
+      displayManager.autoLogin = {
+        enable = true;
+        user = "paul";
       };
-      desktopManager.gnome.enable = true;
+      enable = true;
       layout = "us";
+      xkbOptions = "ctrl:nocaps";
       xkbVariant = "dvorak";
     };
   };
@@ -80,13 +81,5 @@
     "autovt@tty1".enable = false;
   };
   time.timeZone = "America/New_York";
-  users = {
-    mutableUsers = false;
-    users.paul = {
-      description = "Paul Stadig";
-      extraGroups = [ "networkmanager" "wheel" ];
-      isNormalUser = true;
-      passwordFile = config.age.secrets.paul-password.path;
-    };
-  };
+  users.mutableUsers = false;
 }
