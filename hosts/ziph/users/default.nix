@@ -4,4 +4,5 @@
     ./paul
     ./root
   ];
+  users.mutableUsers = false;
 }

@@ -73,5 +73,4 @@
     "autovt@tty1".enable = false;
   };
   time.timeZone = "America/New_York";
-  users.mutableUsers = false;
 }
