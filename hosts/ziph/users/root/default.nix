@@ -13,12 +13,12 @@
       stateVersion = "22.11";
       username = "root";
     };
-    imports = [ ../zsh.nix ];
-    programs = {
-      emacs.enable = true;
-      # Let Home Manager install and manage itself.
-      home-manager.enable = true;
-    };
+    imports = [
+      ../emacs.nix
+      ../zsh.nix
+    ];
+    # Let Home Manager install and manage itself.
+    programs.home-manager.enable = true;
   };
   users.users.root = {
     openssh.authorizedKeys.keys = [
