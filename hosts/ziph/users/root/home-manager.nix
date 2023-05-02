@@ -1,7 +1,5 @@
-{ home-manager, pkgs, ... } : {
+{ ... } : {
   home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
     users.root = {
       home = {
         username = "root";
@@ -24,7 +22,4 @@
       };
     };
   };
-  imports = [
-    home-manager.nixosModules.home-manager
-  ];
 }
