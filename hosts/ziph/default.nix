@@ -1,10 +1,5 @@
-{ agenix, config, pkgs, unstable, ... }: {
-  age = {
-    identityPaths = [
-      "/etc/ssh/ssh_host_ed25519_key"
-    ];
-    secrets.paul-password.file = ../../age/secrets/paul-password.age;
-  };
+{ ... }: {
+  age.secrets.paul-password.file = ../../age/secrets/paul-password.age;
   boot = {
     initrd = {
       luks.devices."ziph-nixos" = {
@@ -21,9 +16,9 @@
   # environment.systemPackages = [];
   hardware.pulseaudio.enable = false;
   imports = [
+    ../agenix.nix
     ./hardware-configuration.nix
     ./users
-    agenix.nixosModules.default
   ];
   i18n = {
     defaultLocale = "en_US.UTF-8";
