@@ -1,6 +1,9 @@
 { agenix, config, pkgs, unstable, ... }: {
   age = {
-    identityPaths = [ "/tmp/bootstrap.key" ];
+    identityPaths = [
+      "/etc/ssh/ssh_host_ed25519_key"
+      "/tmp/bootstrap.key"
+    ];
     secrets.paul-password.file = ../../age/secrets/paul-password.age;
   };
   boot = {

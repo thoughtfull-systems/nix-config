@@ -1,13 +1,9 @@
+with builtins;
 let
-  keyfiles = [
-    /home/paul/.ssh/id_ed25519.pub
-    ./keys/yk5nano475.pub
-  ] ++ (if (builtins.pathExists ./keys/bootstrap.pub)
-        then
-          [ ./keys/bootstrap.pub ]
-        else
-          []);
-  keys = map builtins.readFile keyfiles;
+  keyDir = (readDir ./keys);
+  keyNames = (filter (n: keyDir.${n} == "regular") (attrNames keyDir));
+  keyPaths = (map (n: ./keys/${n}) keyNames);
+  keys = map readFile keyPaths;
 in
 {
   "secrets/paul-password.age".publicKeys = keys;

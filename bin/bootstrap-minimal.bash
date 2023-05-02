@@ -454,7 +454,7 @@ if [[ ! -e "${scriptdir}/../age/keys/bootstrap.pub" ]]; then
   # Re-encrypt secrets
   log "Re-encrpting secrets"
   pushd "${scriptdir}/../age"
-  ${agenix} -r -i "keys/yk5nano475.key" |& indent
+  ${agenix} -r -i "yk5nano475.txt" |& indent
 
   # Commit and push secrets
   # Create temporary branch?
