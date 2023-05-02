@@ -17,16 +17,8 @@
       ../zsh.nix
       ./exwm.nix
     ];
-    programs = {
-      emacs = {
-        enable = true;
-        extraPackages = epkgs: with epkgs; [
-          exwm
-        ];
-      };
-      # Let Home Manager install and manage itself.
-      home-manager.enable = true;
-    };
+    # Let Home Manager install and manage itself.
+    programs.home-manager.enable = true;
   };
   users.users.paul = {
     description = "Paul Stadig";

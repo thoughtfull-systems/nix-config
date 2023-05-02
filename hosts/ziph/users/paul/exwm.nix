@@ -1,12 +1,16 @@
 { lib, pkgs, ... }: {
-  home = {
-    packages = [
-      (pkgs.concatTextFile {
-        name = "exwm";
-        files = [ ./exwm.sh ];
-        executable = true;
-        destination = "/bin/exwm";
-      })
+  home.packages = [
+    (pkgs.concatTextFile {
+      name = "exwm";
+      files = [ ./exwm.sh ];
+      executable = true;
+      destination = "/bin/exwm";
+    })
+  ];
+  programs.emacs = {
+    enable = true;
+    extraPackages = epkgs: with epkgs; [
+      exwm
     ];
   };
   xsession = {
