@@ -2,7 +2,6 @@
   age = {
     identityPaths = [
       "/etc/ssh/ssh_host_ed25519_key"
-      "/tmp/bootstrap.key"
     ];
     secrets.paul-password.file = ../../age/secrets/paul-password.age;
   };
@@ -23,8 +22,7 @@
   hardware.pulseaudio.enable = false;
   imports = [
     ./hardware-configuration.nix
-    ./paul
-    ./root
+    ./users
     agenix.nixosModules.default
   ];
   i18n = {
