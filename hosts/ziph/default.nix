@@ -19,15 +19,12 @@
     };
   };
   console.keyMap = "dvorak";
-  environment.systemPackages = [
-    # ?? pkgs.age-plugin-yubikey
-  ];
-  hardware = {
-    pulseaudio.enable = false;
-  };
+  # environment.systemPackages = [];
+  hardware.pulseaudio.enable = false;
   imports = [
     ./hardware-configuration.nix
     ./paul
+    ./root
     agenix.nixosModules.default
   ];
   i18n = {
@@ -60,8 +57,6 @@
     openssh.enable = true;
     pipewire = {
       enable = true;
-      alsa.enable = true;
-      alsa.support32Bit = true;
       pulse.enable = true;
     };
     printing.enable = true;
