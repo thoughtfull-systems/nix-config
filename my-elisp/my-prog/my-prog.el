@@ -16,7 +16,7 @@
  'my-prog
  '(display-line-numbers-minor-tick 10)
  '(display-line-numbers-width-start t)
- '(emacs-lisp-docstring-fill-column t)
+ '(emacs-lisp-docstring-fill-column 80)
  '(emacs-lisp-mode-hook '(eldoc-mode imenu-add-menubar-index checkdoc-minor-mode paredit-mode))
  '(fill-column 100)
  '(prog-mode-hook '(flyspell-prog-mode display-line-numbers-mode))
