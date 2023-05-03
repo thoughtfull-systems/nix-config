@@ -1,11 +1,6 @@
 { lib, pkgs, ... }: {
-  home.packages = [
-    (pkgs.concatTextFile {
-      name = "exwm";
-      files = [ ./exwm.sh ];
-      executable = true;
-      destination = "/bin/exwm";
-    })
+  home.packages = with pkgs; [
+    exwm-trampoline
   ];
   imports = [ ./emacs.nix ];
   programs.emacs.extraPackages = epkgs: with epkgs; [
@@ -13,6 +8,6 @@
   ];
   xsession = {
     enable = true;
-    initExtra = lib.mkAfter "[ ! -f $\{HOME}/.noexwm ] && (exwm; xfce4-session-logout -fl) &";
+    initExtra = lib.mkAfter "[ ! -f $\{HOME}/.noexwm ] && (exwm-trampoline; xfce4-session-logout -fl) &";
   };
 }

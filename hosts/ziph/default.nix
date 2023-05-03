@@ -1,4 +1,4 @@
-{ ... }: {
+{ my-nixpkgs, ... }: {
   age.secrets.paul-password.file = ../../age/secrets/paul-password.age;
   boot = {
     initrd = {
@@ -39,7 +39,10 @@
     hostName = "ziph";
     networkmanager.enable = true;
   };
-  nixpkgs.config.allowUnfree = true;
+  nixpkgs = {
+    config.allowUnfree = true;
+    overlays = [ my-nixpkgs ];
+  };
   programs = {
     git.enable = true;
     ssh.startAgent = true;

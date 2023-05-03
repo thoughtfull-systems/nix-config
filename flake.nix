@@ -17,6 +17,7 @@
         modules = [ ./hosts/ziph ];
         specialArgs = {
           inherit (inputs) agenix home-manager;
+          my-nixpkgs = import ./my-nixpkgs;
           unstable = import inputs.unstable {
             config.allowUnfree = true;
             system = "x86_64-linux";
