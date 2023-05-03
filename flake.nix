@@ -17,6 +17,7 @@
         modules = [ ./hosts/ziph ];
         specialArgs = {
           inherit (inputs) agenix home-manager;
+          my-elisp = import ./my-elisp;
           my-nixpkgs = import ./my-nixpkgs;
           unstable = import inputs.unstable {
             config.allowUnfree = true;
