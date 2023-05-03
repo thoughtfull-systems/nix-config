@@ -1,9 +1,9 @@
-{ my-elisp, pkgs, ... } : {
+{ lib, my-elisp, pkgs, ... } : {
   home.packages = with pkgs; [ source-code-pro ];
-  fonts.fontconfig.enable = true;
   programs.emacs = {
     enable = true;
-    extraConfig = ''
+    extraConfig = lib.mkBefore ''
+      (require 'use-package)
       (use-package my :demand t)
     '';
     extraPackages = epkgs: with epkgs; [

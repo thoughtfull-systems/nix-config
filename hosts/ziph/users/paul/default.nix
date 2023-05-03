@@ -14,7 +14,8 @@
       username = "paul";
     };
     imports = [
-      ../exwm.nix
+      ../emacs/my-exwm.nix
+      ../emacs/my-prog.nix
       ../zsh.nix
     ];
     # Let Home Manager install and manage itself.

@@ -2,7 +2,7 @@
   home.packages = with pkgs; [
     exwm-trampoline
   ];
-  imports = [ ./emacs.nix ];
+  imports = [ ../emacs.nix ];
   programs.emacs.extraPackages = epkgs: with epkgs; [
     exwm
   ];
