@@ -4,7 +4,7 @@
     enable = true;
     extraConfig = lib.mkBefore ''
       (require 'use-package)
-      (use-package my :demand t)
+      (use-package my)
     '';
     extraPackages = epkgs: with epkgs; [
       my

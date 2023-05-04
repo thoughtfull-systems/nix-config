@@ -9,6 +9,9 @@
 ;; None
 
 ;;; Code:
+(defvar my-custom-file "~/.config/emacs/custom.el")
+
+(load my-custom-file t)
 
 (deftheme my)
 
@@ -16,12 +19,12 @@
  'my
  '(auto-save-visited-mode t)
  '(backup-directory-alist '(("." . "~/.config/emacs/backups")))
- '(custom-file "~/.config/emacs/custom.el")
+ '(custom-file my-custom-file)
  '(desktop-restore-frames nil)
  '(fringe-mode 1)
  '(global-whitespace-mode t)
  '(indent-tabs-mode nil)
- `(inhibit-startup-echo-area-message ,(getenv "USER"))
+ '(inhibit-startup-echo-area-message (getenv "USER"))
  '(inhibit-startup-screen t)
  '(menu-bar-mode nil)
  '(save-interprogram-paste-before-kill t)
@@ -38,22 +41,7 @@
 
 (custom-theme-set-faces
  'my
- '(default ((t (:inherit nil
-                         :extend nil
-                         :stipple nil
-                         :background "#eeeeec"
-                         :foreground "#2e3436"
-                         :inverse-video nil
-                         :box nil
-                         :strike-through nil
-                         :overline nil
-                         :underline nil
-                         :slant normal
-                         :weight normal
-                         :height 110
-                         :width normal
-                         :foundry "ADBO"
-                         :family "Source Code Pro")))))
+ '(default ((t (:height 110 :family "Source Code Pro")))))
 
 (provide-theme 'my)
 (enable-theme 'my)
