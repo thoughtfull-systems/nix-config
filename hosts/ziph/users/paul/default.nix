@@ -14,6 +14,7 @@
       username = "paul";
     };
     imports = [
+      ../emacs/my-completion.nix
       ../emacs/my-exwm.nix
       ../emacs/my-prog.nix
       ../zsh.nix
