@@ -4,7 +4,7 @@
   ];
   imports = [ ../emacs.nix ];
   programs.emacs.extraPackages = epkgs: with epkgs; [
-    exwm
+    my-exwm
   ];
   xsession = {
     enable = true;
