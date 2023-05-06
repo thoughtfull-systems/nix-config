@@ -13,6 +13,9 @@
 
 (load my-custom-file t)
 
+(defun my-buffer-compare (b1 b2)
+  (string-collate-lessp (buffer-name b1) (buffer-name b2) nil t))
+
 (defun my-switch-buffer (&optional prefix)
   (interactive "p")
   (if (eq prefix 4)

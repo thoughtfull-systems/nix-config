@@ -17,9 +17,6 @@
 (require 'exwm-config)
 (require 'exwm-randr)
 
-(defun my-buffer-compare (b1 b2)
-  (string-collate-lessp (buffer-name b1) (buffer-name b2) nil t))
-
 (defun my-exwm-buffer-class (buffer)
   (with-current-buffer buffer exwm-class-name))
 
