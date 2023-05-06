@@ -17,6 +17,7 @@
       ../emacs/my-completion.nix
       ../emacs/my-exwm.nix
       ../emacs/my-prog.nix
+      ../firefox.nix
       ../zsh.nix
     ];
     # Let Home Manager install and manage itself.
