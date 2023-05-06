@@ -13,6 +13,12 @@
 
 (load my-custom-file t)
 
+(defun my-switch-buffer (&optional prefix)
+  (interactive "p")
+  (if (eq prefix 4)
+      (ibuffer)
+    (call-interactively 'switch-to-buffer)))
+
 (deftheme my)
 
 (custom-theme-set-variables
