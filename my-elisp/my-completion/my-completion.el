@@ -11,11 +11,23 @@
 ;;; Code:
 (require 'use-package)
 
+(defun my-completion-delete-back-to-slash ()
+  (interactive)
+  (let ((end (point-marker)))
+    (when (string= (char-to-string (char-before)) "/")
+      (backward-char 1))
+    (if (search-backward "/" nil t)
+        (progn
+          (forward-char 1)
+          (delete-region (point-marker) end))
+      (goto-char end))))
+
 (use-package icomplete
   :bind
   (:map icomplete-minibuffer-map
         ("C-<return>" . icomplete-force-complete)
-        ("<return>" . icomplete-force-complete-and-exit)))
+        ("<return>" . icomplete-force-complete-and-exit)
+        ("C-l" . my-completion-delete-back-to-slash)))
 
 (use-package orderless)
 
