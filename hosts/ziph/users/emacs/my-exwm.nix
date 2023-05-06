@@ -1,7 +1,11 @@
 { lib, pkgs, ... }: {
-  home.packages = with pkgs; [
-    exwm-trampoline
-  ];
+  home = {
+    packages = with pkgs; [
+      exwm-trampoline
+      flameshot
+    ];
+    sessionVariables.EDITOR = "emacsclient";
+  };
   imports = [ ../emacs.nix ];
   programs.emacs.extraPackages = epkgs: with epkgs; [
     my-exwm
