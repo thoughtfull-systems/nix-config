@@ -10,6 +10,9 @@
 
 ;;; Code:
 
+(use-package magit
+  :bind ("C-x g" . magit-status))
+
 (deftheme my-prog)
 
 (custom-theme-set-variables

@@ -1,6 +1,7 @@
 self: super: {
   my-prog = self.elpaBuild {
     packageRequires = with self; [
+      magit
       paredit
     ];
     pname = "my-prog";
