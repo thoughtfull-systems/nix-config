@@ -13,6 +13,13 @@
 (use-package magit
   :bind ("C-x g" . magit-status))
 
+(use-package projectile
+  :init
+  (projectile-mode +1)
+  :bind
+  (:map projectile-mode-map
+        ("C-c p" . projectile-command-map)))
+
 (deftheme my-prog)
 
 (custom-theme-set-variables
