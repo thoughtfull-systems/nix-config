@@ -24,9 +24,6 @@ let
     folder.enable
   ) cfg.folders);
 
-  guiAddress = "http://localhost:8384";
-  configDir = "~/.config/syncthing";
-
   updateConfig = pkgs.writers.writeDash "merge-syncthing-config" ''
     set -efu
     # be careful not to leak secrets in the filesystem or in process listings
@@ -35,7 +32,7 @@ let
     while
         ! ${pkgs.libxml2}/bin/xmllint \
             --xpath 'string(configuration/gui/apikey)' \
-            ${configDir}/config.xml \
+            ${cfg.configDir}/config.xml \
             >"$RUNTIME_DIRECTORY/api_key"
     do sleep 1; done
     (printf "X-API-Key: "; cat "$RUNTIME_DIRECTORY/api_key") >"$RUNTIME_DIRECTORY/headers"
@@ -45,24 +42,31 @@ let
             "$@"
     }
     # query the old config
-    old_cfg=$(curl ${guiAddress}/rest/config)
+    old_cfg=$(curl ${cfg.guiAddress}/rest/config)
     # generate the new config by merging with the NixOS config options
     new_cfg=$(printf '%s\n' "$old_cfg" | ${pkgs.jq}/bin/jq -c '. * {
         "devices": (${builtins.toJSON devices}${optionalString (cfg.devices == {}) " + .devices"}),
         "folders": (${builtins.toJSON folders}${optionalString (cfg.folders == {}) " + .folders"})
     }')
     # send the new config
-    curl -X PUT -d "$new_cfg" ${guiAddress}/rest/config
+    curl -X PUT -d "$new_cfg" ${cfg.guiAddress}/rest/config
     # restart Syncthing if required
-    if curl ${guiAddress}/rest/config/restart-required |
+    if curl ${cfg.guiAddress}/rest/config/restart-required |
        ${pkgs.jq}/bin/jq -e .requiresRestart > /dev/null; then
-        curl -X POST ${guiAddress}/rest/system/restart
+        curl -X POST ${cfg.guiAddress}/rest/system/restart
     fi
   '';
 in {
   ###### interface
   options = {
     thoughtfull.services.syncthing-init = {
+      configDir = mkOption {
+        default = "~/.config/syncthing";
+        description = mdDoc ''
+          Configuration dir for syncthing.
+        '';
+        type = types.str;
+      };
 
       devices = mkOption {
         default = {};
@@ -320,6 +324,14 @@ in {
             };
           };
         }));
+      };
+
+      guiAddress = mkOption {
+        default = "http://localhost:8384";
+        type = types.str;
+        description = mdDoc ''
+          URL for syncthing API.
+        '';
       };
     };
   };
