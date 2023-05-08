@@ -26,6 +26,7 @@
   :bind
   (:map icomplete-minibuffer-map
         ("C-<return>" . icomplete-force-complete)
+        ("M-<return>" . exit-minibuffer)
         ("<return>" . icomplete-force-complete-and-exit)
         ("C-l" . my-completion-delete-back-to-slash)))
 

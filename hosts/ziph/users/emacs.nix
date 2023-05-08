@@ -1,4 +1,4 @@
-{ lib, my-elisp, pkgs, ... } : {
+{ lib, pkgs, thoughtfull, ... } : {
   home.packages = with pkgs; [ source-code-pro ];
   programs.emacs = {
     enable = true;
@@ -13,6 +13,6 @@
       my
       use-package
     ];
-    overrides = my-elisp;
+    overrides = thoughtfull.epkgs;
   };
 }

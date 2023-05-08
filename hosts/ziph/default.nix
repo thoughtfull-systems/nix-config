@@ -1,4 +1,4 @@
-{ my-nixpkgs, ... }: {
+{ thoughtfull, ... }: {
   age.secrets.paul-password.file = ../../age/secrets/paul-password.age;
   boot = {
     initrd = {
@@ -42,7 +42,7 @@
   };
   nixpkgs = {
     config.allowUnfree = true;
-    overlays = [ my-nixpkgs ];
+    overlays = [ thoughtfull.pkgs ];
   };
   programs = {
     git.enable = true;

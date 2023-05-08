@@ -17,11 +17,11 @@
         modules = [ ./hosts/ziph ];
         specialArgs = {
           inherit (inputs) agenix home-manager;
-          my-elisp = import ./my-elisp;
           thoughtfull = {
+            epkgs = import ./epkgs;
             home-manager = import ./home-manager;
+            pkgs = import ./pkgs;
           };
-          my-nixpkgs = import ./my-nixpkgs;
           unstable = import inputs.unstable {
             config.allowUnfree = true;
             system = "x86_64-linux";

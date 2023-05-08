@@ -1,9 +1,9 @@
-{ home-manager, my-elisp, thoughtfull, ... } : {
+{ home-manager, thoughtfull, ... } : {
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
     extraSpecialArgs = {
-      inherit my-elisp thoughtfull;
+      inherit thoughtfull;
     };
   };
   imports = [
