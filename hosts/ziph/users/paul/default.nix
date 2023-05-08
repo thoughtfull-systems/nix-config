@@ -1,4 +1,4 @@
-{ config, pkgs, ... } : {
+{ config, lib, pkgs, thoughtfull, ... } : {
   home-manager.users.paul = {
     home = {
       homeDirectory = "/home/paul";
@@ -18,10 +18,26 @@
       ../emacs/my-exwm.nix
       ../emacs/my-prog.nix
       ../firefox.nix
+      ../syncthing.nix
       ../zsh.nix
+      thoughtfull.home-manager
     ];
     # Let Home Manager install and manage itself.
     programs.home-manager.enable = true;
+    thoughtfull.services.syncthing-init.folders = {
+      org = {
+        devices = [ "hemera" ];
+        enable = true;
+      };
+      org-work = {
+        devices = [ "hemera" ];
+        enable = true;
+      };
+      sync = {
+        devices = [ "hemera" ];
+        enable = true;
+      };
+    };
   };
   users.users.paul = {
     description = "Paul Stadig";

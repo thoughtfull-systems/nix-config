@@ -18,6 +18,9 @@
         specialArgs = {
           inherit (inputs) agenix home-manager;
           my-elisp = import ./my-elisp;
+          thoughtfull = {
+            home-manager = import ./home-manager;
+          };
           my-nixpkgs = import ./my-nixpkgs;
           unstable = import inputs.unstable {
             config.allowUnfree = true;
