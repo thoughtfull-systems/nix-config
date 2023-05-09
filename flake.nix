@@ -13,22 +13,26 @@
   };
   outputs = inputs: {
     nixosConfigurations = {
-      ziph = inputs.nixpkgs.lib.nixosSystem {
-        modules = [ ./hosts/ziph ];
-        specialArgs = {
-          inherit (inputs) agenix home-manager;
-          thoughtfull = {
-            epkgs = import ./epkgs;
-            home-manager = import ./home-manager;
-            pkgs = import ./pkgs;
-          };
-          unstable = import inputs.unstable {
-            config.allowUnfree = true;
-            system = "x86_64-linux";
-          };
-        };
+      ziph = let
         system = "x86_64-linux";
-      };
+        unstable = import inputs.unstable {
+          config.allowUnfree = true;
+          system = system;
+        };
+      in
+        inputs.nixpkgs.lib.nixosSystem {
+          modules = [ ./hosts/ziph ];
+          specialArgs = {
+            inherit (inputs) agenix home-manager;
+            thoughtfull = {
+              epkgs = import ./epkgs unstable;
+              home-manager = import ./home-manager;
+              pkgs = import ./pkgs;
+            };
+            unstable = unstable;
+          };
+          system = system;
+        };
     };
   };
 }

@@ -1,5 +1,8 @@
 { lib, pkgs, thoughtfull, ... } : {
-  home.packages = with pkgs; [ source-code-pro ];
+  home.packages = with pkgs; [
+    emacs-all-the-icons-fonts
+    source-code-pro
+  ];
   programs.emacs = {
     enable = true;
     extraConfig = lib.mkBefore ''
