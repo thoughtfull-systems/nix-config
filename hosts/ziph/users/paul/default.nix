@@ -22,8 +22,14 @@
       ../zsh.nix
       thoughtfull.home-manager
     ];
-    # Let Home Manager install and manage itself.
-    programs.home-manager.enable = true;
+    programs = {
+      git = {
+        enable = true;
+        ignores = [ "*~" ];
+      };
+      # Let Home Manager install and manage itself.
+      home-manager.enable = true;
+    };
     thoughtfull.services.syncthing-init.folders = {
       org = {
         devices = [ "hemera" ];
