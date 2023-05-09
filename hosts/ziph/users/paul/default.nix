@@ -14,10 +14,10 @@
       username = "paul";
     };
     imports = [
+      ../desktop
       ../emacs/my-completion.nix
       ../emacs/my-exwm.nix
       ../emacs/my-prog.nix
-      ../firefox.nix
       ../syncthing.nix
       ../zsh.nix
       thoughtfull.home-manager
