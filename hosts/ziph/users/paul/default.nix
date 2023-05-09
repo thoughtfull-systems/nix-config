@@ -18,6 +18,7 @@
       ../emacs/my-completion.nix
       ../emacs/my-exwm.nix
       ../emacs/my-prog.nix
+      ../keychain.nix
       ../syncthing.nix
       ../zsh.nix
       thoughtfull.home-manager
