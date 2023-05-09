@@ -3,7 +3,6 @@ self: super: {
     packageRequires = with self; [
       magit
       paredit
-      projectile
     ];
     pname = "my-prog";
     src = ./my-prog.el;
