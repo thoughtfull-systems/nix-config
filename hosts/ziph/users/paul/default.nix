@@ -19,6 +19,7 @@
       ../emacs/my-exwm.nix
       ../emacs/my-prog.nix
       ../keychain.nix
+      ../starship.nix
       ../syncthing.nix
       ../zsh.nix
       thoughtfull.home-manager
