@@ -30,6 +30,11 @@
         ("<return>" . icomplete-force-complete-and-exit)
         ("C-l" . my-completion-delete-back-to-slash)))
 
+(use-package marginalia
+  :after icomplete
+  :config
+  (marginalia-mode))
+
 (use-package orderless)
 
 (deftheme my-completion)

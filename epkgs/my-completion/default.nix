@@ -1,6 +1,7 @@
 self: super: {
   my-completion = self.elpaBuild {
     packageRequires = with self; [
+      marginalia
       orderless
       use-package
     ];
