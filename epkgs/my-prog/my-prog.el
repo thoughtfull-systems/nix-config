@@ -10,9 +10,31 @@
 
 ;;; Code:
 
-(use-package magit
-  :bind ("C-x g" . magit-status))
+(require 'use-package)
+(use-package company
+  :hook (prog-mode . company-mode))
+(use-package display-line-numbers
+  :hook (prog-mode . display-line-numbers-mode))
+(use-package emacs-lisp
+  :hook (emacs-lisp-mode . eldoc-mode))
+(use-package flycheck
+  :after (prog-mode)
+  :bind (:map prog-mode-map
+              ("C-c e n" . flycheck-next-error)
+              ("C-c e p" . flycheck-previous-error))
+  :commands (flycheck-next-error flycheck-previous-error)
+  :hook (prog-mode . flycheck-mode))
+(use-package flycheck-pos-tip
+  :after (flycheck)
+  :commands (flycheck-pos-tip-mode)
+  :config (flycheck-pos-tip-mode)
+  :if (display-graphic-p))
+(use-package imenu
+  :bind (("C-c i" . imenu)
+         ("C-c C-i" . imenu)))
 (use-package magit-extras)
+(use-package paredit
+  :hook (emacs-lisp-mode . paredit-mode))
 
 (deftheme my-prog)
 
@@ -21,9 +43,8 @@
  '(display-line-numbers-minor-tick 10)
  '(display-line-numbers-width-start t)
  '(emacs-lisp-docstring-fill-column 80)
- '(emacs-lisp-mode-hook '(eldoc-mode imenu-add-menubar-index checkdoc-minor-mode paredit-mode))
  '(fill-column 100)
- '(prog-mode-hook '(flyspell-prog-mode display-line-numbers-mode))
+ '(flycheck-emacs-lisp-load-path 'inherit)
  '(sh-basic-offset 2))
 
 (provide-theme 'my-prog)

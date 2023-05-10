@@ -1,6 +1,9 @@
 self: super: {
   my-prog = self.elpaBuild {
     packageRequires = with self; [
+      company
+      flycheck
+      flycheck-pos-tip
       magit
       paredit
     ];
