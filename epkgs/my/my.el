@@ -18,6 +18,7 @@
   :if (display-graphic-p))
 (use-package all-the-icons-completion
   :after (all-the-icons icomplete marginalia)
+  :commands (all-the-icons-completion-mode)
   :config (all-the-icons-completion-mode)
   :hook (marginalia-mode . all-the-icons-completion-marginalia-setup))
 (use-package all-the-icons-dired
@@ -26,6 +27,9 @@
 (use-package all-the-icons-ibuffer
   :after (all-the-icons)
   :hook (ibuffer-mode . all-the-icons-ibuffer-mode))
+(use-package flyspell
+  :hook ((text-mode . flyspell-mode)
+         (prog-mode . flyspell-prog-mode)))
 
 (defun my-buffer-compare (b1 b2)
   (string-collate-lessp (buffer-name b1) (buffer-name b2) nil t))
@@ -37,7 +41,6 @@
     (call-interactively 'switch-to-buffer)))
 
 (deftheme my)
-
 (custom-theme-set-variables
  'my
  '(auto-save-visited-mode t)
@@ -61,11 +64,9 @@
  '(whitespace-line-column nil)
  '(whitespace-style '(face trailing lines-tail missing-newline-at-eof empty indentation
                            space-after-tab space-before-tab)))
-
 (custom-theme-set-faces
  'my
  '(default ((t (:height 110 :family "Source Code Pro")))))
-
 (provide-theme 'my)
 (enable-theme 'my)
 

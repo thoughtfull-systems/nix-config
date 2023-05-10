@@ -1,5 +1,9 @@
 { lib, pkgs, thoughtfull, ... } : {
   home.packages = with pkgs; [
+    aspell
+    aspellDicts.en
+    aspellDicts.en-computers
+    aspellDicts.en-science
     emacs-all-the-icons-fonts
     source-code-pro
   ];
@@ -14,7 +18,6 @@
     '';
     extraPackages = epkgs: with epkgs; [
       my
-      use-package
     ];
     overrides = thoughtfull.epkgs;
   };
