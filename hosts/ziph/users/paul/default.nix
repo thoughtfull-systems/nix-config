@@ -21,6 +21,7 @@
       ../keychain.nix
       ../starship.nix
       ../syncthing.nix
+      ../tmux.nix
       ../zsh.nix
       thoughtfull.home-manager
     ];
