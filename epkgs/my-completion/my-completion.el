@@ -9,7 +9,6 @@
 ;; None
 
 ;;; Code:
-(require 'use-package)
 
 (defun my-completion-delete-back-to-slash ()
   (interactive)
@@ -22,6 +21,7 @@
           (delete-region (point-marker) end))
       (goto-char end))))
 
+(require 'use-package)
 (use-package icomplete
   :bind
   (:map icomplete-minibuffer-map
@@ -29,16 +29,11 @@
         ("M-<return>" . exit-minibuffer)
         ("<return>" . icomplete-force-complete-and-exit)
         ("C-l" . my-completion-delete-back-to-slash)))
-
 (use-package marginalia
-  :after icomplete
-  :config
-  (marginalia-mode))
-
+  :hook (icomplete-mode . marginalia-mode))
 (use-package orderless)
 
 (deftheme my-completion)
-
 (custom-theme-set-variables
  'my-completion
  '(completion-auto-help 'lazy)
@@ -52,12 +47,10 @@
    '(orderless-regexp orderless-literal orderless-initialism orderless-prefixes))
  '(read-buffer-completion-ignore-case t)
  '(read-file-name-completion-ignore-case t))
-
 (custom-theme-set-faces
  'my-completion
  '(completions-common-part ((t (:inherit orderless-match-face-0))))
  '(icomplete-selected-match ((t nil))))
-
 (provide-theme 'my-completion)
 (enable-theme 'my-completion)
 
