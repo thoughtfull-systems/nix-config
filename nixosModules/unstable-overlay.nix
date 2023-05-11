@@ -1,4 +1,4 @@
-unstable: args: {
+{ unstable, ... }: {
   nixpkgs.overlays = [
     (final: prev: {
       unstable = import unstable {

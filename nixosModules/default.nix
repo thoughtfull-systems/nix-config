@@ -1,4 +1,4 @@
-unstable: rec {
+inputs: rec {
   default = thoughtfull;
-  thoughtfull = import ./thoughtfull.nix unstable;
+  thoughtfull = import ./thoughtfull.nix inputs;
 }

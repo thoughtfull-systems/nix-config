@@ -1,6 +1,7 @@
-unstable: args: {
+inputs: args: {
+  _module.args = inputs;
   imports = [
     ./nix.nix
-    (import ./unstable-overlay.nix unstable)
+    ./unstable-overlay.nix
   ];
 }

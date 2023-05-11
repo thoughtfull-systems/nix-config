@@ -1,4 +1,4 @@
-{ nix-lib, pkgs, unstable, ... }: {
+{ nix-lib, pkgs, ... }: {
   environment.systemPackages = with pkgs; [
     yubikey-manager-qt
     yubioath-desktop

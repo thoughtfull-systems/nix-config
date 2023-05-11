@@ -27,14 +27,10 @@
             home-manager = import ./home-manager;
             pkgs = import ./pkgs;
           };
-          unstable = import inputs.unstable {
-            config.allowUnfree = true;
-            system = system;
-          };
         };
         system = system;
       };
     };
-    nixosModules = (import ./nixosModules inputs.unstable);
+    nixosModules = import ./nixosModules inputs;
   };
 }
