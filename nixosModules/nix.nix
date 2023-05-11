@@ -46,9 +46,9 @@ in {
         };
       };
       programs.ssh.extraConfig = ''
-      Host deploy.${cfg.hostname}
-        Hostname ${cfg.hostname}
-        IdentityFile "/etc/nixos/deploy-key"
+        Host deploy.${cfg.hostname}
+          Hostname ${cfg.hostname}
+          IdentityFile "/etc/nixos/deploy-key"
       '';
       system.autoUpgrade = {
         allowReboot = true;
