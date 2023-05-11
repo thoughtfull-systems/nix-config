@@ -11,11 +11,11 @@
     # for some software I want the most recent version
     unstable.url = "github:nixos/nixpkgs/nixos-unstable";
   };
-  outputs = { nixpkgs, ... }@inputs: let
-    forAllSystems = nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed;
+  outputs = { nixpkgs, ... }@inputs: with nixpkgs.lib; let
+    forAllSystems = genAttrs systems.flakeExposed;
   in rec {
     nixosConfigurations = {
-      ziph = nixpkgs.lib.nixosSystem {
+      ziph = nixosSystem {
         modules = [
           ./hosts/ziph
           nixosModules.thoughtfull
