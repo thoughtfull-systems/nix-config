@@ -11,11 +11,11 @@
     # for some software I want the most recent version
     unstable.url = "github:nixos/nixpkgs/nixos-unstable";
   };
-  outputs = inputs: rec {
+  outputs = { nixpkgs, ... }@inputs: let
+    forAllSystems = nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed;
+  in rec {
     nixosConfigurations = {
-      ziph = let
-        system = "x86_64-linux";
-      in inputs.nixpkgs.lib.nixosSystem {
+      ziph = nixpkgs.lib.nixosSystem {
         modules = [
           ./hosts/ziph
           nixosModules.thoughtfull
@@ -25,12 +25,17 @@
           thoughtfull = {
             epkgs = import ./epkgs;
             home-manager = import ./home-manager;
-            pkgs = import ./pkgs;
           };
         };
-        system = system;
+        system = "x86_64-linux";
       };
     };
     nixosModules = import ./nixosModules inputs;
+    packages = forAllSystems (system: import ./packages (inputs // {
+      nixpkgs = import nixpkgs {
+        inherit system;
+        # TODO: not sure if I need to worry about config.allowUnfree = true?
+      };
+    }));
   };
 }

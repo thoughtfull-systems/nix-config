@@ -40,10 +40,7 @@
     hostName = "ziph";
     networkmanager.enable = true;
   };
-  nixpkgs = {
-    config.allowUnfree = true;
-    overlays = [ thoughtfull.pkgs ];
-  };
+  nixpkgs.config.allowUnfree = true;
   programs = {
     git.enable = true;
     ssh.startAgent = true;

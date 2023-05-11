@@ -1,7 +1,7 @@
 { lib, pkgs, ... }: {
   home = {
     packages = with pkgs; [
-      exwm-trampoline
+      thoughtfull.exwm-trampoline
       flameshot
     ];
     sessionVariables.EDITOR = "emacsclient";
