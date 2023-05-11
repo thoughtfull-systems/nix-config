@@ -1,4 +1,4 @@
-{ home-manager, thoughtfull, ... } : {
+{ inputs, thoughtfull, ... } : {
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
@@ -7,6 +7,6 @@
     };
   };
   imports = [
-    home-manager.nixosModules.home-manager
+    inputs.home-manager.nixosModules.home-manager
   ];
 }

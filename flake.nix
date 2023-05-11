@@ -21,7 +21,6 @@
           nixosModules.thoughtfull
         ];
         specialArgs = {
-          inherit (inputs) agenix home-manager;
           thoughtfull = {
             epkgs = import ./epkgs;
             home-manager = import ./home-manager;

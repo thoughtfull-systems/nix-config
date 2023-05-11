@@ -1,8 +1,14 @@
-inputs: args: {
-  _module.args = { inherit inputs; };
-  imports = [
+inputs: args: let
+  # TODO: not really happy with this hack, but _module.args is bewildering
+  import' = f: { pkgs, ... }@args: import f (args // { inherit inputs; });
+  importAll' = fs: map (f: import' f) fs;
+in {
+  imports = importAll' [
+    ./agenix.nix
     ./nix.nix
+    ./home-manager.nix
     ./thoughtfull-overlay.nix
     ./unstable-overlay.nix
+    ./yubikey.nix
   ];
 }

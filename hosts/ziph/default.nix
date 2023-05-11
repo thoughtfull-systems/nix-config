@@ -16,8 +16,6 @@
   # environment.systemPackages = [];
   hardware.pulseaudio.enable = false;
   imports = [
-    ../agenix.nix
-    ../yubikey.nix
     ./hardware-configuration.nix
     ./users
   ];
