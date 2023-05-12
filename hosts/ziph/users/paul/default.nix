@@ -1,4 +1,4 @@
-{ config, lib, pkgs, thoughtfull, ... } : {
+{ config, lib, pkgs, ... } : {
   home-manager.users.paul = {
     home = {
       homeDirectory = "/home/paul";
@@ -23,7 +23,6 @@
       ../syncthing.nix
       ../tmux.nix
       ../zsh.nix
-      thoughtfull.home-manager
     ];
     programs = {
       git = {
