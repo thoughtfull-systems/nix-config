@@ -1,6 +1,6 @@
-self: super: {
-  my-completion = self.elpaBuild {
-    packageRequires = with self; [
+epkgs: {
+  my-completion = epkgs.elpaBuild {
+    packageRequires = with epkgs; [
       marginalia
       orderless
       use-package

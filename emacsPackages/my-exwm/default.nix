@@ -1,6 +1,6 @@
-self: super: {
-  my-exwm = self.elpaBuild {
-    packageRequires = with self; [
+epkgs: {
+  my-exwm = epkgs.elpaBuild {
+    packageRequires = with epkgs; [
       exwm
       exwm-modeline
     ];

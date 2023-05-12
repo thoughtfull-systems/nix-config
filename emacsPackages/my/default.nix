@@ -1,6 +1,6 @@
-self: super: {
-  my = self.elpaBuild {
-    packageRequires = with self; [
+epkgs: {
+  my = epkgs.elpaBuild {
+    packageRequires = with epkgs; [
       all-the-icons
       all-the-icons-completion
       all-the-icons-dired

@@ -1,4 +1,4 @@
-{ lib, pkgs, thoughtfull, ... } : {
+{ lib, pkgs, ... } : {
   home.packages = with pkgs; [
     aspell
     aspellDicts.en
@@ -19,6 +19,5 @@
     extraPackages = epkgs: with epkgs; [
       my
     ];
-    overrides = thoughtfull.epkgs;
   };
 }

@@ -14,6 +14,7 @@
   outputs = { nixpkgs, ... }@inputs: with nixpkgs.lib; let
     forAllSystems = genAttrs systems.flakeExposed;
   in rec {
+    emacsPackages = import ./emacsPackages;
     homeManagerModules = import ./homeManagerModules inputs;
     nixosConfigurations = {
       ziph = nixosSystem {

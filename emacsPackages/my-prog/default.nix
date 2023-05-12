@@ -1,6 +1,6 @@
-self: super: {
-  my-prog = self.elpaBuild {
-    packageRequires = with self; [
+epkgs: {
+  my-prog = epkgs.elpaBuild {
+    packageRequires = with epkgs; [
       company
       flycheck
       flycheck-pos-tip
