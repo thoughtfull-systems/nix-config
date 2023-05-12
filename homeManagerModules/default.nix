@@ -4,6 +4,7 @@ inputs: args: let
   importAll' = fs: map (f: import' f) fs;
 in {
   imports = importAll' [
+    ./home-manager.nix
     ./emacs-overlay.nix
     ./syncthing.nix
   ];
