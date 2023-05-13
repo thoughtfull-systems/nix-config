@@ -43,6 +43,7 @@
 (deftheme my)
 (custom-theme-set-variables
  'my
+ '(all-the-icons-dired-monochrome nil)
  '(auto-save-visited-mode t)
  '(backup-directory-alist '(("." . "~/.config/emacs/backups")))
  '(custom-file my-custom-file)
