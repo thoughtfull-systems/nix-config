@@ -15,14 +15,10 @@
   console.keyMap = "dvorak";
   # environment.systemPackages = [];
   hardware.pulseaudio.enable = false;
-  home-manager.users = {
-    paul.imports = [ ./users/paul ];
-    root.imports = [ ./users/root ];
-  };
   imports = [
-    ../../users/paul
-    ../../users/root
     ./hardware-configuration.nix
+    ./users/paul.nix
+    ./users/root.nix
   ];
   i18n = {
     defaultLocale = "en_US.UTF-8";

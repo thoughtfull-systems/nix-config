@@ -13,8 +13,8 @@
     username = "root";
   };
   imports = [
-    ../emacs.nix
-    ../zsh.nix
+    ./emacs.nix
+    ./zsh.nix
   ];
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;

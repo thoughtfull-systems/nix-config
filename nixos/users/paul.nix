@@ -4,7 +4,7 @@
     extraGroups = [ "networkmanager" "wheel" ];
     group = "users";
     isNormalUser = true;
-    openssh.authorizedKeys.keys = import ./authorizedKeys;
+    openssh.authorizedKeys.keys = import ./paul/authorizedKeys;
     passwordFile = config.age.secrets.paul-password.path;
     shell = pkgs.zsh;
     uid = 1000;
