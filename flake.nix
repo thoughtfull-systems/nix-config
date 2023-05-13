@@ -19,7 +19,7 @@
     nixosConfigurations = {
       ziph = nixosSystem {
         modules = [
-          ./hosts/ziph
+          ./nixos/hosts/ziph
           nixosModules.thoughtfull
         ];
         specialArgs = {
