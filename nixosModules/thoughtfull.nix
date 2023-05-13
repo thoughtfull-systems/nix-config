@@ -11,4 +11,5 @@ in {
     ./unstable-overlay.nix
     ./yubikey.nix
   ];
+  users.mutableUsers = false;
 }
