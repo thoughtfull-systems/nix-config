@@ -1,5 +1,5 @@
 { config, pkgs, lib, ... } : let
-  cfg = config.thoughtfull.services.xbanish;
+  cfg = config.thoughtfull.desktop;
 in {
   options = {
     thoughtfull.services.xbanish.enable = lib.mkEnableOption "xbanish";

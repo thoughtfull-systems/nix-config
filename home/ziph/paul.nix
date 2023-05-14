@@ -13,18 +13,9 @@
     username = "paul";
   };
   imports = [
-    ../../homeManagerModules/desktop
-    ../../homeManagerModules/emacs/my-completion.nix
-    ../../homeManagerModules/emacs/my-exwm.nix
-    ../../homeManagerModules/emacs/my-prog.nix
-    ../../homeManagerModules/keychain.nix
-    ../../homeManagerModules/starship.nix
-    ../../homeManagerModules/tmux.nix
-    ../../homeManagerModules/zsh.nix
     ./syncthing.nix
   ];
   programs = {
-    firefox.enable = true;
     git = {
       enable = true;
       ignores = [ "*~" ];
@@ -32,8 +23,9 @@
     # Let Home Manager install and manage itself.
     home-manager.enable = true;
   };
-  thoughtfull.services = {
-    syncthing-init.folders = {
+  thoughtfull = {
+    desktop.enable = true;
+    services.syncthing-init.folders = {
       org = {
         devices = [ "hemera" ];
         enable = true;
@@ -47,6 +39,5 @@
         enable = true;
       };
     };
-    xbanish.enable = true;
   };
 }
