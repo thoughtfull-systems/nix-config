@@ -32,18 +32,21 @@
     # Let Home Manager install and manage itself.
     home-manager.enable = true;
   };
-  thoughtfull.services.syncthing-init.folders = {
-    org = {
-      devices = [ "hemera" ];
-      enable = true;
+  thoughtfull.services = {
+    syncthing-init.folders = {
+      org = {
+        devices = [ "hemera" ];
+        enable = true;
+      };
+      org-work = {
+        devices = [ "hemera" ];
+        enable = true;
+      };
+      sync = {
+        devices = [ "hemera" ];
+        enable = true;
+      };
     };
-    org-work = {
-      devices = [ "hemera" ];
-      enable = true;
-    };
-    sync = {
-      devices = [ "hemera" ];
-      enable = true;
-    };
+    xbanish.enable = true;
   };
 }
