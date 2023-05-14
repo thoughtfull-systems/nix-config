@@ -8,7 +8,6 @@
   fonts.fontconfig.enable = lib.mkForce true;
   programs = {
     firefox = {
-      enable = true;
       profiles.default = {
         id = 0;
         settings = {
