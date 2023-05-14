@@ -31,7 +31,7 @@
         system = "x86_64-linux";
       };
     };
-    nixosModules = import ./nixosModules inputs;
+    nixosModules = import ./nixos/modules inputs;
     packages = forAllSystems (system: import ./packages (inputs // {
       nixpkgs = import nixpkgs {
         inherit system;
