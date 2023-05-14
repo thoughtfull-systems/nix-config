@@ -4,8 +4,18 @@ inputs: args: let
   importAll' = fs: map (f: import' f) fs;
 in {
   imports = importAll' [
-    ./home-manager.nix
+    ./desktop
+    ./emacs/my-completion.nix
+    ./emacs/my-exwm.nix
+    ./emacs/my-prog.nix
+    ./emacs.nix
     ./emacs-overlay.nix
+    ./gnome-terminal.nix
+    ./home-manager.nix
+    ./keychain.nix
+    ./starship.nix
     ./syncthing.nix
+    ./tmux.nix
+    ./zsh.nix
   ];
 }

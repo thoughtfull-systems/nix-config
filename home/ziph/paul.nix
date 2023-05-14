@@ -13,15 +13,15 @@
     username = "paul";
   };
   imports = [
-    ./desktop
-    ./emacs/my-completion.nix
-    ./emacs/my-exwm.nix
-    ./emacs/my-prog.nix
-    ./keychain.nix
-    ./starship.nix
+    ../../homeManagerModules/desktop
+    ../../homeManagerModules/emacs/my-completion.nix
+    ../../homeManagerModules/emacs/my-exwm.nix
+    ../../homeManagerModules/emacs/my-prog.nix
+    ../../homeManagerModules/keychain.nix
+    ../../homeManagerModules/starship.nix
+    ../../homeManagerModules/tmux.nix
+    ../../homeManagerModules/zsh.nix
     ./syncthing.nix
-    ./tmux.nix
-    ./zsh.nix
   ];
   programs = {
     git = {
