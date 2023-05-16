@@ -17,8 +17,8 @@
   hardware.pulseaudio.enable = false;
   imports = [
     ./hardware-configuration.nix
-    ./users/paul.nix
-    ./users/root.nix
+    ./paul.nix
+    ./root.nix
   ];
   i18n = {
     defaultLocale = "en_US.UTF-8";
