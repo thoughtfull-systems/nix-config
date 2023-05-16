@@ -67,7 +67,10 @@
     };
   };
   sound.enable = true;
-  system.stateVersion = "22.11"; # Did you read the comment?
+  system = {
+    autoUpgrade.enable = true;
+    stateVersion = "22.11"; # Did you read the comment?
+  };
   systemd.services = {
     "getty@tty1".enable = false;
     "autovt@tty1".enable = false;
