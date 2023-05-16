@@ -19,7 +19,7 @@
     nixosConfigurations = {
       ziph = nixosSystem {
         modules = [
-          ./nixos/hosts/ziph
+          ./nixos/ziph
           nixosModules.thoughtfull
         ];
         specialArgs = {
@@ -31,7 +31,7 @@
         system = "x86_64-linux";
       };
     };
-    nixosModules = import ./nixos/modules inputs;
+    nixosModules = import ./nixosModules inputs;
     packages = forAllSystems (system: import ./packages (inputs // {
       nixpkgs = import nixpkgs {
         inherit system;
