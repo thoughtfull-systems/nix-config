@@ -508,11 +508,11 @@ fi
 # Generate NixOS config
 log "Generate NixOS config"
 ${ssh} sudo nixos-generate-config --root /mnt |& indent
-log "Copying hardware config to '/mnt/etc/nixos/nixos/hosts/${hostname}'"
-${ssh} sudo mkdir -p "/mnt/etc/nixos/nixos/hosts/${hostname}" |& indent
-${ssh} sudo mv /mnt/etc/nixos/hardware-configuration.nix \
-       "/mnt/etc/nixos/nixos/hosts/${hostname}/" |& indent
-${ssh_nixos} sudo git add nixos/hosts/${hostname}/hardware-configuration.nix |& \
+log "Copying hardware config to '/mnt/etc/nixos/nixos/${hostname}'"
+${ssh} sudo mkdir -p "/mnt/etc/nixos/nixos/${hostname}" |& indent
+${ssh} sudo cp /mnt/etc/nixos/hardware-configuration.nix \
+       "/mnt/etc/nixos/nixos/${hostname}/" |& indent
+${ssh_nixos} sudo git add nixos/${hostname}/hardware-configuration.nix |& \
   indent
 
 # Install NixOS
@@ -527,5 +527,5 @@ ${ssh_nixos} sudo nixos-install --no-root-password --flake .#${hostname} |& \
 log "Copying log file"
 log "Installation complete $(date)"
 scp "${logfile}" "nixos@${ip}:/tmp/install.log"
-${ssh} sudo rm -f "/mnt/etc/nixos/nixos/hosts/${hostname}/install.log"
-${ssh} sudo mv /tmp/install.log "/mnt/etc/nixos/nixos/hosts/${hostname}"
+${ssh} sudo rm -f "/mnt/etc/nixos/nixos/${hostname}/install.log"
+${ssh} sudo mv /tmp/install.log "/mnt/etc/nixos/nixos/${hostname}"
