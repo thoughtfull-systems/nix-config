@@ -11,24 +11,30 @@
     # for some software I want the most recent version
     unstable.url = "github:nixos/nixpkgs/nixos-unstable";
   };
-  outputs = { nixpkgs, ... }@inputs: with nixpkgs.lib; let
+  outputs = { agenix, nixpkgs, ... }@inputs: with nixpkgs.lib; let
     forAllSystems = genAttrs systems.flakeExposed;
   in rec {
     emacsPackages = import ./emacsPackages;
     homeManagerModules = import ./homeManagerModules inputs;
     nixosConfigurations = {
-      ziph = nixosSystem {
+      ziph = let
+        system = "x86_64-linux";
+      in nixosSystem {
         modules = [
           ./nixos/ziph
           nixosModules.thoughtfull
         ];
         specialArgs = {
+          agenix = {
+            nixosModule = agenix.nixosModules.default;
+            package = agenix.packages.${system}.default;
+          };
           thoughtfull = {
             epkgs = import ./epkgs;
             home-manager = import ./home-manager;
           };
         };
-        system = "x86_64-linux";
+        system = system;
       };
     };
     nixosModules = import ./nixosModules inputs;
