@@ -1,5 +1,8 @@
-{ ... }: {
-  age.secrets.paul-password.file = ../../age/secrets/paul-password.age;
+{ config, ... }: {
+  age.secrets = {
+    paul-password.file = ../../age/secrets/paul-password.age;
+    ziph-deploy-key.file = ../../age/secrets/ziph-deploy-key.age;
+  };
   boot = {
     initrd = {
       luks.devices."ziph-nixos" = {
@@ -13,6 +16,7 @@
     };
   };
   console.keyMap = "dvorak";
+  environment.etc."nixos/deploy-key".source = config.age.secrets.ziph-deploy-key.path;
   # environment.systemPackages = [];
   hardware.pulseaudio.enable = false;
   imports = [
