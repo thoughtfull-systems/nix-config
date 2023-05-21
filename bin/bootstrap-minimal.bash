@@ -253,7 +253,7 @@ ${ssh} sudo parted -l |& indent
 partitioned=1
 if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
   ask "Partition which disk?" disk
-  while ! ${ssh} sudo parted -s "${disk}" print &>/dev/null; do
+  while ! ${ssh} sudo parted -s "${disk}" select &>/dev/null; do
     ask "'${disk}' does not exist; partition which disk?" disk
   done
 
