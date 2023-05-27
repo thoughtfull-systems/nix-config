@@ -1,7 +1,7 @@
 {
   description = "NixOS configuration";
   inputs = {
-    agenix.url = "github:thoughtfull-systems/agenix/cac900f4aeb6f9c119bcb01b3739078879e7e45a";
+    agenix.url = "github:thoughtfull-systems/agenix/561b774487ade1cf1120c7e0becd1226604e92d1";
     hardware.url = "github:nixos/nixos-hardware/master";
     home-manager = {
       inputs.nixpkgs.follows = "nixpkgs";
