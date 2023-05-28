@@ -94,7 +94,7 @@ swapon | grep "$(realpath ${swap_device})" &>/dev/null ||
 nixos-generate-config --root /mnt |& indent
 
 repo="${2:-github:thoughtfull-systems/nix-config}"
-nixos-install --no-root-password --flake "${repo}#bootstrap-x86" --option "networking.hostame" "${hostname}" |& \
+nixos-install --no-root-password --flake "${repo}#${hostname}" |& \
   indent ||
   die "Failed to install NixOS"
 
