@@ -22,24 +22,28 @@
         modules = [({ config, ... }: let
           hostname = config.networking.hostName;
         in {
-          boot = {
-            initrd = {
-              luks.devices."${hostname}-nixos" = {
-                device = "/dev/disk/by-partlabel/${hostname}-luks";
-                preLVM = true;
-              };
+          boot.initrd.luks.devices."${hostname}-lvm" = {
+            device = "/dev/disk/by-partlabel/${hostname}-luks";
+            preLVM = true;
+          };
+          fileSystems = {
+            "/" = {
+              device = "/dev/mapper/${hostname}-root";
+              fsType = "ext4";
+            };
+            "/boot" = {
+              device = "/dev/disk/by-partlabel/${hostname}-boot";
+              fsType = "vfat";
             };
           };
-          imports = [ /etc/nixos/hardware-configuration.nix ];
           networking = {
             domain = "stadig.name";
             networkmanager.enable = true;
           };
           services.openssh.enable = true;
+          swapDevices = [{ device = "/dev/disk/by-partlabel/${hostname}-swap"; }];
           system.stateVersion = "22.11";
-          users.users.root = {
-            openssh.authorizedKeys.keys = import ./nixos/paul/authorizedKeys;
-          };
+          users.users.root.openssh.authorizedKeys.keys = import ./nixos/paul/authorizedKeys;
         })];
       };
       ziph = let
