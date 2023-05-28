@@ -82,13 +82,13 @@ function is_mounted {
 }
 
 is_mounted "/mnt" ||
-  mount "/dev/mapper/${hostname}-root" "/mnt" &| indent
+  mount "/dev/mapper/${hostname}-root" "/mnt" |& indent
 is_mounted "/mnt/boot" ||
-  mount "${boot_device}" "/mnt/boot" &| indent
+  mount "${boot_device}" "/mnt/boot" |& indent
 
 swap_device="/dev/mapper/${hostname}-swap"
 swapon | grep "$(realpath ${swap_device})" &>/dev/null ||
-  swapon "${swap_device}" &| indent
+  swapon "${swap_device}" |& indent
 
 ## INSTALL ##
 nixos-generate-config --root /mnt |& indent
