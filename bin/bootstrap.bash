@@ -97,8 +97,8 @@ else
   display=1
 fi
 nixos-generate-config --root /mnt |& indent
-[[ ${display} -eq 0 ]] || cat /mnt/etc/nixos/hardware-configuration.nix
-read -sp "Press any key to continue..."
+[[ ${display} -eq 0 ]] ||
+  (cat /mnt/etc/nixos/hardware-configuration.nix; read -sp "Press any key to continue...")
 
 repo="${2:-github:thoughtfull-systems/nix-config}"
 nixos-install --no-root-password --flake "${repo}#${hostname}" |& indent ||
