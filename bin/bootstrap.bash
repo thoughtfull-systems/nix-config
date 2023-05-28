@@ -91,7 +91,11 @@ swapon | grep "$(realpath ${swap_device})" &>/dev/null ||
   swapon "${swap_device}" |& indent
 
 ## INSTALL ##
-display=$([[ -e /mnt/etc/nixos/hardware-configuration.nix ]])
+if [[ -e /mnt/etc/nixos/hardware-configuration.nix ]]; then
+  display=0
+else
+  display=1
+fi
 nixos-generate-config --root /mnt |& indent
 [[ ${display} -eq 0 ]] || less /mnt/etc/nixos/hardware-configuration.nix
 
