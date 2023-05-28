@@ -17,6 +17,31 @@
     emacsPackages = import ./emacsPackages;
     homeManagerModules = import ./homeManagerModules inputs;
     nixosConfigurations = {
+      bootstrap-x86 = nixosSystem {
+        system = "x86_64-linux";
+        modules = [({ config, ... }: let
+          hostname = config.networking.hostName;
+        in {
+          boot = {
+            initrd = {
+              luks.devices."${hostname}-nixos" = {
+                device = "/dev/disk/by-partlabel/${hostname}-luks";
+                preLVM = true;
+              };
+            };
+          };
+          imports = [ /etc/nixos/hardware-configuration.nix ];
+          networking = {
+            domain = "stadig.name";
+            networkmanager.enable = true;
+          };
+          services.openssh.enable = true;
+          system.stateVersion = "22.11";
+          users.users.root = {
+            openssh.authorizedKeys.keys = import ./nixos/paul/authorizedKeys;
+          };
+        })];
+      };
       ziph = let
         system = "x86_64-linux";
       in nixosSystem {
