@@ -29,7 +29,7 @@ luks_device="/dev/disk/by-partlabel/${luks_part}"
   die "Missing parttion ${luks_part}"
 
 lvm_name="${hostname}-lvm"
-lvm_device="/dev/mapper/${lvm-name}"
+lvm_device="/dev/mapper/${lvm_name}"
 
 function ask_no_echo() {
   msg="??? ${1} "
