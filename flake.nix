@@ -22,9 +22,13 @@
         modules = [({ config, ... }: let
           hostname = config.networking.hostName;
         in {
-          boot.initrd.luks.devices."${hostname}-lvm" = {
-            device = "/dev/disk/by-partlabel/${hostname}-luks";
-            preLVM = true;
+          boot = {
+            initrd.luks.devices."${hostname}-lvm" = {
+              device = "/dev/disk/by-partlabel/${hostname}-luks";
+              preLVM = true;
+            };
+            loader.efi.canTouchEfiVariables = true;
+            loader.systemd-boot.enable = true;
           };
           fileSystems = {
             "/" = {
