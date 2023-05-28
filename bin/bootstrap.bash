@@ -69,7 +69,7 @@ vg_name="${hostname}"
 vgs | grep "${vg_name}" &>/dev/null || die "Missing volume group ${vg_name}"
 
 function verify_lv {
-  ${ssh} sudo lvs -S "vg_name=${vg_name} && lv_name=${1}" |
+  lvs -S "vg_name=${vg_name} && lv_name=${1}" |
     grep "${1}" &>/dev/null || die "Missing logical volume ${1}"
 }
 
