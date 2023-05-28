@@ -91,11 +91,12 @@ swapon | grep "$(realpath ${swap_device})" &>/dev/null ||
   swapon "${swap_device}" |& indent
 
 ## INSTALL ##
+display=$([[ -e /mnt/etc/nixos/hardware-configuration.nix ]])
 nixos-generate-config --root /mnt |& indent
+[[ ${display} -eq 0 ]] || less /mnt/etc/nixos/hardware-configuration.nix
 
 repo="${2:-github:thoughtfull-systems/nix-config}"
-nixos-install --no-root-password --flake "${repo}#${hostname}" |& \
-  indent ||
+nixos-install --no-root-password --flake "${repo}#${hostname}" |& indent ||
   die "Failed to install NixOS"
 
 ## COPY LOG ##
