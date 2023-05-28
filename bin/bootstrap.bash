@@ -51,7 +51,7 @@ function wait_for() {
 
 if [[ ! -b "${lvm_device}" ]]; then
   PASS=1
-  CONFIM=2
+  CONFIRM=2
   while [[ "${PASS}" != "${CONFIRM}" ]]; do
     echo "Passphrases did not match!"
     ask_no_echo "Enter passphrase for ${luks_device}:" PASS
