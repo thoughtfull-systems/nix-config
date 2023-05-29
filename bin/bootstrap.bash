@@ -95,6 +95,7 @@ log "Generating hardware-configuration.nix"
 log "Add this for ${hostname} and commit"
 nixos-generate-config --show-hardware-config --no-filesystems
 read -sp "Press any key to continue..."
+echo
 
 repo="${2:-github:thoughtfull-systems/nix-config}"
 nixos-install --no-root-password --flake "${repo}#${hostname}" |& indent ||
