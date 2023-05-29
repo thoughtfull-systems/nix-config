@@ -18,6 +18,17 @@
   console.keyMap = "dvorak";
   environment.etc."nixos/deploy-key".source = config.age.secrets.ziph-deploy-key.path;
   # environment.systemPackages = [];
+  fileSystems = {
+    "/" = {
+      device = "/dev/disk/by-uuid/1df9e543-2a96-4a8e-856f-f99ff4dd89de";
+      fsType = "ext4";
+    };
+
+    "/boot" = {
+      device = "/dev/disk/by-uuid/C929-4CDD";
+      fsType = "vfat";
+    };
+  };
   hardware.pulseaudio.enable = false;
   imports = [
     ./hardware-configuration.nix
@@ -71,6 +82,9 @@
     };
   };
   sound.enable = true;
+  swapDevices = [{
+    device = "/dev/disk/by-uuid/d321cb5d-6b9e-445c-9c45-f58c9d14a7b6";
+  }];
   system = {
     autoUpgrade.enable = true;
     stateVersion = "22.11"; # Did you read the comment?
