@@ -91,14 +91,10 @@ swapon | grep "$(realpath ${swap_device})" &>/dev/null ||
   swapon "${swap_device}" |& indent
 
 ## INSTALL ##
-if [[ -e /mnt/etc/nixos/hardware-configuration.nix ]]; then
-  display=0
-else
-  display=1
-fi
-nixos-generate-config --root /mnt |& indent
-[[ ${display} -eq 0 ]] ||
-  (cat /mnt/etc/nixos/hardware-configuration.nix; read -sp "Press any key to continue...")
+log "Generating hardware-configuration.nix"
+log "Add this for ${hostname} and commit"
+nixos-generate-config --show-hardware-config --no-filesystems
+read -sp "Press any key to continue..."
 
 repo="${2:-github:thoughtfull-systems/nix-config}"
 nixos-install --no-root-password --flake "${repo}#${hostname}" |& indent ||
