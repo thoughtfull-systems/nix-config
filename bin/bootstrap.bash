@@ -86,31 +86,31 @@ swapon | grep "$(realpath ${swap_device})" &>/dev/null ||
   swapon "${swap_device}" |& indent
 
 ## GENERATE ##
-log "Generating openssh host keys"
+# copied from sshd pre-start script
 ssh_dir="/mnt/etc/ssh"
 if ! [ -s "${ssh_dir}/ssh_host_rsa_key" ]; then
   if ! [ -h "${ssh_dir}/ssh_host_rsa_key" ]; then
-    rm -f "${ssh_dir}/ssh_host_rsa_key"
+    rm -f "${ssh_dir}/ssh_host_rsa_key" |& indent
   fi
-  mkdir -m 0755 -p "$(dirname '${ssh_dir}/ssh_host_rsa_key')"
-  ssh-keygen -t "rsa" -b 4096 -C "root@${hostname}" -f "${ssh_dir}/ssh_host_rsa_key" -N ""
+  log "Generating openssh host rsa keys"
+  mkdir -m 0755 -p "$(dirname '${ssh_dir}/ssh_host_rsa_key')" |& indent
+  ssh-keygen -t "rsa" -b 4096 -C "root@${hostname}" -f "${ssh_dir}/ssh_host_rsa_key" -N "" |& indent
 fi
-if ! [ -s "${ssh_dir}/ssh_host_ed25519_key" ]; then
-  if ! [ -h "${ssh_dir}/ssh_host_ed25519_key" ]; then
-    rm -f "${ssh_dir}/ssh_host_ed25519_key"
+keypath="${ssh_dir}/ssh_host_ed25519_key"
+if ! [ -s "${keypath}" ]; then
+  if ! [ -h "${keypath}" ]; then
+    rm -f "${keypath}" |& indent
   fi
-  mkdir -m 0755 -p "$(dirname '${ssh_dir}/ssh_host_ed25519_key')"
-  ssh-keygen -t "ed25519" -C "root@${hostname}" -f "${ssh_dir}/ssh_host_ed25519_key" -N ""
+  log "Generating openssh host ed25519 keys"
+  mkdir -m 0755 -p "$(dirname '${keypath}')" |& indent
+  ssh-keygen -t "ed25519" -C "root@${hostname}" -f "${keypath}" -N "" |& indent
 fi
-log ""
-log "SSH host key"
-log ""
-cat "${ssh_dir}/ssh_host_ed25519_key.pub"
-log ""
+
+log "${keypath}.pub"
+cat "${keypath}.pub"
 log "hardware-configuration.nix"
-log ""
 nixos-generate-config --show-hardware-config --no-filesystems
-log "Add these for ${hostname} and commit"
+log "Add these for ${hostname}, rekey secrets, and commit"
 read -sp "Press any key to continue..."
 echo
 
