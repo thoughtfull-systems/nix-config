@@ -15,7 +15,6 @@ log "Installation starting $(date)"
 function die { echo "!!! ${1}" >&2; exit 1; }
 
 [[ -v 1 ]] || die "Expected hostname as first argument"
-[[ "${1}" = "$(hostname)" ]] || die "First argument does not match hostname"
 hostname="${1}"
 
 boot_part="${hostname}-boot"
@@ -50,16 +49,12 @@ function wait_for() {
 }
 
 if [[ ! -b "${lvm_device}" ]]; then
-  PASS=1
-  CONFIRM=2
-  while [[ "${PASS}" != "${CONFIRM}" ]]; do
-    echo "Passphrases did not match!"
+  ask_no_echo "Enter passphrase for ${luks_device}:" PASS
+  while ! echo "${PASS}" |
+      cryptsetup open "${luks_device}" "${lvm_name}" |& indent; do
+    echo "Open LUKS failed!"
     ask_no_echo "Enter passphrase for ${luks_device}:" PASS
-    ask_no_echo "Confirm passphrase for ${luks_device}:" CONFIRM
   done
-  echo "${PASS}" |
-    cryptsetup open "${luks_device}" "${lvm_name}" |& indent ||
-    die "Failed to open '${luks_device}'"
   wait_for "/dev/mapper/${lvm_name}"
 fi
 
@@ -90,16 +85,41 @@ swap_device="/dev/mapper/${hostname}-swap"
 swapon | grep "$(realpath ${swap_device})" &>/dev/null ||
   swapon "${swap_device}" |& indent
 
-## INSTALL ##
-log "Generating hardware-configuration.nix"
-log "Add this for ${hostname} and commit"
+## GENERATE ##
+log "Generating openssh host keys"
+ssh_dir="/mnt/etc/ssh"
+if ! [ -s "${ssh_dir}/ssh_host_rsa_key" ]; then
+  if ! [ -h "${ssh_dir}/ssh_host_rsa_key" ]; then
+    rm -f "${ssh_dir}/ssh_host_rsa_key"
+  fi
+  mkdir -m 0755 -p "$(dirname '${ssh_dir}/ssh_host_rsa_key')"
+  ssh-keygen -t "rsa" -b 4096 -C "root@${hostname}" -f "${ssh_dir}/ssh_host_rsa_key" -N ""
+fi
+if ! [ -s "${ssh_dir}/ssh_host_ed25519_key" ]; then
+  if ! [ -h "${ssh_dir}/ssh_host_ed25519_key" ]; then
+    rm -f "${ssh_dir}/ssh_host_ed25519_key"
+  fi
+  mkdir -m 0755 -p "$(dirname '${ssh_dir}/ssh_host_ed25519_key')"
+  ssh-keygen -t "ed25519" -C "root@${hostname}" -f "${ssh_dir}/ssh_host_ed25519_key" -N ""
+fi
+log ""
+log "SSH host key"
+log ""
+cat "${ssh_dir}/ssh_host_ed25519_key.pub"
+log ""
+log "hardware-configuration.nix"
+log ""
 nixos-generate-config --show-hardware-config --no-filesystems
+log "Add these for ${hostname} and commit"
 read -sp "Press any key to continue..."
 echo
 
+## INSTALL ##
 repo="${2:-github:thoughtfull-systems/nix-config}"
 nixos-install --no-root-password --flake "${repo}#${hostname}" |& indent ||
   die "Failed to install NixOS"
+
+ssh-keygen -t "rsa" -b 4096 -N ""
 
 ## COPY LOG ##
 log "Copying log file"
