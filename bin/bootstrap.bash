@@ -58,14 +58,14 @@ if [[ ! -b "${lvm_device}" ]]; then
   wait_for "/dev/mapper/${lvm_name}"
 fi
 
-pvs | grep "${lvm_device}" &>/dev/null || die "Missing physical volume ${lvm_device}"
+(pvs | grep "${lvm_device}") &>/dev/null || die "Missing physical volume ${lvm_device}"
 
 vg_name="${hostname}"
-vgs | grep "${vg_name}" &>/dev/null || die "Missing volume group ${vg_name}"
+(vgs | grep "${vg_name}") &>/dev/null || die "Missing volume group ${vg_name}"
 
 function verify_lv {
-  lvs -S "vg_name=${vg_name} && lv_name=${1}" |
-    grep "${1}" &>/dev/null || die "Missing logical volume ${1}"
+  (lvs -S "vg_name=${vg_name} && lv_name=${1}" |
+    grep "${1}") &>/dev/null || die "Missing logical volume ${1}"
 }
 
 verify_lv "root"
@@ -73,7 +73,7 @@ verify_lv "swap"
 
 ## MOUNT ##
 function is_mounted {
-  mount | grep " ${1} " &>/dev/null
+  (mount | grep " ${1} ") &>/dev/null
 }
 
 is_mounted "/mnt" ||
@@ -82,7 +82,7 @@ is_mounted "/mnt/boot" ||
   mount "${boot_device}" "/mnt/boot" |& indent
 
 swap_device="/dev/mapper/${hostname}-swap"
-swapon | grep "$(realpath ${swap_device})" &>/dev/null ||
+(swapon | grep "$(realpath ${swap_device})") &>/dev/null ||
   swapon "${swap_device}" |& indent
 
 ## GENERATE ##
