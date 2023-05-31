@@ -216,14 +216,13 @@ if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
     ensure_pv_removed
     ensure_luks_closed
     log "Creating partition table"
-    parted="parted -fs ${disk}"
-    ${parted} mklabel gpt |& indent || die "Failed to create partition table"
+    parted -fs "${disk}" mklabel gpt |& indent || die "Failed to create partition table"
     log "Creating boot partition (1G)"
-    ${parted} mkpart "${boot_name}" fat32 1MiB 1GiB |& indent ||
+    parted -fs "${disk}" mkpart "${boot_name}" fat32 1MiB 1GiB |& indent ||
       die "Failed to create boot partition"
-    ${parted} set 1 esp |& indent || die "Failed to mark boot partition as ESP"
+    parted -fs "${disk}" set 1 esp |& indent || die "Failed to mark boot partition as ESP"
     log "Creating LUKS partition with free space"
-    ${parted} mkpart "${luks_name}" 1GiB 100% |& indent ||
+    parted -fs "${disk}" mkpart "${luks_name}" 1GiB 100% |& indent ||
       die "Failed to create LUKS partition"
   fi
 else
@@ -269,19 +268,23 @@ then
   log "Formatting as LUKS '${luks_device}'"
   (ask_no_echo "Please enter your passphrase:" PASS
    ask_no_echo "Please confirm your passphrase:" CONFIRM
-   if [[ "${PASS}" = "${CONFIRM}" ]]; then
-     echo "${PASS}" | cryptsetup luksFormat "${luks_device}" |& \
-       indent
-     open_luks "${PASS}"
-   else
-     die "Passphrase does not match"
-   fi) || die "Failed to format as LUKS '${luks_device}'"
+   while [[ "${PASS}" != "${CONFIRM}" ]]; do
+     log "Password and confirmation do not match..."
+     ask_no_echo "Please enter your passphrase:" PASS
+     ask_no_echo "Please confirm your passphrase:" CONFIRM
+   done
+   echo "${PASS}" | cryptsetup luksFormat "${luks_device}" |& \
+     indent
+   open_luks "${PASS}") || die "Failed to format as LUKS '${luks_device}'"
 fi
 
 if is_luks; then
   if ! has_device "${lvm_device}" ; then
     ask_no_echo "Please enter your passphrase:" PASS
-    open_luks "${PASS}"
+    while ! open_luks "${PASS}"; do
+      log "Incorrect password..."
+      ask_no_echo "Please enter your passphrase:" PASS
+    done
   fi
 else
   die "Unsuitable LUKS device '${luks_device}'"
@@ -321,8 +324,7 @@ if was_partitioned || ! has_lv "swap"; then
                   / 1000000))
    swap_size=$((${mem_total}*${swap_factor}))
    log "Creating '${vg_name}-swap' with ${swap_size}G"
-   lvcreate --size "${swap_size}G" --name swap "${vg_name}" |& \
-     indent
+   lvcreate --size "${swap_size}G" --name swap "${vg_name}" |& indent
    wait_for "/dev/mapper/${vg_name}-swap")||
     die "Failed to create 'swap' LVM volume"
 fi
