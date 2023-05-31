@@ -122,4 +122,4 @@ nixos-install --no-root-password --flake "${repo}#${hostname}" |& indent ||
 ## COPY LOG ##
 log "Copying log file"
 log "Installation complete $(date)"
-cp "${logfile}" "/mnt/etc/nixos/bootstrap.log"
+cat "${logfile}" >> "/mnt/etc/nixos/bootstrap.log"
