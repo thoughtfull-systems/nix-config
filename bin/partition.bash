@@ -81,7 +81,7 @@ function has_partition {
 }
 
 function is_mounted {
-  mount | grep "${1}" &>/dev/null
+  mount | grep " ${1} " &>/dev/null
 }
 
 function ensure_unmounted {
