@@ -119,8 +119,6 @@ repo="${2:-github:thoughtfull-systems/nix-config}"
 nixos-install --no-root-password --flake "${repo}#${hostname}" |& indent ||
   die "Failed to install NixOS"
 
-ssh-keygen -t "rsa" -b 4096 -N ""
-
 ## COPY LOG ##
 log "Copying log file"
 log "Installation complete $(date)"
