@@ -395,4 +395,5 @@ ensure_mounted "${boot_device}" /mnt/boot
 ## COPY LOG ##
 log "Copying log file"
 log "Partitioning complete $(date)"
-cat "${logfile}" >> "/mnt/etc/nixos/nixos/${hostname}"
+mkdir -p "/mnt/etc/nixos/nixos/${hostname}"
+cat "${logfile}" >> "/mnt/etc/nixos/nixos/${hostname}/install.log"
