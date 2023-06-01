@@ -225,6 +225,8 @@ if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
     parted -fs "${disk}" mkpart "${luks_name}" 1GiB 100% |& indent ||
       die "Failed to create LUKS partition"
   fi
+  wait_for "${boot_device}"
+  wait_for "${luks_device}"
 else
   log "Using existing partition table"
 fi
