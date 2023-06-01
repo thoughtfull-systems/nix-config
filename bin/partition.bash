@@ -76,10 +76,6 @@ function has_device {
   [[ -b "${1}" ]] &>/dev/null
 }
 
-function has_partition {
-  has_device "/dev/disk/by-partlabel/${1}"
-}
-
 function is_mounted {
   mount | grep " ${1} " &>/dev/null
 }
@@ -232,8 +228,8 @@ else
 fi
 
 # Verify partitions
-has_partition "${boot_name}" || die "Missing boot partition '${boot_name}'"
-has_partition "${luks_name}" || die "Missing LUKS partition '${luks_name}'"
+has_device "${boot_device}" || die "Missing boot partition '${boot_name}'"
+has_device "${luks_device}" || die "Missing LUKS partition '${luks_name}'"
 
 ### BOOT DEVICE ###
 if was_partitioned ||
