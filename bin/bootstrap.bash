@@ -65,7 +65,7 @@ vg_name="${hostname}"
 
 function verify_lv {
   (lvs -S "vg_name=${vg_name} && lv_name=${1}" |
-    grep "${1}") &>/dev/null || die "Missing logical volume ${1}"
+     grep "${1}") &>/dev/null || die "Missing logical volume ${1}"
 }
 
 verify_lv "root"
@@ -77,13 +77,16 @@ function is_mounted {
 }
 
 is_mounted "/mnt" ||
-  mount "/dev/mapper/${hostname}-root" "/mnt" |& indent
+  mount "/dev/mapper/${hostname}-root" "/mnt" |& indent ||
+  die "Failed to mount /dev/mapper/${hostname}-root"
 is_mounted "/mnt/boot" ||
-  mount "${boot_device}" "/mnt/boot" |& indent
+  mount "${boot_device}" "/mnt/boot" |& indent ||
+  die "Failed to mount ${boot_device}"
 
 swap_device="/dev/mapper/${hostname}-swap"
 (swapon | grep "$(realpath ${swap_device})") &>/dev/null ||
-  swapon "${swap_device}" |& indent
+  swapon "${swap_device}" |& indent ||
+  die "Failed to enable swap ${swap_device}"
 
 ## GENERATE ##
 # copied from sshd pre-start script
@@ -93,8 +96,10 @@ if ! [ -s "${ssh_dir}/ssh_host_rsa_key" ]; then
     rm -f "${ssh_dir}/ssh_host_rsa_key" |& indent
   fi
   log "Generating openssh host rsa keys"
-  mkdir -m 0755 -p "$(dirname '${ssh_dir}/ssh_host_rsa_key')" |& indent
-  ssh-keygen -t "rsa" -b 4096 -C "root@${hostname}" -f "${ssh_dir}/ssh_host_rsa_key" -N "" |& indent
+  (mkdir -m 0755 -p "$(dirname '${ssh_dir}/ssh_host_rsa_key')" |& indent
+   ssh-keygen -t "rsa" -b 4096 -C "root@${hostname}" -f "${ssh_dir}/ssh_host_rsa_key" -N "" |&
+   indent) ||
+    die "Failed to generate host RSA key"
 fi
 keypath="${ssh_dir}/ssh_host_ed25519_key"
 if ! [ -s "${keypath}" ]; then
@@ -102,8 +107,9 @@ if ! [ -s "${keypath}" ]; then
     rm -f "${keypath}" |& indent
   fi
   log "Generating openssh host ed25519 keys"
-  mkdir -m 0755 -p "$(dirname '${keypath}')" |& indent
-  ssh-keygen -t "ed25519" -C "root@${hostname}" -f "${keypath}" -N "" |& indent
+  (mkdir -m 0755 -p "$(dirname '${keypath}')" |& indent
+   ssh-keygen -t "ed25519" -C "root@${hostname}" -f "${keypath}" -N "" |& indent) ||
+    die "Failed to generate host ed25519"
 fi
 
 log "${keypath}.pub"
