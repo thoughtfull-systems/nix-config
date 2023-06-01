@@ -77,7 +77,7 @@ function has_device {
 }
 
 function is_mounted {
-  mount | grep " ${1} " &>/dev/null
+  (mount | grep " ${1} ") &>/dev/null
 }
 
 function ensure_unmounted {
@@ -126,7 +126,7 @@ function open_luks {
 
 # LVM
 function has_pv {
-  pvs | grep "${lvm_device}" &>/dev/null
+  (pvs | grep "${lvm_device}") &>/dev/null
 }
 
 function ensure_pv_removed {
@@ -137,7 +137,7 @@ function ensure_pv_removed {
 }
 
 function has_vg {
-  vgs | grep "${vg_name}" &>/dev/null
+  (vgs | grep "${vg_name}") &>/dev/null
 }
 
 function ensure_vg_removed {
@@ -148,8 +148,8 @@ function ensure_vg_removed {
 }
 
 function has_lv {
-  lvs -S "vg_name=${vg_name} && lv_name=${1}" |
-    grep "${1}" &>/dev/null
+  (lvs -S "vg_name=${vg_name} && lv_name=${1}" |
+    grep "${1}") &>/dev/null
 }
 
 function ensure_lv_removed {
@@ -172,7 +172,7 @@ function is_swap {
 }
 
 function is_swapon {
-  swapon | grep "$(realpath ${swap_device})" &>/dev/null
+  (swapon | grep "$(realpath ${swap_device})") &>/dev/null
 }
 
 function ensure_swapoff {
@@ -183,7 +183,7 @@ function ensure_swapoff {
 }
 
 function is_root_ext4 {
-  ${file} -sL "${root_device}" | grep "ext4 filesystem" &>/dev/null
+  (${file} -sL "${root_device}" | grep "ext4 filesystem") &>/dev/null
 }
 
 function was_partitioned {
