@@ -104,9 +104,9 @@ vg_name="${hostname}"
 (vgs | grep "${vg_name}") &>/dev/null || die "Missing volume group: ${vg_name}"
 
 function verify_lv {
-  try <<-EOF || die "Missing logical volume: ${1}"
+  try <<-EOF
     lvs -S "vg_name=${vg_name} && lv_name=${1}" | grep "${1}"
-EOF
+EOF || die "Missing logical volume: ${1}"
 }
 
 verify_lv "root"
