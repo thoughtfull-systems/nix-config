@@ -115,18 +115,25 @@ function ensure_ssh_keys {
   fi
   log "Verified SSH keys exist"
 }
+function pause_for_input {
+  read -sp "Press any key to continue..."
+  echo
+}
 function print_key_and_config {
   log "${keypath}.pub"
   cat "${keypath}.pub"
   log "hardware-configuration.nix"
   nixos-generate-config --show-hardware-config --no-filesystems
   log "Add these for ${hostname}, rekey secrets, and commit"
-  read -sp "Press any key to continue..."
-  echo
+  pause_for_input
 }
 
 log "Installation started"
 [[ -v 1 ]] || die "Expected hostname as first argument"
+log "Using hostname ${hostname}"
+repo="${2:-github:thoughtfull-systems/nix-config}"
+log "Using repo ${repo}"
+pause_for_input
 hostname="${1}"
 luks_name="${hostname}-luks"
 luks_device="/dev/disk/by-partlabel/${luks_name}"
@@ -144,7 +151,6 @@ ensure_swap
 ensure_ssh_keys
 print_key_and_config
 
-repo="${2:-github:thoughtfull-systems/nix-config}"
 nixos-install --no-root-password --flake "${repo}#${hostname}" |& indent ||
   die "Failed to install NixOS"
 
