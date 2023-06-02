@@ -44,7 +44,7 @@ function try_ts {
 }
 function try {
   # cut off the timestamp at the beginning of each line
-  run_ts "${1}" > >(cut -c 37-)
+  try_ts "${1}" > >(cut -c 37-)
 }
 function indent {
   while read -r line; do
