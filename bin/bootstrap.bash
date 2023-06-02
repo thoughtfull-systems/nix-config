@@ -104,21 +104,22 @@ function ensure_ssh_keys {
   ssh_dir="/mnt/etc/ssh"
   mkdir -m 0755 -p "${ssh_dir}" |& indent
   keypath="${ssh_dir}/ssh_host_rsa_key"
+  sshargs="-C \"root@${hostname}\" -N \"\""
   if ! [ -s "${keypath}" ]; then
     if ! [ -h "${keypath}" ]; then
-      rm -f "${keypath}" |& indent
+      try "rm -f \"${keypath}\"" |& indent
     fi
     log "Generating openssh host rsa keys"
-    (ssh-keygen -t "rsa" -b 4096 -C "root@${hostname}" -f "${keypath}" -N "" |& indent) ||
+    try "ssh-keygen -t \"rsa\" -b 4096 -f \"${keypath}\" ${sshargs}" |& indent ||
       die "Failed to generate host RSA key"
   fi
   keypath="${ssh_dir}/ssh_host_ed25519_key"
   if ! [ -s "${keypath}" ]; then
     if ! [ -h "${keypath}" ]; then
-      rm -f "${keypath}" |& indent
+      try "rm -f \"${keypath}\"" |& indent
     fi
     log "Generating openssh host ed25519 keys"
-    (ssh-keygen -t "ed25519" -C "root@${hostname}" -f "${keypath}" -N "" |& indent) ||
+    try "ssh-keygen -t \"ed25519\" -f \"${keypath}\" ${sshargs}" |& indent ||
       die "Failed to generate host ed25519"
   fi
   log "SSH keys exist"
