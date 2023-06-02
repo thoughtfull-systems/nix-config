@@ -130,11 +130,11 @@ function print_key_and_config {
 
 log "Installation started"
 [[ -v 1 ]] || die "Expected hostname as first argument"
+hostname="${1}"
 log "Using hostname ${hostname}"
 repo="${2:-github:thoughtfull-systems/nix-config}"
 log "Using repo ${repo}"
 pause_for_input
-hostname="${1}"
 luks_name="${hostname}-luks"
 luks_device="/dev/disk/by-partlabel/${luks_name}"
 lvm_name="${hostname}-lvm"
