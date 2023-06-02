@@ -41,13 +41,11 @@ function wait_for() {
   fi
 }
 function verify_partition {
-  log "Verifing \"${1}\" partition"
   [[ -b "/dev/disk/by-partlabel/${1}" ]] ||
     die "Missing partition: ${1}"
   log "Verified \"${1}\" partition"
 }
 function open_luks_device {
-  log "Opening LUKS device \"${luks_device}\""
   if [[ ! -b "${lvm_device}" ]]; then
     ask_no_echo "Enter passphrase for ${luks_device}:" PASS
     while ! echo "${PASS}" |
@@ -60,22 +58,18 @@ function open_luks_device {
   log "Opened LUKS device \"${luks_device}\""
 }
 function verify_lv {
-  log "Verifing \"${1}\" volume"
   try "lvs -S \"vg_name=${vg_name} && lv_name=${1}\" | grep \"${1}\"" |& indent ||
     die "Missing logical volume: ${1}"
   log "Verified \"${1}\" volume"
 }
 function verify_disks {
-  log "Verifying disks"
   verify_partition "${boot_name}"
   verify_partition "${luks_name}"
   open_luks_device
 
-  log "Verifing \"${lvm_device}\" physical volume"
   try "pvs | grep \"${lvm_device}\"" | indent || die "Missing physical volume: ${lvm_device}"
   log "Verified \"${lvm_device}\" physical volume"
 
-  log "Verifing \"${vg_name}\" volume group"
   try "vgs | grep \"${vg_name}\"" | indent || die "Missing volume group: ${vg_name}"
   log "Verified \"${vg_name}\" volume group"
 
@@ -87,19 +81,16 @@ function is_mounted {
   try "mount | grep \" ${1} \"" | indent
 }
 function ensure_mnt {
-  log "Ensuring mounted \"${2}\""
   try "is_mounted \"${2}\" || mount \"${1}\" \"${2}\"" | indent ||
     die "Failed to mount \"${1}\""
   log "Mounted \"${2}\""
 }
 function ensure_swap {
-  log "Ensuring swap enabled \"${swap_device}\""
   try "swapon | grep \"$(realpath ${swap_device})\" || swapon \"${swap_device}\"" | indent ||
     die "Failed to enable swap ${swap_device}"
-  log "Swap enabled \"${swap_device}\""
+  log "Enabled swap \"${swap_device}\""
 }
 function ensure_ssh_keys {
-  log "Ensuring ssh keys"
   # copied from sshd pre-start script
   ssh_dir="/mnt/etc/ssh"
   mkdir -m 0755 -p "${ssh_dir}" |& indent
@@ -122,7 +113,7 @@ function ensure_ssh_keys {
     try "ssh-keygen -t \"ed25519\" -f \"${keypath}\" ${sshargs}" |& indent ||
       die "Failed to generate host ed25519"
   fi
-  log "SSH keys exist"
+  log "Verified SSH keys exist"
 }
 function print_key_and_config {
   log "${keypath}.pub"
