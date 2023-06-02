@@ -9,42 +9,17 @@ set -euo pipefail
 
 function log { printf "%s === %s\n" "$(date -uIns)" "${1}"; }
 function die { printf "%s !!! %s\n" "$(date -uIns)" "${1}" >&2; exit 1; }
-function ts {
-  while read -r line; do
-    printf '%s %s\n' "$(date -uIns)" "${line}";
-  done
-}
-function try_ts {
-  # a bit complicated, but captures both stdout and stderr in (pretty much) printed order, and
-  # displays only stdout on success and both stdout and stderr on failure.
-  out=$(mktemp)
-  err=$(mktemp)
-  dir=$(mktemp -d)
-  # the fifos are necessary so we can have some subprocess for which to wait, otherwise the outputs
-  # aren't ready when we try to cat them
-  outp="${dir}/out"
-  mkfifo ${outp}
-  (cat ${outp} >${out}) &
-  outpid=$!
-  errp="${dir}/err"
-  mkfifo ${errp}
-  (cat ${errp} >${err}) &
-  errpid=$!
-  if (eval "${1}") 1> >(ts > ${outp}) 2> >(ts > ${errp}); then
-    wait ${outpid} ${errpid}; rm -rf "${dir}"
-    cat ${out} | sort
-    rm ${out} ${err}
-  else
-    result=$?
-    wait ${outpid} ${errpid}; rm -rf "${dir}"
-    cat ${out} ${err} | sort
-    rm ${out} ${err}
-    return $result
-  fi
-}
 function try {
-  # cut off the timestamp at the beginning of each line
-  try_ts "${1}" > >(cut -c 37-)
+  out=$(mktemp)
+  if ! (eval "${1}") &>${out}; then
+    result=$?
+    cat ${out}
+    rm ${out}
+    return $result
+  else
+    rm ${out}
+    return 0
+  fi
 }
 function indent {
   while read -r line; do
@@ -65,107 +40,127 @@ function wait_for() {
     done
   fi
 }
+function verify_argument {
+  [[ -v 1 ]] || die "Expected hostname as first argument"
+  hostname="${1}"
+}
+function verify_partition {
+  log "Verifing \"${1}\" partition"
+  [[ -b "/dev/disk/by-partlabel/${1}" ]] ||
+    die "Missing partition: ${1}"
+  log "Verified \"${1}\" partition"
+}
+function open_luks_device {
+  log "Opening LUKS device \"${luks_device}\""
+  if [[ ! -b "${lvm_device}" ]]; then
+    ask_no_echo "Enter passphrase for ${luks_device}:" PASS
+    while ! echo "${PASS}" |
+        cryptsetup open "${luks_device}" "${lvm_name}" |& indent; do
+      echo "Open LUKS failed!" | indent
+      ask_no_echo "Enter passphrase for ${luks_device}:" PASS
+    done
+    wait_for "${lvm_device}"
+  fi
+  log "Opened LUKS device \"${luks_device}\""
+}
+function verify_lv {
+  log "Verifing \"${1}\" volume"
+  try "lvs -S \"vg_name=${vg_name} && lv_name=${1}\" | grep \"${1}\"" |& indent ||
+    die "Missing logical volume: ${1}"
+  log "Verified \"${1}\" volume"
+}
+function verify_disks {
+  log "Verifying disks"
+  verify_partition "${boot_name}"
+  verify_partition "${luks_name}"
+  open_luks_device
 
+  log "Verifing \"${lvm_device}\" physical volume"
+  try "pvs | grep \"${lvm_device}\"" | indent || die "Missing physical volume: ${lvm_device}"
+  log "Verified \"${lvm_device}\" physical volume"
 
-log "Installation started"
+  log "Verifing \"${vg_name}\" volume group"
+  try "vgs | grep \"${vg_name}\"" | indent || die "Missing volume group: ${vg_name}"
+  log "Verified \"${vg_name}\" volume group"
 
-## VERIFY ##
+  verify_lv "root"
+  verify_lv "swap"
+  log "Verified disks"
+}
+function is_mounted {
+  try "mount | grep \" ${1} \"" | indent
+}
+function ensure_mnt {
+  log "Ensuring mounted \"${2}\""
+  try "is_mounted \"${2}\" || mount \"${1}\" \"${2}\"" | indent ||
+    die "Failed to mount \"${1}\""
+  log "Mounted \"${2}\""
+}
+function ensure_swap {
+  log "Ensuring swap enabled \"${swap_device}\""
+  try "swapon | grep \"$(realpath ${swap_device})\" || swapon \"${swap_device}\"" | indent ||
+    die "Failed to enable swap ${swap_device}"
+  log "Swap enabled \"${swap_device}\""
+}
+function ensure_ssh_keys {
+  log "Ensuring ssh keys"
+  # copied from sshd pre-start script
+  ssh_dir="/mnt/etc/ssh"
+  if ! [ -s "${ssh_dir}/ssh_host_rsa_key" ]; then
+    if ! [ -h "${ssh_dir}/ssh_host_rsa_key" ]; then
+      rm -f "${ssh_dir}/ssh_host_rsa_key" |& indent
+    fi
+    log "Generating openssh host rsa keys"
+    (mkdir -m 0755 -p "$(dirname '${ssh_dir}/ssh_host_rsa_key')" |& indent
+     ssh-keygen -t "rsa" -b 4096 -C "root@${hostname}" -f "${ssh_dir}/ssh_host_rsa_key" -N "" |&
+     indent) ||
+      die "Failed to generate host RSA key"
+  fi
+  keypath="${ssh_dir}/ssh_host_ed25519_key"
+  if ! [ -s "${keypath}" ]; then
+    if ! [ -h "${keypath}" ]; then
+      rm -f "${keypath}" |& indent
+    fi
+    log "Generating openssh host ed25519 keys"
+    (mkdir -m 0755 -p "$(dirname '${keypath}')" |& indent
+     ssh-keygen -t "ed25519" -C "root@${hostname}" -f "${keypath}" -N "" |& indent) ||
+      die "Failed to generate host ed25519"
+  fi
+  log "SSH keys exist"
+}
+function print_key_and_config {
+  log "${keypath}.pub"
+  cat "${keypath}.pub"
+  log "hardware-configuration.nix"
+  nixos-generate-config --show-hardware-config --no-filesystems
+  log "Add these for ${hostname}, rekey secrets, and commit"
+  read -sp "Press any key to continue..."
+  echo
+}
 
-[[ -v 1 ]] || die "Expected hostname as first argument"
-hostname="${1}"
-
-boot_part="${hostname}-boot"
-boot_device="/dev/disk/by-partlabel/${boot_part}"
-[[ -b "${boot_device}" ]] ||
-  die "Missing partition: ${boot_part}"
-
-luks_part="${hostname}-luks"
-luks_device="/dev/disk/by-partlabel/${luks_part}"
-[[ -b "${luks_device}" ]] ||
-  die "Missing partition: ${luks_part}"
-
+luks_name="${hostname}-luks"
+luks_device="/dev/disk/by-partlabel/${luks_name}"
 lvm_name="${hostname}-lvm"
 lvm_device="/dev/mapper/${lvm_name}"
-
-log "Opening LVM device: ${lvm_device}"
-if [[ ! -b "${lvm_device}" ]]; then
-  ask_no_echo "Enter passphrase for ${luks_device}:" PASS
-  while ! echo "${PASS}" |
-      cryptsetup open "${luks_device}" "${lvm_name}" |& indent; do
-    echo "Open LUKS failed!"
-    ask_no_echo "Enter passphrase for ${luks_device}:" PASS
-  done
-  wait_for "/dev/mapper/${lvm_name}"
-fi
-
-(pvs | grep "${lvm_device}") &>/dev/null || die "Missing physical volume: ${lvm_device}"
-
 vg_name="${hostname}"
-(vgs | grep "${vg_name}") &>/dev/null || die "Missing volume group: ${vg_name}"
-
-function verify_lv {
-  try "lvs -S \"vg_name=${vg_name} && lv_name=${1}\" | grep \"${1}\"" |& indent ||
-      die "Missing logical volume: ${1}"
-}
-
-verify_lv "root"
-verify_lv "swap"
-
-## MOUNT ##
-function is_mounted {
-  (mount | grep " ${1} ") &>/dev/null
-}
-
-is_mounted "/mnt" ||
-  mount "/dev/mapper/${hostname}-root" "/mnt" |& indent ||
-  die "Failed to mount /dev/mapper/${hostname}-root"
-is_mounted "/mnt/boot" ||
-  mount "${boot_device}" "/mnt/boot" |& indent ||
-  die "Failed to mount ${boot_device}"
-
 swap_device="/dev/mapper/${hostname}-swap"
-(swapon | grep "$(realpath ${swap_device})") &>/dev/null ||
-  swapon "${swap_device}" |& indent ||
-  die "Failed to enable swap ${swap_device}"
+boot_name="${hostname}-boot"
+boot_device="/dev/disk/by-partlabel/${boot_name}"
 
-## GENERATE ##
-# copied from sshd pre-start script
-ssh_dir="/mnt/etc/ssh"
-if ! [ -s "${ssh_dir}/ssh_host_rsa_key" ]; then
-  if ! [ -h "${ssh_dir}/ssh_host_rsa_key" ]; then
-    rm -f "${ssh_dir}/ssh_host_rsa_key" |& indent
-  fi
-  log "Generating openssh host rsa keys"
-  (mkdir -m 0755 -p "$(dirname '${ssh_dir}/ssh_host_rsa_key')" |& indent
-   ssh-keygen -t "rsa" -b 4096 -C "root@${hostname}" -f "${ssh_dir}/ssh_host_rsa_key" -N "" |&
-   indent) ||
-    die "Failed to generate host RSA key"
-fi
-keypath="${ssh_dir}/ssh_host_ed25519_key"
-if ! [ -s "${keypath}" ]; then
-  if ! [ -h "${keypath}" ]; then
-    rm -f "${keypath}" |& indent
-  fi
-  log "Generating openssh host ed25519 keys"
-  (mkdir -m 0755 -p "$(dirname '${keypath}')" |& indent
-   ssh-keygen -t "ed25519" -C "root@${hostname}" -f "${keypath}" -N "" |& indent) ||
-    die "Failed to generate host ed25519"
-fi
+log "Installation started"
+verify_argument
+verify_disks
+ensure_mnt "/dev/mapper/${hostname}-root" "/mnt"
+try "mkdir -p \"/mnt/boot\"" | indent
+ensure_mnt "${boot_device}" "/mnt/boot"
+ensure_swap
+ensure_ssh_keys
+print_key_and_config
 
-log "${keypath}.pub"
-cat "${keypath}.pub"
-log "hardware-configuration.nix"
-nixos-generate-config --show-hardware-config --no-filesystems
-log "Add these for ${hostname}, rekey secrets, and commit"
-read -sp "Press any key to continue..."
-echo
-
-## INSTALL ##
 repo="${2:-github:thoughtfull-systems/nix-config}"
 nixos-install --no-root-password --flake "${repo}#${hostname}" |& indent ||
   die "Failed to install NixOS"
 
-## COPY LOG ##
 log "Copying log file"
-log "Installation complete $(date)"
+log "Installation complete"
 cat "${logfile}" >> "/mnt/etc/nixos/bootstrap.log"
