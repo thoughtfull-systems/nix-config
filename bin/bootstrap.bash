@@ -106,7 +106,7 @@ vg_name="${hostname}"
 function verify_lv {
   try <<-EOF || die "Missing logical volume: ${1}"
     lvs -S "vg_name=${vg_name} && lv_name=${1}" | grep "${1}"
-  EOF
+EOF
 }
 
 verify_lv "root"
