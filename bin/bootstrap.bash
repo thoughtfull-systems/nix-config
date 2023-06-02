@@ -138,6 +138,8 @@ function print_key_and_config {
   echo
 }
 
+log "Installation started"
+verify_argument
 luks_name="${hostname}-luks"
 luks_device="/dev/disk/by-partlabel/${luks_name}"
 lvm_name="${hostname}-lvm"
@@ -146,9 +148,6 @@ vg_name="${hostname}"
 swap_device="/dev/mapper/${hostname}-swap"
 boot_name="${hostname}-boot"
 boot_device="/dev/disk/by-partlabel/${boot_name}"
-
-log "Installation started"
-verify_argument
 verify_disks
 ensure_mnt "/dev/mapper/${hostname}-root" "/mnt"
 try "mkdir -p \"/mnt/boot\"" | indent
