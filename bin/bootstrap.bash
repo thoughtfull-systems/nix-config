@@ -40,10 +40,6 @@ function wait_for() {
     done
   fi
 }
-function verify_argument {
-  [[ -v 1 ]] || die "Expected hostname as first argument"
-  hostname="${1}"
-}
 function verify_partition {
   log "Verifing \"${1}\" partition"
   [[ -b "/dev/disk/by-partlabel/${1}" ]] ||
@@ -139,7 +135,8 @@ function print_key_and_config {
 }
 
 log "Installation started"
-verify_argument
+[[ -v 1 ]] || die "Expected hostname as first argument"
+hostname="${1}"
 luks_name="${hostname}-luks"
 luks_device="/dev/disk/by-partlabel/${luks_name}"
 lvm_name="${hostname}-lvm"
