@@ -102,14 +102,14 @@ function ensure_ssh_keys {
   log "Ensuring ssh keys"
   # copied from sshd pre-start script
   ssh_dir="/mnt/etc/ssh"
-  if ! [ -s "${ssh_dir}/ssh_host_rsa_key" ]; then
-    if ! [ -h "${ssh_dir}/ssh_host_rsa_key" ]; then
-      rm -f "${ssh_dir}/ssh_host_rsa_key" |& indent
+  mkdir -m 0755 -p "${ssh_dir}" |& indent
+  keypath="${ssh_dir}/ssh_host_rsa_key"
+  if ! [ -s "${keypath}" ]; then
+    if ! [ -h "${keypath}" ]; then
+      rm -f "${keypath}" |& indent
     fi
     log "Generating openssh host rsa keys"
-    (mkdir -m 0755 -p "$(dirname '${ssh_dir}/ssh_host_rsa_key')" |& indent
-     ssh-keygen -t "rsa" -b 4096 -C "root@${hostname}" -f "${ssh_dir}/ssh_host_rsa_key" -N "" |&
-     indent) ||
+    (ssh-keygen -t "rsa" -b 4096 -C "root@${hostname}" -f "${keypath}" -N "" |& indent) ||
       die "Failed to generate host RSA key"
   fi
   keypath="${ssh_dir}/ssh_host_ed25519_key"
@@ -118,8 +118,7 @@ function ensure_ssh_keys {
       rm -f "${keypath}" |& indent
     fi
     log "Generating openssh host ed25519 keys"
-    (mkdir -m 0755 -p "$(dirname '${keypath}')" |& indent
-     ssh-keygen -t "ed25519" -C "root@${hostname}" -f "${keypath}" -N "" |& indent) ||
+    (ssh-keygen -t "ed25519" -C "root@${hostname}" -f "${keypath}" -N "" |& indent) ||
       die "Failed to generate host ed25519"
   fi
   log "SSH keys exist"
