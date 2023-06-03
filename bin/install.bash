@@ -9,11 +9,7 @@ set -euo pipefail
 
 function log { printf "%s === %s\n" "$(date -uIns)" "${1}"; }
 function die { printf "%s !!! %s\n" "$(date -uIns)" "${1}" >&2; exit 1; }
-function indent {
-  while read -r line; do
-    printf '    %s\n' "${line}";
-  done
-}
+function indent { sed -E 's/\r$//g;s/\r/\n/g' | sed -E "s/^/    /g"; }
 function ask_no_echo() {
   msg="??? ${1} "
   read -sp "${msg}" ${2}

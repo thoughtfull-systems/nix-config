@@ -35,12 +35,7 @@ nix="nix --extra-experimental-features nix-command \
 [[ -v 1 ]] || die "Expected hostname as first argument"
 hostname="${1}"
 
-function indent {
-  while read -r line; do
-    printf '    %s\n' "${line}";
-  done
-}
-#function indent { sed -E 's/\r$//g;s/\r/\n/g' | sed -E "s/^/    /g"; }
+function indent { sed -E 's/\r$//g;s/\r/\n/g' | sed -E "s/^/    /g"; }
 
 scriptdir="$(dirname $(realpath ${0}))"
 repo="${3:-github:thoughtfull-systems/nix-config}"
