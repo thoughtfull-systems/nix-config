@@ -14,18 +14,6 @@ function indent {
     printf '    %s\n' "${line}";
   done
 }
-function try {
-  out=$(mktemp)
-  if ! (eval "${1}") &>${out}; then
-    result=$?
-    cat ${out} | indent
-    rm ${out}
-    return $result
-  else
-    rm ${out}
-    return 0
-  fi
-}
 function ask_no_echo() {
   msg="??? ${1} "
   read -sp "${msg}" ${2}
@@ -59,7 +47,7 @@ function open_luks_device {
   log "LUKS device opened: ${luks_device}"
 }
 function verify_logical_volume {
-  try "lvs -S 'vg_name=${vg_name} && lv_name=${1}' | grep '${1}'" ||
+  (lvs -S "vg_name=${vg_name} && lv_name=${1}" | grep "${1}") |& indent ||
     die "Logical volume missing: ${1}"
   log "Logical volume exists: ${1}"
 }
@@ -68,45 +56,45 @@ function verify_disks {
   verify_partition "${luks_name}"
   open_luks_device
 
-  try "pvs | grep '${lvm_device}'" || die "Physical volume missing: ${lvm_device}"
+  (pvs | grep "${lvm_device}") |& indent || die "Physical volume missing: ${lvm_device}"
   log "Physical volume exists: ${lvm_device}"
 
-  try "vgs | grep '${vg_name}'" || die "Volume group missing: ${vg_name}"
+  (vgs | grep "${vg_name}") |& indent || die "Volume group missing: ${vg_name}"
   log "Volume group exists: ${vg_name}"
 
   verify_logical_volume "root"
   verify_logical_volume "swap"
 }
 function is_mounted {
-  try "mount | grep ' ${1} '"
+  (mount | grep " ${1} ") |& indent
 }
 function mount_partition {
-  try "is_mounted '${2}' || mount '${1}' '${2}'" ||
-    die "Failed to mount '${1}'"
+  (is_mounted "${2}" || mount "${1}" "${2}") |& indent ||
+    die "Failed to mount "${1}""
   log "Mounted: ${2}"
 }
 function enable_swap {
-  try "swapon | grep '$(realpath ${swap_device})' || swapon '${swap_device}'" ||
+  (swapon | grep "$(realpath ${swap_device})" || swapon "${swap_device}") |& indent ||
     die "Failed to enable swap ${swap_device}"
   log "Swap enabled: ${swap_device}"
 }
 function create_ssh_keys {
   # copied from sshd pre-start script
-  try "mkdir -m 0755 -p '${ssh_dir}'"
+  mkdir -m 0755 -p "${ssh_dir}" |& indent
   sshargs="-C 'root@${hostname}' -N ''"
   if ! [ -s "${rsa_key_path}" ]; then
     if ! [ -h "${rsa_key_path}" ]; then
-      try "rm -f '${rsa_key_path}'"
+      rm -f "${rsa_key_path}" |& indent
     fi
-    try "ssh-keygen -t 'rsa' -b 4096 -f '${rsa_key_path}' ${sshargs}" ||
+    ssh-keygen -t "rsa" -b 4096 -f "${rsa_key_path}" "${sshargs}" |& indent ||
       die "Failed to generate host RSA keys"
     log "Generated host RSA keys"
   fi
   if ! [ -s "${ed25519_key_path}" ]; then
     if ! [ -h "${ed25519_key_path}" ]; then
-      try "rm -f '${ed25519_key_path}'"
+      rm -f "${ed25519_key_path}" |& indent
     fi
-    try "ssh-keygen -t 'ed25519' -f '${ed25519_key_path}' ${sshargs}" ||
+    ssh-keygen -t "ed25519" -f "${ed25519_key_path}" "${sshargs}" |& indent ||
       die "Failed to generate host ed25519 keys"
     log "Generated host ed25519 keys"
   fi
@@ -146,7 +134,7 @@ boot_name="${hostname}-boot"
 boot_device="/dev/disk/by-partlabel/${boot_name}"
 verify_disks
 mount_partition "/dev/mapper/${hostname}-root" "/mnt"
-try "mkdir -p '/mnt/boot'"
+mkdir -p "/mnt/boot" |& indent
 mount_partition "${boot_device}" "/mnt/boot"
 enable_swap
 ssh_dir="/mnt/etc/ssh"
