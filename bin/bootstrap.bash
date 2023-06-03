@@ -9,22 +9,22 @@ set -euo pipefail
 
 function log { printf "%s === %s\n" "$(date -uIns)" "${1}"; }
 function die { printf "%s !!! %s\n" "$(date -uIns)" "${1}" >&2; exit 1; }
+function indent {
+  while read -r line; do
+    printf '    %s\n' "${line}";
+  done
+}
 function try {
   out=$(mktemp)
   if ! (eval "${1}") &>${out}; then
     result=$?
-    cat ${out}
+    cat ${out} | indent
     rm ${out}
     return $result
   else
     rm ${out}
     return 0
   fi
-}
-function indent {
-  while read -r line; do
-    printf '    %s\n' "${line}";
-  done
 }
 function ask_no_echo() {
   msg="??? ${1} "
@@ -57,8 +57,8 @@ function open_luks_device {
   fi
   log "Opened LUKS device \"${luks_device}\""
 }
-function verify_lv {
-  try "lvs -S \"vg_name=${vg_name} && lv_name=${1}\" | grep \"${1}\"" |& indent ||
+function verify_volume {
+  try "lvs -S \"vg_name=${vg_name} && lv_name=${1}\" | grep \"${1}\"" ||
     die "Missing logical volume: ${1}"
   log "Verified \"${1}\" volume"
 }
@@ -67,30 +67,30 @@ function verify_disks {
   verify_partition "${luks_name}"
   open_luks_device
 
-  try "pvs | grep \"${lvm_device}\"" | indent || die "Missing physical volume: ${lvm_device}"
+  try "pvs | grep \"${lvm_device}\"" || die "Missing physical volume: ${lvm_device}"
   log "Verified \"${lvm_device}\" physical volume"
 
-  try "vgs | grep \"${vg_name}\"" | indent || die "Missing volume group: ${vg_name}"
+  try "vgs | grep \"${vg_name}\"" || die "Missing volume group: ${vg_name}"
   log "Verified \"${vg_name}\" volume group"
 
-  verify_lv "root"
-  verify_lv "swap"
+  verify_volume "root"
+  verify_volume "swap"
   log "Verified disks"
 }
 function is_mounted {
-  try "mount | grep \" ${1} \"" | indent
+  try "mount | grep \" ${1} \""
 }
-function ensure_mnt {
-  try "is_mounted \"${2}\" || mount \"${1}\" \"${2}\"" | indent ||
+function mount_partition {
+  try "is_mounted \"${2}\" || mount \"${1}\" \"${2}\"" ||
     die "Failed to mount \"${1}\""
   log "Mounted \"${2}\""
 }
-function ensure_swap {
-  try "swapon | grep \"$(realpath ${swap_device})\" || swapon \"${swap_device}\"" | indent ||
+function enable_swap {
+  try "swapon | grep \"$(realpath ${swap_device})\" || swapon \"${swap_device}\"" ||
     die "Failed to enable swap ${swap_device}"
   log "Enabled swap \"${swap_device}\""
 }
-function ensure_ssh_keys {
+function create_ssh_keys {
   # copied from sshd pre-start script
   ssh_dir="/mnt/etc/ssh"
   mkdir -m 0755 -p "${ssh_dir}" |& indent
@@ -98,19 +98,19 @@ function ensure_ssh_keys {
   sshargs="-C \"root@${hostname}\" -N \"\""
   if ! [ -s "${keypath}" ]; then
     if ! [ -h "${keypath}" ]; then
-      try "rm -f \"${keypath}\"" |& indent
+      try "rm -f \"${keypath}\""
     fi
     log "Generating openssh host rsa keys"
-    try "ssh-keygen -t \"rsa\" -b 4096 -f \"${keypath}\" ${sshargs}" |& indent ||
+    try "ssh-keygen -t \"rsa\" -b 4096 -f \"${keypath}\" ${sshargs}" ||
       die "Failed to generate host RSA key"
   fi
   keypath="${ssh_dir}/ssh_host_ed25519_key"
   if ! [ -s "${keypath}" ]; then
     if ! [ -h "${keypath}" ]; then
-      try "rm -f \"${keypath}\"" |& indent
+      try "rm -f \"${keypath}\""
     fi
     log "Generating openssh host ed25519 keys"
-    try "ssh-keygen -t \"ed25519\" -f \"${keypath}\" ${sshargs}" |& indent ||
+    try "ssh-keygen -t \"ed25519\" -f \"${keypath}\" ${sshargs}" ||
       die "Failed to generate host ed25519"
   fi
   log "Verified SSH keys exist"
@@ -144,11 +144,11 @@ swap_device="/dev/mapper/${hostname}-swap"
 boot_name="${hostname}-boot"
 boot_device="/dev/disk/by-partlabel/${boot_name}"
 verify_disks
-ensure_mnt "/dev/mapper/${hostname}-root" "/mnt"
-try "mkdir -p \"/mnt/boot\"" | indent
-ensure_mnt "${boot_device}" "/mnt/boot"
-ensure_swap
-ensure_ssh_keys
+mount_partition "/dev/mapper/${hostname}-root" "/mnt"
+try "mkdir -p \"/mnt/boot\""
+mount_partition "${boot_device}" "/mnt/boot"
+enable_swap
+create_ssh_keys
 print_key_and_config
 
 nixos-install --no-root-password --flake "${repo}#${hostname}" |& indent ||
