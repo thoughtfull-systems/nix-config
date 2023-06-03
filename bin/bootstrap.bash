@@ -59,7 +59,7 @@ function open_luks_device {
   log "LUKS device opened: ${luks_device}"
 }
 function verify_logical_volume {
-  try "lvs -S \"vg_name=${vg_name} && lv_name=${1}\" | grep \"${1}\"" ||
+  try "lvs -S 'vg_name=${vg_name} && lv_name=${1}' | grep '${1}'" ||
     die "Logical volume missing: ${1}"
   log "Logical volume exists: ${1}"
 }
@@ -68,45 +68,45 @@ function verify_disks {
   verify_partition "${luks_name}"
   open_luks_device
 
-  try "pvs | grep \"${lvm_device}\"" || die "Physical volume missing: ${lvm_device}"
+  try "pvs | grep '${lvm_device}'" || die "Physical volume missing: ${lvm_device}"
   log "Physical volume exists: ${lvm_device}"
 
-  try "vgs | grep \"${vg_name}\"" || die "Volume group missing: ${vg_name}"
+  try "vgs | grep '${vg_name}'" || die "Volume group missing: ${vg_name}"
   log "Volume group exists: ${vg_name}"
 
   verify_logical_volume "root"
   verify_logical_volume "swap"
 }
 function is_mounted {
-  try "mount | grep \" ${1} \""
+  try "mount | grep ' ${1} '"
 }
 function mount_partition {
-  try "is_mounted \"${2}\" || mount \"${1}\" \"${2}\"" ||
-    die "Failed to mount \"${1}\""
+  try "is_mounted '${2}' || mount '${1}' '${2}'" ||
+    die "Failed to mount '${1}'"
   log "Mounted: ${2}"
 }
 function enable_swap {
-  try "swapon | grep \"$(realpath ${swap_device})\" || swapon \"${swap_device}\"" ||
+  try "swapon | grep '$(realpath ${swap_device})' || swapon '${swap_device}'" ||
     die "Failed to enable swap ${swap_device}"
   log "Swap enabled: ${swap_device}"
 }
 function create_ssh_keys {
   # copied from sshd pre-start script
-  try "mkdir -m 0755 -p \"${ssh_dir}\""
-  sshargs="-C \"root@${hostname}\" -N \"\""
+  try "mkdir -m 0755 -p '${ssh_dir}'"
+  sshargs="-C 'root@${hostname}' -N ''"
   if ! [ -s "${rsa_key_path}" ]; then
     if ! [ -h "${rsa_key_path}" ]; then
-      try "rm -f \"${rsa_key_path}\""
+      try "rm -f '${rsa_key_path}'"
     fi
-    try "ssh-keygen -t \"rsa\" -b 4096 -f \"${rsa_key_path}\" ${sshargs}" ||
+    try "ssh-keygen -t 'rsa' -b 4096 -f '${rsa_key_path}' ${sshargs}" ||
       die "Failed to generate host RSA keys"
     log "Generated host RSA keys"
   fi
   if ! [ -s "${ed25519_key_path}" ]; then
     if ! [ -h "${ed25519_key_path}" ]; then
-      try "rm -f \"${ed25519_key_path}\""
+      try "rm -f '${ed25519_key_path}'"
     fi
-    try "ssh-keygen -t \"ed25519\" -f \"${ed25519_key_path}\" ${sshargs}" ||
+    try "ssh-keygen -t 'ed25519' -f '${ed25519_key_path}' ${sshargs}" ||
       die "Failed to generate host ed25519 keys"
     log "Generated host ed25519 keys"
   fi
@@ -142,7 +142,7 @@ boot_name="${hostname}-boot"
 boot_device="/dev/disk/by-partlabel/${boot_name}"
 verify_disks
 mount_partition "/dev/mapper/${hostname}-root" "/mnt"
-try "mkdir -p \"/mnt/boot\""
+try "mkdir -p '/mnt/boot'"
 mount_partition "${boot_device}" "/mnt/boot"
 enable_swap
 ssh_dir="/mnt/etc/ssh"
