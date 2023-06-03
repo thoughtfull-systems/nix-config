@@ -143,7 +143,7 @@ function has_vg {
 function ensure_vg_removed {
   if has_vg; then
     log "Removing volume group '${vg_name}'"
-    vgremove -y "${vg_name}"
+    vgremove -y "${vg_name}" |& indent
   fi
 }
 
