@@ -160,3 +160,4 @@ nixos-install --no-root-password --flake "${repo}#${hostname}" |& indent ||
 
 log "Installation complete"
 cat "${logfile}" >> "/mnt/etc/nixos/nixos/${hostname}/install.log"
+rm "${logfile}"
