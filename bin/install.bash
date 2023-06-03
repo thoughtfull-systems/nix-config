@@ -82,7 +82,7 @@ function create_ssh_keys {
     if ! [ -h "${rsa_key_path}" ]; then
       rm -f "${rsa_key_path}" |& indent
     fi
-    ssh-keygen -t "rsa" -b 4096 -f "${rsa_key_path}" -N"" ${sshargs} |& indent ||
+    ssh-keygen -t "rsa" -b 4096 -f "${rsa_key_path}" -N "" ${sshargs} |& indent ||
       die "Failed to generate host RSA keys"
     log "Generated host RSA keys"
   fi
@@ -90,7 +90,7 @@ function create_ssh_keys {
     if ! [ -h "${ed25519_key_path}" ]; then
       rm -f "${ed25519_key_path}" |& indent
     fi
-    ssh-keygen -t "ed25519" -f "${ed25519_key_path}" -N"" ${sshargs} |& indent ||
+    ssh-keygen -t "ed25519" -f "${ed25519_key_path}" -N "" ${sshargs} |& indent ||
       die "Failed to generate host ed25519 keys"
     log "Generated host ed25519 keys"
   fi
