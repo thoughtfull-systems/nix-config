@@ -34,16 +34,17 @@ function ask_no_echo() {
 }
 function wait_for() {
   if [[ ! -e "${1}" ]] &>/dev/null; then
-    log "Waiting for '${1}'..."
+    log "Waiting for: ${1}"
     while [[ ! -e "${1}" ]] &>/dev/null; do
       sleep 1
     done
   fi
+  log "Exists: ${1}"
 }
 function verify_partition {
   [[ -b "/dev/disk/by-partlabel/${1}" ]] ||
-    die "Missing partition: ${1}"
-  log "Verified \"${1}\" partition"
+    die "Partition missing: ${1}"
+  log "Patition exists: ${1}"
 }
 function open_luks_device {
   if [[ ! -b "${lvm_device}" ]]; then
@@ -55,27 +56,26 @@ function open_luks_device {
     done
     wait_for "${lvm_device}"
   fi
-  log "Opened LUKS device \"${luks_device}\""
+  log "LUKS device opened: ${luks_device}"
 }
-function verify_volume {
+function verify_logical_volume {
   try "lvs -S \"vg_name=${vg_name} && lv_name=${1}\" | grep \"${1}\"" ||
-    die "Missing logical volume: ${1}"
-  log "Verified \"${1}\" volume"
+    die "Logical volume missing: ${1}"
+  log "Logical volume exists: ${1}"
 }
 function verify_disks {
   verify_partition "${boot_name}"
   verify_partition "${luks_name}"
   open_luks_device
 
-  try "pvs | grep \"${lvm_device}\"" || die "Missing physical volume: ${lvm_device}"
-  log "Verified \"${lvm_device}\" physical volume"
+  try "pvs | grep \"${lvm_device}\"" || die "Physical volume missing: ${lvm_device}"
+  log "Physical volume exists: ${lvm_device}"
 
-  try "vgs | grep \"${vg_name}\"" || die "Missing volume group: ${vg_name}"
-  log "Verified \"${vg_name}\" volume group"
+  try "vgs | grep \"${vg_name}\"" || die "Volume group missing: ${vg_name}"
+  log "Volume group exists: ${vg_name}"
 
-  verify_volume "root"
-  verify_volume "swap"
-  log "Verified disks"
+  verify_logical_volume "root"
+  verify_logical_volume "swap"
 }
 function is_mounted {
   try "mount | grep \" ${1} \""
@@ -83,45 +83,42 @@ function is_mounted {
 function mount_partition {
   try "is_mounted \"${2}\" || mount \"${1}\" \"${2}\"" ||
     die "Failed to mount \"${1}\""
-  log "Mounted \"${2}\""
+  log "Mounted: ${2}"
 }
 function enable_swap {
   try "swapon | grep \"$(realpath ${swap_device})\" || swapon \"${swap_device}\"" ||
     die "Failed to enable swap ${swap_device}"
-  log "Enabled swap \"${swap_device}\""
+  log "Swap enabled: ${swap_device}"
 }
 function create_ssh_keys {
   # copied from sshd pre-start script
-  ssh_dir="/mnt/etc/ssh"
-  mkdir -m 0755 -p "${ssh_dir}" |& indent
-  keypath="${ssh_dir}/ssh_host_rsa_key"
+  try "mkdir -m 0755 -p \"${ssh_dir}\""
   sshargs="-C \"root@${hostname}\" -N \"\""
-  if ! [ -s "${keypath}" ]; then
-    if ! [ -h "${keypath}" ]; then
-      try "rm -f \"${keypath}\""
+  if ! [ -s "${rsa_key_path}" ]; then
+    if ! [ -h "${rsa_key_path}" ]; then
+      try "rm -f \"${rsa_key_path}\""
     fi
-    log "Generating openssh host rsa keys"
-    try "ssh-keygen -t \"rsa\" -b 4096 -f \"${keypath}\" ${sshargs}" ||
-      die "Failed to generate host RSA key"
+    try "ssh-keygen -t \"rsa\" -b 4096 -f \"${rsa_key_path}\" ${sshargs}" ||
+      die "Failed to generate host RSA keys"
+    log "Generated host RSA keys"
   fi
-  keypath="${ssh_dir}/ssh_host_ed25519_key"
-  if ! [ -s "${keypath}" ]; then
-    if ! [ -h "${keypath}" ]; then
-      try "rm -f \"${keypath}\""
+  if ! [ -s "${ed25519_key_path}" ]; then
+    if ! [ -h "${ed25519_key_path}" ]; then
+      try "rm -f \"${ed25519_key_path}\""
     fi
-    log "Generating openssh host ed25519 keys"
-    try "ssh-keygen -t \"ed25519\" -f \"${keypath}\" ${sshargs}" ||
-      die "Failed to generate host ed25519"
+    try "ssh-keygen -t \"ed25519\" -f \"${ed25519_key_path}\" ${sshargs}" ||
+      die "Failed to generate host ed25519 keys"
+    log "Generated host ed25519 keys"
   fi
-  log "Verified SSH keys exist"
+  log "SSH host keys exist"
 }
 function pause_for_input {
   read -sp "Press any key to continue..."
   echo
 }
 function print_key_and_config {
-  log "${keypath}.pub"
-  cat "${keypath}.pub"
+  log "${ed25519_key_path}.pub"
+  cat "${ed25519_key_path}.pub"
   log "hardware-configuration.nix"
   nixos-generate-config --show-hardware-config --no-filesystems
   log "Add these for ${hostname}, rekey secrets, and commit"
@@ -131,9 +128,9 @@ function print_key_and_config {
 log "Installation started"
 [[ -v 1 ]] || die "Expected hostname as first argument"
 hostname="${1}"
-log "Using hostname \"${hostname}\""
+log "Using hostname: ${hostname}"
 repo="${2:-github:thoughtfull-systems/nix-config}"
-log "Using repo \"${repo}\""
+log "Using repo: ${repo}"
 pause_for_input
 luks_name="${hostname}-luks"
 luks_device="/dev/disk/by-partlabel/${luks_name}"
@@ -148,6 +145,9 @@ mount_partition "/dev/mapper/${hostname}-root" "/mnt"
 try "mkdir -p \"/mnt/boot\""
 mount_partition "${boot_device}" "/mnt/boot"
 enable_swap
+ssh_dir="/mnt/etc/ssh"
+rsa_key_path="${ssh_dir}/ssh_host_rsa_key"
+ed25519_key_path="${ssh_dir}/ssh_host_ed25519_key"
 create_ssh_keys
 print_key_and_config
 
