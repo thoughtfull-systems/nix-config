@@ -118,9 +118,13 @@ function pause_for_input {
 }
 function print_key_and_config {
   log "${ed25519_key_path}.pub"
+  echo "--------------------------------------------------------------------------------"
   cat "${ed25519_key_path}.pub"
+  echo "--------------------------------------------------------------------------------"
   log "hardware-configuration.nix"
+  echo "--------------------------------------------------------------------------------"
   nixos-generate-config --show-hardware-config --no-filesystems
+  echo "--------------------------------------------------------------------------------"
   log "Add these for ${hostname}, rekey secrets, and commit"
   pause_for_input
 }
