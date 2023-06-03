@@ -154,6 +154,5 @@ print_key_and_config
 nixos-install --no-root-password --flake "${repo}#${hostname}" |& indent ||
   die "Failed to install NixOS"
 
-log "Copying log file"
 log "Installation complete"
-cat "${logfile}" >> "/mnt/etc/nixos/bootstrap.log"
+cat "${logfile}" >> "/mnt/etc/nixos/install.log"
