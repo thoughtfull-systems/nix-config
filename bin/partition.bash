@@ -7,8 +7,8 @@ exec 1> >(tee ${logfile}) 2>&1
 ### EVERYTHING BELOW WILL GO TO CONSOLE AND LOGFILE ############################
 set -euo pipefail
 
-function die { echo "!!! ${1}" >&2; exit 1; }
-function log { echo "=== ${1}"; }
+function log { printf "%s === %s\n" "$(date -uIns)" "${1}"; }
+function die { printf "%s !!! %s\n" "$(date -uIns)" "${1}" >&2; exit 1; }
 function indent { sed -E 's/\r$//g;s/\r/\n/g' | sed -E "s/^/    /g"; }
 
 log "Partitioning starting $(date)"
@@ -185,41 +185,45 @@ function was_partitioned {
 }
 
 ### PARTITION TABLE ###
-parted -l |& indent
-
-# Create new partition table?
 partitioned=1
-if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
-  ask "Partition which disk?" disk
-  while ! parted -s "${disk}" print &>/dev/null; do
-    ask "'${disk}' does not exist; partition which disk?" disk
-  done
+function create_partition_table {
+  log "Current partition table..."
+  parted -l |& indent
 
-  if really_sure "erase and partition '${disk}'"; then
-    partitioned=0
-    ensure_unmounted "/mnt/boot"
-    ensure_unmounted "/mnt"
-    ensure_lv_removed "root"
-    ensure_swapoff
-    ensure_lv_removed "swap"
-    ensure_vg_removed
-    ensure_pv_removed
-    ensure_luks_closed
-    log "Creating partition table"
-    parted -fs "${disk}" mklabel gpt |& indent || die "Failed to create partition table"
-    log "Creating boot partition (1G)"
-    parted -fs "${disk}" mkpart "${boot_name}" fat32 1MiB 1GiB |& indent ||
-      die "Failed to create boot partition"
-    parted -fs "${disk}" set 1 esp |& indent || die "Failed to mark boot partition as ESP"
-    log "Creating LUKS partition with free space"
-    parted -fs "${disk}" mkpart "${luks_name}" 1GiB 100% |& indent ||
-      die "Failed to create LUKS partition"
+  # Create new partition table?
+  log "Partition table must include ${boot_name} (FAT32) and ${root_name} (ext4)"
+  if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
+    ask "Partition which disk?" disk
+    while ! parted -s "${disk}" print &>/dev/null; do
+      ask "'${disk}' does not exist; partition which disk?" disk
+    done
+
+    if really_sure "erase and partition '${disk}'"; then
+      partitioned=0
+      ensure_unmounted "/mnt/boot"
+      ensure_unmounted "/mnt"
+      ensure_lv_removed "root"
+      ensure_swapoff
+      ensure_lv_removed "swap"
+      ensure_vg_removed
+      ensure_pv_removed
+      ensure_luks_closed
+      log "Creating partition table"
+      parted -fs "${disk}" mklabel gpt |& indent || die "Failed to create partition table"
+      log "Creating boot partition (1G)"
+      parted -fs "${disk}" mkpart "${boot_name}" fat32 1MiB 1GiB |& indent ||
+        die "Failed to create boot partition"
+      parted -fs "${disk}" set 1 esp |& indent || die "Failed to mark boot partition as ESP"
+      log "Creating LUKS partition with free space"
+      parted -fs "${disk}" mkpart "${luks_name}" 1GiB 100% |& indent ||
+        die "Failed to create LUKS partition"
+    fi
+    wait_for "${boot_device}"
+    wait_for "${luks_device}"
+  else
+    log "Using existing partition table"
   fi
-  wait_for "${boot_device}"
-  wait_for "${luks_device}"
-else
-  log "Using existing partition table"
-fi
+}
 
 # Verify partitions
 has_device "${boot_device}" || die "Missing boot partition '${boot_name}'"
