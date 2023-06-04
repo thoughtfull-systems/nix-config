@@ -29,9 +29,6 @@ function confirm {
   [[ ${REPLY} =~ ^[Yy].* ]]
 }
 
-nix="nix --extra-experimental-features nix-command \
-         --extra-experimental-features flakes"
-
 # Validate hostname argument
 [[ -v 1 ]] || die "Expected hostname as first argument"
 hostname="${1}"
@@ -41,9 +38,6 @@ scriptdir="$(dirname $(realpath ${0}))"
 repo="${3:-github:thoughtfull-systems/nix-config}"
 
 ### VARIABLES ##################################################################
-# programs
-file="nix run nixpkgs#file -- -sL"
-
 # devices
 boot_name="${hostname}-boot"
 boot_device="/dev/disk/by-partlabel/${boot_name}"
@@ -163,7 +157,7 @@ function ensure_lv_removed {
 function is_boot_fat32 {
   # https://wiki.archlinux.org/title/FAT#Detecting_FAT_type recommends either
   # file or minfo
-  (${file} "${boot_device}" | grep "FAT (32 bit)")
+  (nix-shell -p file --run "file -sL ${boot_device}" | grep "FAT (32 bit)")
 }
 
 # Swap
