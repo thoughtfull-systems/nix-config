@@ -77,7 +77,7 @@ function enable_swap {
 function create_ssh_keys {
   # copied from sshd pre-start script
   mkdir -m 0755 -p "${ssh_dir}" |& indent
-  sshargs="-C 'root@${hostname}'  -N \"\""
+  sshargs="-C \"root@${hostname}\"  -N \"\""
   if ! [ -s "${rsa_key_path}" ]; then
     if ! [ -h "${rsa_key_path}" ]; then
       rm -f "${rsa_key_path}" |& indent
