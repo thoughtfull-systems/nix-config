@@ -96,7 +96,7 @@ function create_ssh_keys {
   log "SSH host keys exist"
 }
 function pause_for_input {
-  read -sp "Press any key to continue..."
+  read -sp "    Press any key to continue..."
   echo
 }
 function print_key_and_config {
