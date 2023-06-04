@@ -157,7 +157,7 @@ function ensure_lv_removed {
 function is_boot_fat32 {
   # https://wiki.archlinux.org/title/FAT#Detecting_FAT_type recommends either
   # file or minfo
-  (nix-shell -p file --run "file -sL ${boot_device}" | grep "FAT (32 bit)")
+  (nix-shell -p file --run "file -sL ${boot_device}" | grep "FAT (32 bit)") &>/dev/null
 }
 
 # Swap
@@ -177,7 +177,7 @@ function ensure_swapoff {
 }
 
 function is_root_ext4 {
-  (${file} -sL "${root_device}" | grep "ext4 filesystem") &>/dev/null
+  (nix-shell -p file --run "file -sL ${root_device}" | grep "ext4 filesystem") &>/dev/null
 }
 
 function was_partitioned {
