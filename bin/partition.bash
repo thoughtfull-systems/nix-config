@@ -224,6 +224,7 @@ function create_partition_table {
     log "Using existing partition table"
   fi
 }
+create_partition_table
 
 # Verify partitions
 has_device "${boot_device}" || die "Missing boot partition '${boot_name}'"
