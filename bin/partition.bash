@@ -191,7 +191,7 @@ function create_partition_table {
   parted -l |& indent
 
   # Create new partition table?
-  log "Partition table must include ${boot_name} (FAT32) and ${root_name} (ext4)"
+  log "Partition table must include ${boot_name} (FAT32) and ${luks_name} (LUKS)"
   if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
     ask "Partition which disk?" disk
     while ! parted -s "${disk}" print &>/dev/null; do
