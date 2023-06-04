@@ -163,7 +163,7 @@ function ensure_lv_removed {
 function is_boot_fat32 {
   # https://wiki.archlinux.org/title/FAT#Detecting_FAT_type recommends either
   # file or minfo
-  (${file} "${boot_device}" | grep "FAT (32 bit)") &>/dev/null
+  (${file} "${boot_device}" | grep "FAT (32 bit)")
 }
 
 # Swap
