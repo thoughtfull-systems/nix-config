@@ -78,9 +78,9 @@ function file {
 }
 function verify_ext4_device {
   if ! (file "${1}" | grep "ext4 filesystem") |& indent; then
-    die "Invalid root partition: ${1}"
+    die "Invalid ext4 partition: ${1}"
   fi
-  log "Valid root partition: ${1}"
+  log "Valid ext4 partition: ${1}"
 }
 function verify_swap_device {
   if ! swaplabel "${swap_device}" |& indent; then
@@ -102,7 +102,7 @@ function verify_mnt {
     verify_luks_device
     open_luks_device
     verify_lvm_volumes
-    mount_partition "/dev/mapper/${hostname}-root" "/mnt"
+    mount_partition "${root_device}" "/mnt"
   fi
 }
 function verify_boot {
@@ -169,6 +169,7 @@ vg_name="${hostname}"
 swap_device="/dev/mapper/${hostname}-swap"
 boot_name="${hostname}-boot"
 boot_device="/dev/disk/by-partlabel/${boot_name}"
+root_device="/dev/disk/by-partlabel/${hostname}-root"
 verify_mnt
 verify_boot
 enable_swap
