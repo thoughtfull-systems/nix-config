@@ -105,10 +105,18 @@ function verify_mnt {
     mount_partition "${root_device}" "/mnt"
   fi
 }
+function verify_boot_device {
+  # https://wiki.archlinux.org/title/FAT#Detecting_FAT_type recommends either
+  # file or minfo
+  if ! (file "${boot_device}" | grep "FAT (32 bit)") |& indent; then
+    die "Invalid boot device: ${boot_device}"
+  fi
+  die "Valid boot device: ${boot_device}"
+}
 function verify_boot {
   if ! is_mounted "/mnt/boot" |& indent; then
     verify_partition "${boot_name}"
-    verify_ext4_device "${boot_device}"
+    verify_boot_device "${boot_device}"
     mkdir -p "/mnt/boot" |& indent
     mount_partition "${boot_device}" "/mnt/boot"
   fi
