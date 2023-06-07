@@ -19,8 +19,7 @@ function is_mounted {
   (mount | grep " ${1} ") &>/dev/null
 }
 function mount_partition {
-  if ! (is_mounted "${2}" || mount "${1}" "${2}") |& indent; then
-    log "Mounting: ${2}"
+  if ! is_mounted "${2}" || mount "${1}" "${2}" |& indent; then
     die "Failed to mount: ${1}"
   fi
   log "Mounted: ${2}"
