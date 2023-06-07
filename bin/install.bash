@@ -16,7 +16,7 @@ function ask_no_echo() {
   echo
 }
 function is_mounted {
-  (mount | grep " ${1} ") |& indent
+  (mount | grep " ${1} ") &>/dev/null
 }
 function mount_partition {
   if ! (is_mounted "${2}" || mount "${1}" "${2}") |& indent; then
@@ -119,7 +119,7 @@ function verify_boot_device {
   log "Valid boot device: ${boot_device}"
 }
 function verify_boot {
-  if ! is_mounted "/mnt/boot" |& indent; then
+  if ! is_mounted "/mnt/boot"; then
     log "Mounting: /mnt/boot"
     verify_partition "${boot_name}"
     verify_boot_device
