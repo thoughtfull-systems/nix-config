@@ -11,10 +11,28 @@ function log { printf "%s === %s\n" "$(date -uIns)" "${1}"; }
 function die { printf "%s !!! %s\n" "$(date -uIns)" "${1}" >&2; exit 1; }
 function indent { sed -E 's/\r$//g;s/\r/\n/g' | sed -E "s/^/    /g"; }
 function ask_no_echo() {
-  msg="??? ${1} "
-  read -sp "${msg}" ${2}
+  read -sp "${1}" "${2}"
   # prevents bunching in the log (because input is not logged)
   echo
+}
+function is_mounted {
+  (mount | grep " ${1} ") |& indent
+}
+function mount_partition {
+  (is_mounted "${2}" || mount "${1}" "${2}") |& indent ||
+    die "Failed to mount: ${1}"
+  log "Mounted: ${2}"
+}
+function verify_partition {
+  [[ -b "/dev/disk/by-partlabel/${1}" ]] ||
+    die "Partition missing: ${1}"
+  log "Partition exists: ${1}"
+}
+function verify_luks_device {
+  if ! crypsetup isLuks "${luks_device}" |& indent; then
+    die "Invalid LUKS device: ${luks_device}"
+  fi
+  log "Valid LUKS device: ${luks_device}"
 }
 function wait_for() {
   if [[ ! -e "${1}" ]] &>/dev/null; then
@@ -23,12 +41,7 @@ function wait_for() {
       sleep 1
     done
   fi
-  log "Exists: ${1}"
-}
-function verify_partition {
-  [[ -b "/dev/disk/by-partlabel/${1}" ]] ||
-    die "Partition missing: ${1}"
-  log "Patition exists: ${1}"
+  log "Found: ${1}"
 }
 function open_luks_device {
   if [[ ! -b "${lvm_device}" ]]; then
@@ -42,36 +55,68 @@ function open_luks_device {
   fi
   log "LUKS device opened: ${luks_device}"
 }
+function verify_physical_volume {
+  if ! (pvs 2>/dev/null | grep "${lvm_device}") |& indent; then
+    die "Physical volume missing: ${lvm_device}"
+  fi
+  log "Physical volume exists: ${lvm_device}"
+}
+function verify_volume_group {
+  if ! (vgs 2>/dev/null | grep "${vg_name}") |& indent; then
+    die "Volume group missing: ${vg_name}"
+  fi
+  log "Volume group exists: ${vg_name}"
+}
 function verify_logical_volume {
-  (lvs -S "vg_name=${vg_name} && lv_name=${1}" | grep "${1}") |& indent ||
+  if ! (lvs -S "vg_name=${vg_name} && lv_name=${1}" 2>/dev/null | grep "${1}") |& indent; then
     die "Logical volume missing: ${1}"
+  fi
   log "Logical volume exists: ${1}"
 }
-function verify_disks {
-  verify_partition "${boot_name}"
-  verify_partition "${luks_name}"
-  open_luks_device
-
-  (pvs | grep "${lvm_device}") |& indent || die "Physical volume missing: ${lvm_device}"
-  log "Physical volume exists: ${lvm_device}"
-
-  (vgs | grep "${vg_name}") |& indent || die "Volume group missing: ${vg_name}"
-  log "Volume group exists: ${vg_name}"
-
+function file {
+  nix-shell -p file --run "file -sL ${1}"
+}
+function verify_ext4_device {
+  if ! (file "${1}" | grep "ext4 filesystem") |& indent; then
+    die "Invalid root partition: ${1}"
+  fi
+  log "Valid root partition: ${1}"
+}
+function verify_swap_device {
+  if ! swaplabel "${swap_device}" |& indent; then
+    die "Invalid swap device: ${swap_device}"
+  fi
+  log "Valid swap device: ${1}"
+}
+function verify_lvm_volumes {
+  verify_physical_volume
+  verify_volume_group
   verify_logical_volume "root"
+  verify_ext4_device "${root_device}"
   verify_logical_volume "swap"
+  verify_swap_volume
 }
-function is_mounted {
-  (mount | grep " ${1} ") |& indent
+function verify_mnt {
+  if ! is_mounted "/mnt"; then
+    verify_partition "${luks_name}"
+    verify_luks_device
+    open_luks_device
+    verify_lvm_volumes
+    mount_partition "/dev/mapper/${hostname}-root" "/mnt"
+  fi
 }
-function mount_partition {
-  (is_mounted "${2}" || mount "${1}" "${2}") |& indent ||
-    die "Failed to mount "${1}""
-  log "Mounted: ${2}"
+function verify_boot {
+  if ! is_mounted "/mnt/boot" |& indent; then
+    verify_partition "${boot_name}"
+    verify_ext4_device "${boot_device}"
+    mkdir -p "/mnt/boot" |& indent
+    mount_partition "${boot_device}" "/mnt/boot"
+  fi
 }
 function enable_swap {
-  (swapon | grep "$(realpath ${swap_device})" || swapon "${swap_device}") |& indent ||
-    die "Failed to enable swap ${swap_device}"
+  if ! (swapon | grep "$(realpath ${swap_device})") &>/dev/null; then
+    swapon "${swap_device}" |& indent || die "Failed to enable swap: ${swap_device}"
+  fi
   log "Swap enabled: ${swap_device}"
 }
 function create_ssh_keys {
@@ -115,6 +160,7 @@ log "Using hostname: ${hostname}"
 repo="${2:-github:thoughtfull-systems/nix-config}"
 log "Using repo: ${repo}"
 pause_for_input
+
 luks_name="${hostname}-luks"
 luks_device="/dev/disk/by-partlabel/${luks_name}"
 lvm_name="${hostname}-lvm"
@@ -123,10 +169,8 @@ vg_name="${hostname}"
 swap_device="/dev/mapper/${hostname}-swap"
 boot_name="${hostname}-boot"
 boot_device="/dev/disk/by-partlabel/${boot_name}"
-verify_disks
-mount_partition "/dev/mapper/${hostname}-root" "/mnt"
-mkdir -p "/mnt/boot" |& indent
-mount_partition "${boot_device}" "/mnt/boot"
+verify_mnt
+verify_boot
 enable_swap
 ssh_dir="/mnt/etc/ssh"
 rsa_key_path="${ssh_dir}/ssh_host_rsa_key"
