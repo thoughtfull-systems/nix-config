@@ -29,7 +29,7 @@ function verify_partition {
   log "Partition exists: ${1}"
 }
 function verify_luks_device {
-  if ! crypsetup isLuks "${luks_device}" |& indent; then
+  if ! cryptsetup isLuks "${luks_device}" |& indent; then
     die "Invalid LUKS device: ${luks_device}"
   fi
   log "Valid LUKS device: ${luks_device}"
