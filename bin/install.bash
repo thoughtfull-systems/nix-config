@@ -16,7 +16,7 @@ function indent {
     cat >/dev/null;
   fi; }
 function ask_no_echo() {
-  read -sp "${1}" "${2}"
+  read -sp "${1} " "${2}"
   # prevents bunching in the log (because input is not logged)
   echo
 }
