@@ -83,11 +83,11 @@ function verify_logical_volume {
 function file {
   nix-shell -p file --run "file -sL ${1}"
 }
-function verify_ext4_device {
-  if ! (file "${1}" | grep "ext4 filesystem") |& indent; then
-    die "Invalid ext4 partition: ${1}"
+function verify_root_device {
+  if ! (file "${root_device}" | grep "ext4 filesystem") |& indent; then
+    die "Invalid root partition: ${root_device}"
   fi
-  log "Valid ext4 partition: ${1}"
+  log "Valid root partition: ${root_device}"
 }
 function verify_swap_device {
   if ! swaplabel "${swap_device}" |& indent; then
@@ -99,7 +99,7 @@ function verify_lvm_volumes {
   verify_physical_volume
   verify_volume_group
   verify_logical_volume "root"
-  verify_ext4_device "${root_device}"
+  verify_root_device
   verify_logical_volume "swap"
   verify_swap_device
 }
