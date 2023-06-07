@@ -161,15 +161,15 @@ repo="${2:-github:thoughtfull-systems/nix-config}"
 log "Using repo: ${repo}"
 pause_for_input
 
+swap_device="/dev/mapper/${hostname}-swap"
+boot_name="${hostname}-boot"
+boot_device="/dev/disk/by-partlabel/${boot_name}"
 luks_name="${hostname}-luks"
 luks_device="/dev/disk/by-partlabel/${luks_name}"
 lvm_name="${hostname}-lvm"
 lvm_device="/dev/mapper/${lvm_name}"
 vg_name="${hostname}"
-swap_device="/dev/mapper/${hostname}-swap"
-boot_name="${hostname}-boot"
-boot_device="/dev/disk/by-partlabel/${boot_name}"
-root_device="/dev/disk/by-partlabel/${hostname}-root"
+root_device="/dev/mapper/${hostname}-root"
 verify_mnt
 verify_boot
 enable_swap
