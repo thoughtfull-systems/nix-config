@@ -86,7 +86,7 @@ function verify_swap_device {
   if ! swaplabel "${swap_device}" |& indent; then
     die "Invalid swap device: ${swap_device}"
   fi
-  log "Valid swap device: ${1}"
+  log "Valid swap device: ${swap_device}"
 }
 function verify_lvm_volumes {
   verify_physical_volume
