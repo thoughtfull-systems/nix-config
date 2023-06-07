@@ -16,10 +16,10 @@ function ask_no_echo() {
   echo
 }
 function is_mounted {
-  (mount | grep " ${1} ") &>/dev/null
+  mount | grep " ${1} "
 }
 function mount_partition {
-  if ! is_mounted "${2}" || mount "${1}" "${2}" |& indent; then
+  if ! (is_mounted "${2}" || mount "${1}" "${2}") |& indent; then
     die "Failed to mount: ${1}"
   fi
   log "Mounted: ${2}"
@@ -99,7 +99,7 @@ function verify_lvm_volumes {
   verify_swap_device
 }
 function verify_mnt {
-  if ! is_mounted "/mnt"; then
+  if ! is_mounted "/mnt" |& indent; then
     log "Mounting: /mnt"
     verify_partition "${luks_name}"
     verify_luks_device
@@ -118,7 +118,7 @@ function verify_boot_device {
   log "Valid boot device: ${boot_device}"
 }
 function verify_boot {
-  if ! is_mounted "/mnt/boot"; then
+  if ! is_mounted "/mnt/boot" |& indent; then
     log "Mounting: /mnt/boot"
     verify_partition "${boot_name}"
     verify_boot_device
@@ -128,7 +128,7 @@ function verify_boot {
   log "Verified: /mnt/boot"
 }
 function enable_swap {
-  if ! (swapon | grep "$(realpath ${swap_device})") &>/dev/null; then
+  if ! (swapon | grep "$(realpath ${swap_device})") |& indent; then
     log "Enabling swap: ${swap_device}"
     swapon "${swap_device}" |& indent || die "Failed to enable swap: ${swap_device}"
   fi
