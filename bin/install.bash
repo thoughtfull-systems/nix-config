@@ -8,7 +8,8 @@ exec 1> >(tee ${logfile}) 2>&1
 set -euo pipefail
 
 function log { printf "%s === %s\n" "$(date -uIns)" "${1}"; }
-function die { printf "%s !!! %s\n" "$(date -uIns)" "${1}" >&2; exit 1; }
+function err { printf "%s !!! %s\n" "$(date -uIns)" "${1}" >&2; }
+function die { err "${1}"; exit 1; }
 function indent {
   if [[ -v DEBUG ]]; then
     sed -E 's/\r$//g;s/\r/\n/g' | sed -E "s/^/    /g"
@@ -56,7 +57,7 @@ function open_luks_device {
     ask_no_echo "Enter passphrase for ${luks_device}:" PASS
     while ! echo "${PASS}" |
         cryptsetup open "${luks_device}" "${lvm_name}" |& indent; do
-      echo "!!! Open LUKS failed!"
+      err "Open LUKS failed!"
       ask_no_echo "Enter passphrase for ${luks_device}:" PASS
     done
     wait_for "${lvm_device}"
@@ -100,8 +101,8 @@ function verify_lvm_volumes {
   verify_physical_volume
   verify_volume_group
   verify_logical_volume "root"
-  verify_root_device
   verify_logical_volume "swap"
+  verify_root_device
   verify_swap_device
 }
 function verify_mnt {
@@ -116,8 +117,6 @@ function verify_mnt {
   log "Verified: /mnt"
 }
 function verify_boot_device {
-  # https://wiki.archlinux.org/title/FAT#Detecting_FAT_type recommends either
-  # file or minfo
   if ! (file "${boot_device}" | grep "FAT (32 bit)") |& indent; then
     die "Invalid boot device: ${boot_device}"
   fi
@@ -141,13 +140,13 @@ function enable_swap {
   log "Swap enabled: ${swap_device}"
 }
 function verify_ssh_keys {
-  # copied from sshd pre-start script
+  # adapted from sshd pre-start script
   mkdir -m 0755 -p "${ssh_dir}" |& indent
   if ! [ -s "${rsa_key_path}" ]; then
     if ! [ -h "${rsa_key_path}" ]; then
       rm -f "${rsa_key_path}" |& indent
     fi
-    log "Creating SSH host key: ${rsa_key_path}"
+    log "Creating SSH host RSA keys"
     ssh-keygen -t "rsa" -b 4096 -f "${rsa_key_path}" -N "" -C "root@${hostname}" |& indent ||
       die "Failed to generate host RSA keys"
   fi
@@ -155,7 +154,7 @@ function verify_ssh_keys {
     if ! [ -h "${ed25519_key_path}" ]; then
       rm -f "${ed25519_key_path}" |& indent
     fi
-    log "Creating SSH host key: ${ed25519_key_path}"
+    log "Creating SSH host ed25519 keys"
     ssh-keygen -t "ed25519" -f "${ed25519_key_path}" -N "" -C "root@${hostname}" |& indent ||
       die "Failed to generate host ed25519 keys"
   fi
@@ -182,7 +181,6 @@ repo="${2:-github:thoughtfull-systems/nix-config}"
 log "Using repo: ${repo}"
 pause_for_input
 
-swap_device="/dev/mapper/${hostname}-swap"
 boot_name="${hostname}-boot"
 boot_device="/dev/disk/by-partlabel/${boot_name}"
 luks_name="${hostname}-luks"
@@ -191,6 +189,7 @@ lvm_name="${hostname}-lvm"
 lvm_device="/dev/mapper/${lvm_name}"
 vg_name="${hostname}"
 root_device="/dev/mapper/${hostname}-root"
+swap_device="/dev/mapper/${hostname}-swap"
 verify_mnt
 verify_boot
 enable_swap
