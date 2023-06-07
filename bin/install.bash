@@ -9,8 +9,7 @@ set -euo pipefail
 
 function log { printf "%s === %s\n" "$(date -uIns)" "${1}"; }
 function die { printf "%s !!! %s\n" "$(date -uIns)" "${1}" >&2; exit 1; }
-function indent { sed -E 's/\r$//g;s/\r/\n/g' | sed -E "s/^/    /g"; }
-function debug_indent { if [[ -v DEBUG ]]; then indent; else cat >/dev/null; fi; }
+function indent { if [[ -v DEBUG ]]; then indent; else cat >/dev/null; fi; }
 function ask_no_echo() {
   read -sp "${1}" "${2}"
   # prevents bunching in the log (because input is not logged)
@@ -31,7 +30,7 @@ function verify_partition {
   log "Partition exists: ${1}"
 }
 function verify_luks_device {
-  if ! cryptsetup isLuks "${luks_device}" |& debug_indent; then
+  if ! cryptsetup isLuks "${luks_device}" |& indent; then
     die "Invalid LUKS device: ${luks_device}"
   fi
   log "Valid LUKS device: ${luks_device}"
