@@ -161,7 +161,7 @@ function verify_ssh_keys {
   log "Verified SSH host keys"
 }
 function pause_for_input {
-  read -sp "Press any key to continue..."
+  read -n1 -sp "Press any key to continue..."
   echo
 }
 function print_key_and_config {
