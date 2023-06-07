@@ -9,13 +9,12 @@ set -euo pipefail
 
 function log { printf "%s === %s\n" "$(date -uIns)" "${1}"; }
 function die { printf "%s !!! %s\n" "$(date -uIns)" "${1}" >&2; exit 1; }
-function indent { sed -E 's/\r$//g;s/\r/\n/g' | sed -E "s/^/    /g"; }
-function debug_indent {
+function indent {
   if [[ -v DEBUG ]]; then
-    indent
+    sed -E 's/\r$//g;s/\r/\n/g' | sed -E "s/^/    /g"
   else
-    cat >/dev/null;
-  fi;
+    cat >/dev/null
+  fi
 }
 function ask_no_echo() {
   read -sp "${1} " "${2}"
@@ -26,7 +25,7 @@ function is_mounted {
   mount | grep " ${1} "
 }
 function mount_partition {
-  if ! (is_mounted "${2}" || mount "${1}" "${2}") |& debug_indent; then
+  if ! (is_mounted "${2}" || mount "${1}" "${2}") |& indent; then
     die "Failed to mount: ${1}"
   fi
   log "Mounted: ${2}"
@@ -37,7 +36,7 @@ function verify_partition {
   log "Partition exists: ${1}"
 }
 function verify_luks_device {
-  if ! cryptsetup isLuks "${luks_device}" |& debug_indent; then
+  if ! cryptsetup isLuks "${luks_device}" |& indent; then
     die "Invalid LUKS device: ${luks_device}"
   fi
   log "Valid LUKS device: ${luks_device}"
@@ -56,8 +55,8 @@ function open_luks_device {
     log "Opening LUKS device: ${luks_device}"
     ask_no_echo "Enter passphrase for ${luks_device}:" PASS
     while ! echo "${PASS}" |
-        cryptsetup open "${luks_device}" "${lvm_name}" |& debug_indent; do
-      echo "Open LUKS failed!" | indent
+        cryptsetup open "${luks_device}" "${lvm_name}" |& indent; do
+      echo "!!! Open LUKS failed!"
       ask_no_echo "Enter passphrase for ${luks_device}:" PASS
     done
     wait_for "${lvm_device}"
@@ -65,19 +64,19 @@ function open_luks_device {
   log "LUKS device opened: ${luks_device}"
 }
 function verify_physical_volume {
-  if ! (pvs | grep "${lvm_device}") |& debug_indent; then
+  if ! (pvs | grep "${lvm_device}") |& indent; then
     die "Physical volume missing: ${lvm_device}"
   fi
   log "Physical volume exists: ${lvm_device}"
 }
 function verify_volume_group {
-  if ! (vgs | grep "${vg_name}") |& debug_indent; then
+  if ! (vgs | grep "${vg_name}") |& indent; then
     die "Volume group missing: ${vg_name}"
   fi
   log "Volume group exists: ${vg_name}"
 }
 function verify_logical_volume {
-  if ! (lvs -S "vg_name=${vg_name} && lv_name=${1}" | grep "${1}") |& debug_indent; then
+  if ! (lvs -S "vg_name=${vg_name} && lv_name=${1}" | grep "${1}") |& indent; then
     die "Logical volume missing: ${1}"
   fi
   log "Logical volume exists: ${1}"
@@ -86,13 +85,13 @@ function file {
   nix-shell -p file --run "file -sL ${1}"
 }
 function verify_root_device {
-  if ! (file "${root_device}" | grep "ext4 filesystem") |& debug_indent; then
+  if ! (file "${root_device}" | grep "ext4 filesystem") |& indent; then
     die "Invalid root partition: ${root_device}"
   fi
   log "Valid root partition: ${root_device}"
 }
 function verify_swap_device {
-  if ! swaplabel "${swap_device}" |& debug_indent; then
+  if ! swaplabel "${swap_device}" |& indent; then
     die "Invalid swap device: ${swap_device}"
   fi
   log "Valid swap device: ${swap_device}"
@@ -106,7 +105,7 @@ function verify_lvm_volumes {
   verify_swap_device
 }
 function verify_mnt {
-  if ! is_mounted "/mnt" |& debug_indent; then
+  if ! is_mounted "/mnt" |& indent; then
     log "Mounting: /mnt"
     verify_partition "${luks_name}"
     verify_luks_device
@@ -119,45 +118,45 @@ function verify_mnt {
 function verify_boot_device {
   # https://wiki.archlinux.org/title/FAT#Detecting_FAT_type recommends either
   # file or minfo
-  if ! (file "${boot_device}" | grep "FAT (32 bit)") |& debug_indent; then
+  if ! (file "${boot_device}" | grep "FAT (32 bit)") |& indent; then
     die "Invalid boot device: ${boot_device}"
   fi
   log "Valid boot device: ${boot_device}"
 }
 function verify_boot {
-  if ! is_mounted "/mnt/boot" |& debug_indent; then
+  if ! is_mounted "/mnt/boot" |& indent; then
     log "Mounting: /mnt/boot"
     verify_partition "${boot_name}"
     verify_boot_device
-    mkdir -p "/mnt/boot" |& debug_indent
+    mkdir -p "/mnt/boot" |& indent
     mount_partition "${boot_device}" "/mnt/boot"
   fi
   log "Verified: /mnt/boot"
 }
 function enable_swap {
-  if ! (swapon | grep "$(realpath ${swap_device})") |& debug_indent; then
+  if ! (swapon | grep "$(realpath ${swap_device})") |& indent; then
     log "Enabling swap: ${swap_device}"
-    swapon "${swap_device}" |& debug_indent || die "Failed to enable swap: ${swap_device}"
+    swapon "${swap_device}" |& indent || die "Failed to enable swap: ${swap_device}"
   fi
   log "Swap enabled: ${swap_device}"
 }
 function verify_ssh_keys {
   # copied from sshd pre-start script
-  mkdir -m 0755 -p "${ssh_dir}" |& debug_indent
+  mkdir -m 0755 -p "${ssh_dir}" |& indent
   if ! [ -s "${rsa_key_path}" ]; then
     if ! [ -h "${rsa_key_path}" ]; then
-      rm -f "${rsa_key_path}" |& debug_indent
+      rm -f "${rsa_key_path}" |& indent
     fi
     log "Creating SSH host key: ${rsa_key_path}"
-    ssh-keygen -t "rsa" -b 4096 -f "${rsa_key_path}" -N "" -C "root@${hostname}" |& debug_indent ||
+    ssh-keygen -t "rsa" -b 4096 -f "${rsa_key_path}" -N "" -C "root@${hostname}" |& indent ||
       die "Failed to generate host RSA keys"
   fi
   if ! [ -s "${ed25519_key_path}" ]; then
     if ! [ -h "${ed25519_key_path}" ]; then
-      rm -f "${ed25519_key_path}" |& debug_indent
+      rm -f "${ed25519_key_path}" |& indent
     fi
     log "Creating SSH host key: ${ed25519_key_path}"
-    ssh-keygen -t "ed25519" -f "${ed25519_key_path}" -N "" -C "root@${hostname}" |& debug_indent ||
+    ssh-keygen -t "ed25519" -f "${ed25519_key_path}" -N "" -C "root@${hostname}" |& indent ||
       die "Failed to generate host ed25519 keys"
   fi
   log "Verified SSH host keys"
@@ -201,7 +200,7 @@ ed25519_key_path="${ssh_dir}/ssh_host_ed25519_key"
 verify_ssh_keys
 print_key_and_config
 
-nixos-install --no-root-password --flake "${repo}#${hostname}" |& debug_indent ||
+nixos-install --no-root-password --flake "${repo}#${hostname}" |& indent ||
   die "Failed to install NixOS"
 
 log "Installation complete"
