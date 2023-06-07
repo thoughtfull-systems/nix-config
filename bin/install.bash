@@ -9,7 +9,7 @@ set -euo pipefail
 
 function log { printf "%s === %s\n" "$(date -uIns)" "${1}"; }
 function die { printf "%s !!! %s\n" "$(date -uIns)" "${1}" >&2; exit 1; }
-function debug_indent {
+function indent {
   if [[ -v DEBUG ]]; then
     sed -E 's/\r$//g;s/\r/\n/g' | sed -E "s/^/    /g";
   else
