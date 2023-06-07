@@ -19,8 +19,10 @@ function is_mounted {
   (mount | grep " ${1} ") |& indent
 }
 function mount_partition {
-  (is_mounted "${2}" || mount "${1}" "${2}") |& indent ||
+  if ! (is_mounted "${2}" || mount "${1}" "${2}") |& indent; then
+    log "Mounting: ${2}"
     die "Failed to mount: ${1}"
+  fi
   log "Mounted: ${2}"
 }
 function verify_partition {
@@ -45,6 +47,7 @@ function wait_for() {
 }
 function open_luks_device {
   if [[ ! -b "${lvm_device}" ]]; then
+    log "Opening LUKS device: ${luks_device}"
     ask_no_echo "Enter passphrase for ${luks_device}:" PASS
     while ! echo "${PASS}" |
         cryptsetup open "${luks_device}" "${lvm_name}" |& indent; do
@@ -98,12 +101,14 @@ function verify_lvm_volumes {
 }
 function verify_mnt {
   if ! is_mounted "/mnt"; then
+    log "Mounting: /mnt"
     verify_partition "${luks_name}"
     verify_luks_device
     open_luks_device
     verify_lvm_volumes
     mount_partition "${root_device}" "/mnt"
   fi
+  log "Verified: /mnt"
 }
 function verify_boot_device {
   # https://wiki.archlinux.org/title/FAT#Detecting_FAT_type recommends either
@@ -115,38 +120,41 @@ function verify_boot_device {
 }
 function verify_boot {
   if ! is_mounted "/mnt/boot" |& indent; then
+    log "Mounting: /mnt/boot"
     verify_partition "${boot_name}"
     verify_boot_device
     mkdir -p "/mnt/boot" |& indent
     mount_partition "${boot_device}" "/mnt/boot"
   fi
+  log "Verified: /mnt/boot"
 }
 function enable_swap {
   if ! (swapon | grep "$(realpath ${swap_device})") &>/dev/null; then
+    log "Enabling swap: ${swap_device}"
     swapon "${swap_device}" |& indent || die "Failed to enable swap: ${swap_device}"
   fi
   log "Swap enabled: ${swap_device}"
 }
-function create_ssh_keys {
+function verify_ssh_keys {
   # copied from sshd pre-start script
   mkdir -m 0755 -p "${ssh_dir}" |& indent
   if ! [ -s "${rsa_key_path}" ]; then
     if ! [ -h "${rsa_key_path}" ]; then
       rm -f "${rsa_key_path}" |& indent
     fi
+    log "Creating SSH host key: ${rsa_key_path}"
     ssh-keygen -t "rsa" -b 4096 -f "${rsa_key_path}" -N "" -C "root@${hostname}" |& indent ||
       die "Failed to generate host RSA keys"
-    log "Generated host RSA keys"
   fi
   if ! [ -s "${ed25519_key_path}" ]; then
     if ! [ -h "${ed25519_key_path}" ]; then
       rm -f "${ed25519_key_path}" |& indent
     fi
+    log "Creating SSH host key: ${ed25519_key_path}"
     ssh-keygen -t "ed25519" -f "${ed25519_key_path}" -N "" -C "root@${hostname}" |& indent ||
       die "Failed to generate host ed25519 keys"
-    log "Generated host ed25519 keys"
   fi
-  log "SSH host keys exist"
+  log "Verified SSH host keys"
 }
 function pause_for_input {
   read -sp "Press any key to continue..."
@@ -184,7 +192,7 @@ enable_swap
 ssh_dir="/mnt/etc/ssh"
 rsa_key_path="${ssh_dir}/ssh_host_rsa_key"
 ed25519_key_path="${ssh_dir}/ssh_host_ed25519_key"
-create_ssh_keys
+verify_ssh_keys
 print_key_and_config
 
 nixos-install --no-root-password --flake "${repo}#${hostname}" |& indent ||
