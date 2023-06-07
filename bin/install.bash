@@ -94,7 +94,7 @@ function verify_lvm_volumes {
   verify_logical_volume "root"
   verify_ext4_device "${root_device}"
   verify_logical_volume "swap"
-  verify_swap_volume
+  verify_swap_device
 }
 function verify_mnt {
   if ! is_mounted "/mnt"; then
