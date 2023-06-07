@@ -63,19 +63,19 @@ function open_luks_device {
   log "LUKS device opened: ${luks_device}"
 }
 function verify_physical_volume {
-  if ! (pvs 2>/dev/null | grep "${lvm_device}") |& indent; then
+  if ! (pvs | grep "${lvm_device}") |& indent; then
     die "Physical volume missing: ${lvm_device}"
   fi
   log "Physical volume exists: ${lvm_device}"
 }
 function verify_volume_group {
-  if ! (vgs 2>/dev/null | grep "${vg_name}") |& indent; then
+  if ! (vgs | grep "${vg_name}") |& indent; then
     die "Volume group missing: ${vg_name}"
   fi
   log "Volume group exists: ${vg_name}"
 }
 function verify_logical_volume {
-  if ! (lvs -S "vg_name=${vg_name} && lv_name=${1}" 2>/dev/null | grep "${1}") |& indent; then
+  if ! (lvs -S "vg_name=${vg_name} && lv_name=${1}" | grep "${1}") |& indent; then
     die "Logical volume missing: ${1}"
   fi
   log "Logical volume exists: ${1}"
