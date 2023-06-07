@@ -9,7 +9,12 @@ set -euo pipefail
 
 function log { printf "%s === %s\n" "$(date -uIns)" "${1}"; }
 function die { printf "%s !!! %s\n" "$(date -uIns)" "${1}" >&2; exit 1; }
-function indent { if [[ -v DEBUG ]]; then indent; else cat >/dev/null; fi; }
+function debug_indent {
+  if [[ -v DEBUG ]]; then
+    sed -E 's/\r$//g;s/\r/\n/g' | sed -E "s/^/    /g";
+  else
+    cat >/dev/null;
+  fi; }
 function ask_no_echo() {
   read -sp "${1}" "${2}"
   # prevents bunching in the log (because input is not logged)
