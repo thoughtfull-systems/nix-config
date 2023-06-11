@@ -53,6 +53,8 @@ function wait_for() {
   log "Found: ${1}"
 }
 function open_luks_device {
+  verify_partition "${luks_name}"
+  verify_luks_device
   if [[ ! -b "${lvm_device}" ]]; then
     log "Opening LUKS device: ${luks_device}"
     ask_no_echo "Enter passphrase for ${luks_device}:" PASS
@@ -92,32 +94,17 @@ function verify_root_device {
   fi
   log "Valid root partition: ${root_device}"
 }
-function verify_swap_device {
-  if ! swaplabel "${swap_device}" |& debug; then
-    die "Invalid swap device: ${swap_device}"
-  fi
-  log "Valid swap device: ${swap_device}"
-}
-function verify_lvm_volumes {
-  verify_physical_volume
-  verify_volume_group
-  verify_logical_volume "root"
-  verify_logical_volume "swap"
-  verify_root_device
-  verify_swap_device
-}
 function verify_mnt {
   if ! is_mounted "/mnt" |& debug; then
     log "Mounting: /mnt"
-    verify_partition "${luks_name}"
-    verify_luks_device
-    open_luks_device
-    verify_lvm_volumes
+    verify_logical_volume "root"
+    verify_root_device
     mount_partition "${root_device}" "/mnt"
   fi
   log "Verified: /mnt"
 }
 function verify_boot_device {
+  verify_partition "${boot_name}"
   if ! (file "${boot_device}" | grep "FAT (32 bit)") |& debug; then
     die "Invalid boot device: ${boot_device}"
   fi
@@ -126,14 +113,21 @@ function verify_boot_device {
 function verify_boot {
   if ! is_mounted "/mnt/boot" |& debug; then
     log "Mounting: /mnt/boot"
-    verify_partition "${boot_name}"
     verify_boot_device
     mkdir -p "/mnt/boot" |& debug
     mount_partition "${boot_device}" "/mnt/boot"
   fi
   log "Verified: /mnt/boot"
 }
+function verify_swap_device {
+  if ! swaplabel "${swap_device}" |& debug; then
+    die "Invalid swap device: ${swap_device}"
+  fi
+  log "Valid swap device: ${swap_device}"
+}
 function enable_swap {
+  verify_logical_volume "swap"
+  verify_swap_device
   if ! (swapon | grep "$(realpath ${swap_device})") |& debug; then
     log "Enabling swap: ${swap_device}"
     swapon "${swap_device}" |& debug || die "Failed to enable swap: ${swap_device}"
@@ -191,6 +185,9 @@ lvm_device="/dev/mapper/${lvm_name}"
 vg_name="${hostname}"
 root_device="/dev/mapper/${hostname}-root"
 swap_device="/dev/mapper/${hostname}-swap"
+open_luks_device
+verify_physical_volume
+verify_volume_group
 verify_mnt
 verify_boot
 enable_swap
