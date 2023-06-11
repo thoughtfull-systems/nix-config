@@ -186,45 +186,42 @@ function was_partitioned {
 
 ### PARTITION TABLE ###
 partitioned=1
-function create_partition_table {
-  log "Current partition table..."
-  parted -l |& indent
+log "Current partition table..."
+parted -l |& indent
 
-  # Create new partition table?
-  log "Partition table must include ${boot_name} (FAT32) and ${luks_name} (LUKS)"
-  if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
-    ask "Partition which disk?" disk
-    while ! parted -s "${disk}" print &>/dev/null; do
-      ask "'${disk}' does not exist; partition which disk?" disk
-    done
+# Create new partition table?
+log "Partition table must include ${boot_name} (FAT32) and ${luks_name} (LUKS)"
+if confirm "Create new partition table (ALL DATA WILL BE LOST)?"; then
+  ask "Partition which disk?" disk
+  while ! parted -s "${disk}" print &>/dev/null; do
+    ask "'${disk}' does not exist; partition which disk?" disk
+  done
 
-    if really_sure "erase and partition '${disk}'"; then
-      partitioned=0
-      ensure_unmounted "/mnt/boot"
-      ensure_unmounted "/mnt"
-      ensure_lv_removed "root"
-      ensure_swapoff
-      ensure_lv_removed "swap"
-      ensure_vg_removed
-      ensure_pv_removed
-      ensure_luks_closed
-      log "Creating partition table"
-      parted -fs "${disk}" mklabel gpt |& indent || die "Failed to create partition table"
-      log "Creating boot partition (1G)"
-      parted -fs "${disk}" mkpart "${boot_name}" fat32 1MiB 1GiB |& indent ||
-        die "Failed to create boot partition"
-      parted -fs "${disk}" set 1 esp |& indent || die "Failed to mark boot partition as ESP"
-      log "Creating LUKS partition with free space"
-      parted -fs "${disk}" mkpart "${luks_name}" 1GiB 100% |& indent ||
-        die "Failed to create LUKS partition"
-    fi
-    wait_for "${boot_device}"
-    wait_for "${luks_device}"
-  else
-    log "Using existing partition table"
+  if really_sure "erase and partition '${disk}'"; then
+    partitioned=0
+    ensure_unmounted "/mnt/boot"
+    ensure_unmounted "/mnt"
+    ensure_lv_removed "root"
+    ensure_swapoff
+    ensure_lv_removed "swap"
+    ensure_vg_removed
+    ensure_pv_removed
+    ensure_luks_closed
+    log "Creating partition table"
+    parted -fs "${disk}" mklabel gpt |& indent || die "Failed to create partition table"
+    log "Creating boot partition (1G)"
+    parted -fs "${disk}" mkpart "${boot_name}" fat32 1MiB 1GiB |& indent ||
+      die "Failed to create boot partition"
+    parted -fs "${disk}" set 1 esp |& indent || die "Failed to mark boot partition as ESP"
+    log "Creating LUKS partition with free space"
+    parted -fs "${disk}" mkpart "${luks_name}" 1GiB 100% |& indent ||
+      die "Failed to create LUKS partition"
   fi
-}
-create_partition_table
+  wait_for "${boot_device}"
+  wait_for "${luks_device}"
+else
+  log "Using existing partition table"
+fi
 
 # Verify partitions
 has_device "${boot_device}" || die "Missing boot partition '${boot_name}'"
