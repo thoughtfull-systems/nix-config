@@ -18,6 +18,17 @@
   console.keyMap = "dvorak";
   environment.etc."nixos/deploy-key".source = config.age.secrets.ziph-deploy-key.path;
   # environment.systemPackages = [];
+  fileSystems = {
+    "/" = {
+      device = "/dev/mapper/ziph-root";
+      fsType = "ext4";
+    };
+
+    "/boot" = {
+      device = "/dev/disk/by-partlabel/ziph-boot";
+      fsType = "vfat";
+    };
+  };
   hardware.pulseaudio.enable = false;
   imports = [
     ./hardware-configuration.nix
@@ -71,6 +82,9 @@
     };
   };
   sound.enable = true;
+  swapDevices = [{
+    device = "/dev/mapper/ziph-swap
+  }];
   system = {
     autoUpgrade.enable = true;
     stateVersion = "22.11"; # Did you read the comment?
