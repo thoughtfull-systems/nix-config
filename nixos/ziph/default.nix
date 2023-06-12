@@ -83,7 +83,7 @@
   };
   sound.enable = true;
   swapDevices = [{
-    device = "/dev/mapper/ziph-swap
+    device = "/dev/mapper/ziph-swap";
   }];
   system = {
     autoUpgrade.enable = true;
