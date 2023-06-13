@@ -15,6 +15,12 @@
   imports = [ ./syncthing.nix ];
   programs.git = {
     enable = true;
+    extraConfig = {
+      user = {
+        email = "paul@stadig.name";
+        name = "Paul Stadig";
+      };
+    };
     ignores = [ "*~" ];
   };
 }
