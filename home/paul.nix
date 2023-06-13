@@ -18,10 +18,6 @@
       enable = true;
       ignores = [ "*~" ];
     };
-    ssh = {
-      enable = true;
-      forwardAgent = true;
-      matchBlocks."*".identityFile = "/home/paul/.ssh/id_ed25519_sk_rk_yk5nano475";
-    };
+    ssh.matchBlocks."*".identityFile = [ "~/.ssh/id_ed25519_sk_rk_yk5nano475" ];
   };
 }
