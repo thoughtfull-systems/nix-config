@@ -13,11 +13,8 @@
     username = "paul";
   };
   imports = [ ./syncthing.nix ];
-  programs = {
-    git = {
-      enable = true;
-      ignores = [ "*~" ];
-    };
-    ssh.matchBlocks."*".identityFile = [ "~/.ssh/id_ed25519_sk_rk_yk5nano475" ];
+  programs.git = {
+    enable = true;
+    ignores = [ "*~" ];
   };
 }
