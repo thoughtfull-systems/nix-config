@@ -5,6 +5,7 @@ inputs: args: let
 in {
   imports = importAll' [
     ./agenix.nix
+    ./avahi.nix
     ./git.nix
     ./nix.nix
     ./home-manager.nix
