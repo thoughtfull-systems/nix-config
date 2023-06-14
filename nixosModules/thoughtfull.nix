@@ -9,6 +9,7 @@ in {
     ./git.nix
     ./nix.nix
     ./home-manager.nix
+    ./sudo.nix
     ./thoughtfull-overlay.nix
     ./unstable-overlay.nix
     ./yubikey.nix
