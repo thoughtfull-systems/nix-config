@@ -3,7 +3,7 @@
   secrets = config.age.secrets;
 in {
   options = {
-    thoughtfull.proton-vpn.enable = lib.mkEnable "proton-vpn";
+    thoughtfull.proton-vpn.enable = lib.mkEnableOption "proton-vpn";
   };
   config = lib.mkIf cfg.enable {
     age.secrets = {
