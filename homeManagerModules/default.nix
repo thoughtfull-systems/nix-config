@@ -10,6 +10,7 @@ in {
     ./emacs/my-prog.nix
     ./emacs.nix
     ./emacs-overlay.nix
+    ./git.nix
     ./gnome-terminal.nix
     ./home-manager.nix
     ./keychain.nix
