@@ -1,5 +1,5 @@
-{ ... } : {
-  programs.zsh = {
+{ lib, ... } : {
+  programs.zsh = lib.mkDefault {
     autocd = true;
     enable = true;
     enableAutosuggestions = true;
