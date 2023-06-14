@@ -13,6 +13,7 @@ in {
     ./thoughtfull-overlay.nix
     ./unstable-overlay.nix
     ./yubikey.nix
+    ./zsh.nix
   ];
   users.mutableUsers = false;
 }
