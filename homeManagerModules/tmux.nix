@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ lib, pkgs, ... }: lib.mkDefault {
   home.packages = with pkgs; [ xsel ];
   programs = {
     tmux = {
