@@ -1,6 +1,8 @@
 { config, ... }: {
   age.secrets = {
     paul-password.file = ../../age/secrets/paul-password.age;
+    proton-ovpn.file = ../../age/secrets/proton-ovpn.age;
+    proton-txt.file = ../../age/secrets/proton-txt.age;
     ziph-deploy-key.file = ../../age/secrets/ziph-deploy-key.age;
   };
   boot = {
