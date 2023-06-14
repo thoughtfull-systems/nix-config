@@ -1,5 +1,5 @@
-{ ... }: {
-  dconf.settings = {
+{ lib, ... }: {
+  dconf.settings = lib.mkDefault {
     "org/gnome/terminal/legacy" = {
       default-show-menubar = false;
     };
