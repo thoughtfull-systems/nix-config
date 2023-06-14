@@ -21,6 +21,5 @@
         name = "Paul Stadig";
       };
     };
-    ignores = [ "*~" ];
   };
 }
