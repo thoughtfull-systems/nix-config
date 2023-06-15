@@ -6,7 +6,6 @@
     ];
     sessionVariables.EDITOR = "emacsclient";
   };
-  imports = [ ./emacs ];
   programs.emacs.extraPackages = epkgs: with epkgs; [
     my-exwm
   ];
