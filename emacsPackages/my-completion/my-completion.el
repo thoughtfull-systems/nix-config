@@ -36,7 +36,7 @@
 (deftheme my-completion)
 (custom-theme-set-variables
  'my-completion
- '(completion-auto-help 'lazy)
+ '(completion-auto-help nil)
  '(completion-category-overrides '((file (styles basic partial-completion orderless))))
  '(completion-cycle-threshold 3)
  '(completion-styles '(orderless))
