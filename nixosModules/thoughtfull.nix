@@ -12,6 +12,7 @@ in {
     ./proton-vpn.nix
     ./sudo.nix
     ./thoughtfull-overlay.nix
+    ./tt-rss.nix
     ./unstable-overlay.nix
     ./vaultwarden.nix
     ./yubikey.nix
