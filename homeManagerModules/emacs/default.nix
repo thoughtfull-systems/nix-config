@@ -16,14 +16,14 @@ in {
         # for loading files from JARs
         unzip
       ];
-      programs.emacs = {
-        enable = true;
-        extraPackages = epkgs: with epkgs; [
-          my
-          my-completion
-          my-prog
-        ];
-      };
+    };
+    programs.emacs = {
+      enable = true;
+      extraPackages = epkgs: with epkgs; [
+        my
+        my-completion
+        my-prog
+      ];
     };
   };
 }
