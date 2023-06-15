@@ -5,9 +5,7 @@ inputs: args: let
 in {
   imports = importAll' [
     ./desktop
-    ./emacs/my-completion.nix
-    ./emacs/my-prog.nix
-    ./emacs.nix
+    ./emacs
     ./emacs-overlay.nix
     ./exwm.nix
     ./git.nix
