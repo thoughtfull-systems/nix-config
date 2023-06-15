@@ -9,8 +9,7 @@
 { config, lib, ... }: let
   cfg = config.thoughtfull.autoUpgrade;
 in {
-  options = {
-    thoughtfull.autoUpgrade = {
+  options.thoughtfull.autoUpgrade = {
       flake = lib.mkOption {
         default = "git+ssh://git@deploy.github.com/thoughtfull-systems/nix-config?ref=main";
         description = lib.mdDoc "Flake used for automatic upgrades.";
@@ -26,7 +25,6 @@ in {
         description = lib.mdDoc "Flake inputs to update for upgrades.";
         type = lib.types.listOf lib.types.str;
       };
-    };
   };
   config = lib.mkMerge [
     (lib.mkDefault {
