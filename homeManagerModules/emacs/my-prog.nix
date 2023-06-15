@@ -7,6 +7,7 @@
   imports = [ ../emacs.nix ];
   programs.emacs = {
     extraConfig = ''
+      (require 'use-package)
       (use-package my-prog)
     '';
     extraPackages = epkgs: with epkgs; [
