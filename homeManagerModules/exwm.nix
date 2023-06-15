@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }: {
+{ config, lib, pkgs, ... }: lib.mkIf config.thoughtfull.desktop.enable {
   home = {
     packages = with pkgs; [
       thoughtfull.exwm-trampoline
