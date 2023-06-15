@@ -6,10 +6,10 @@ in {
   imports = importAll' [
     ./desktop
     ./emacs/my-completion.nix
+    ./emacs/my-exwm.nix
     ./emacs/my-prog.nix
     ./emacs.nix
     ./emacs-overlay.nix
-    ./exwm.nix
     ./git.nix
     ./gnome-terminal.nix
     ./home-manager.nix
