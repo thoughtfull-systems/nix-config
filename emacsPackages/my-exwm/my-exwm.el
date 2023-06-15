@@ -189,6 +189,16 @@
           ("C-y" . "C-S-v")
           ("M-<iso-lefttab>" . "C-z C-M-B")
           ("M-<tab>" . "C-z C-M-F")
+          ("s-w" . "C-z K"))))
+     ((string-equal exwm-class-name "Xfce4-terminal")
+      simulation-keys
+      ,(my-exwm-kbd-all
+        '(("C-<iso-lefttab>" . "C-z M-b")
+          ("C-<tab>" . "C-z M-f")
+          ("C-g" . "C-c")
+          ("C-y" . "C-S-v")
+          ("M-<iso-lefttab>" . "C-z C-M-B")
+          ("M-<tab>" . "C-z C-M-F")
           ("s-w" . "C-z K"))))))
  '(exwm-randr-screen-change-hook 'my-exwm-autorandr-change)
  '(exwm-replace t)
