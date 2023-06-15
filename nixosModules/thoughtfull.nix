@@ -13,6 +13,7 @@ in {
     ./sudo.nix
     ./thoughtfull-overlay.nix
     ./unstable-overlay.nix
+    ./vaultwarden.nix
     ./yubikey.nix
     ./zsh.nix
   ];
