@@ -40,6 +40,9 @@
       (ibuffer)
     (call-interactively 'switch-to-buffer)))
 
+(bind-key "C-c b" my-switch-buffer)
+(bind-key "C-c C-b" my-switch-buffer)
+
 (deftheme my)
 (custom-theme-set-variables
  'my
