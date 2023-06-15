@@ -1,13 +1,11 @@
 { config, lib, pkgs, ... } : let
   cfg = config.thoughtfull.services.xbanish;
 in {
-  options = {
-    thoughtfull.services.xbanish.enable = lib.mkOption {
-      default = config.thoughtfull.desktop.enable;
-      example = false;
-      description = "Whether to enable xbanish.";
-      type = lib.types.bool;
-    };
+  options.thoughtfull.services.xbanish.enable = lib.mkOption {
+    default = config.thoughtfull.desktop.enable;
+    example = false;
+    description = "Whether to enable xbanish.";
+    type = lib.types.bool;
   };
   config = lib.mkIf cfg.enable {
     home.packages = [ pkgs.xbanish ];
