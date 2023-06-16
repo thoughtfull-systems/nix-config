@@ -17,9 +17,7 @@
     emacsPackages = import ./emacsPackages;
     homeManagerModules = import ./homeManagerModules inputs;
     nixosConfigurations = {
-      ziph = let
-        system = "x86_64-linux";
-      in nixosSystem {
+      ziph = nixosSystem rec {
         modules = [
           ./nixos/ziph
           nixosModules.thoughtfull
@@ -34,7 +32,7 @@
             home-manager = import ./home-manager;
           };
         };
-        system = system;
+        system = "x86_64-linux";
       };
     };
     nixosModules = rec {
