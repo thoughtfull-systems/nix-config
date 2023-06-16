@@ -4,4 +4,6 @@ while [ ${v} -eq 82 ]; do
   emacs -f my-exwm-enable
   v=${?}
 done
+(which xfce4-session-logout 1>/dev/null 2>&1 && xfce4-session-logout -fl) ||
+  (which cinnamon-session-quit 1>/dev/null 2>&1 && cinnamon-session-quit --no-prompt)
 exit ${v}

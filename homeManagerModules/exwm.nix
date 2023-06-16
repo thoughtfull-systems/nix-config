@@ -22,7 +22,7 @@ in {
     thoughtfull.emacs.enable = true;
     xsession = {
       enable = true;
-      initExtra = lib.mkAfter "[ ! -f $\{HOME}/.noexwm ] && (exwm-trampoline; xfce4-session-logout -fl) &";
+      initExtra = lib.mkAfter "[ ! -f $\{HOME}/.noexwm ] && exwm-trampoline &";
     };
   };
 }
