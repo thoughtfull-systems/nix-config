@@ -22,12 +22,7 @@
           ./nixos/ziph
           nixosModules.thoughtfull
         ];
-        specialArgs = {
-          agenix = {
-            nixosModule = agenix.nixosModules.default;
-            package = agenix.packages.${system}.default;
-          };
-        };
+        specialArgs.system = system;
         system = "x86_64-linux";
       };
     };
