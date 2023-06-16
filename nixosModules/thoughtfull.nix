@@ -13,6 +13,7 @@ in {
     ./moonlander.nix
     ./nix.nix
     ./proton-vpn.nix
+    ./restic.nix
     ./sudo.nix
     ./thoughtfull-overlay.nix
     ./tt-rss.nix
