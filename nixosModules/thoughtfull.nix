@@ -6,6 +6,7 @@ in {
   imports = importAll' [
     ./agenix.nix
     ./avahi.nix
+    ./brother.nix
     ./git.nix
     ./nix.nix
     ./home-manager.nix
