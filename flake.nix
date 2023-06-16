@@ -16,6 +16,12 @@
   in rec {
     emacsPackages = import ./emacsPackages;
     homeManagerModules = import ./homeManagerModules inputs;
+    lib = rec {
+      callWithInputs = f :
+        { ... }@args:
+        (if builtins.isPath f then import f else f)
+          (args // { inherit inputs; });
+    };
     nixosConfigurations = {
       ziph = nixosSystem rec {
         modules = [
@@ -28,7 +34,7 @@
     };
     nixosModules = rec {
       default = thoughtfull;
-      thoughtfull = import ./nixosModules inputs;
+      thoughtfull = lib.callWithInputs ./nixosModules;
     };
     packages = forAllSystems (system: import ./packages (inputs // {
       nixpkgs = import nixpkgs {
