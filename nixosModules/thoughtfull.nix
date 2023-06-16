@@ -7,9 +7,11 @@ in {
     ./agenix.nix
     ./avahi.nix
     ./brother.nix
+    ./fonts.nix
     ./git.nix
-    ./nix.nix
     ./home-manager.nix
+    ./moonlander.nix
+    ./nix.nix
     ./proton-vpn.nix
     ./sudo.nix
     ./thoughtfull-overlay.nix
