@@ -10,55 +10,50 @@
   cfg = config.thoughtfull.autoUpgrade;
 in {
   options.thoughtfull.autoUpgrade = {
-      flake = lib.mkOption {
-        default = "git+ssh://git@deploy.github.com/thoughtfull-systems/nix-config?ref=main";
-        description = lib.mdDoc "Flake used for automatic upgrades.";
-        type = lib.types.str;
-      };
-      hostname = lib.mkOption {
-        default = "github.com";
-        description = lib.mdDoc "Hostname prepended with 'deploy.' and configured for deploy key.";
-        type = lib.types.str;
-      };
-      inputs = lib.mkOption {
-        default = [ "nixpkgs" ];
-        description = lib.mdDoc "Flake inputs to update for upgrades.";
-        type = lib.types.listOf lib.types.str;
-      };
+    flake = lib.mkOption {
+      default = "git+ssh://git@deploy.github.com/thoughtfull-systems/nix-config?ref=main";
+      description = lib.mdDoc "Flake used for automatic upgrades.";
+      type = lib.types.str;
+    };
+    hostname = lib.mkOption {
+      default = "github.com";
+      description = lib.mdDoc "Hostname prepended with 'deploy.' and configured for deploy key.";
+      type = lib.types.str;
+    };
+    inputs = lib.mkOption {
+      default = [ "nixpkgs" ];
+      description = lib.mdDoc "Flake inputs to update for upgrades.";
+      type = lib.types.listOf lib.types.str;
+    };
   };
-  config = lib.mkMerge [
-    (lib.mkDefault {
-      nix = {
-        gc = {
-          automatic = true;
-          dates = "03:15";
-          options = "--delete-older-than 7d";
-        };
-        optimise = {
-          automatic = true;
-          dates = [ "04:15" ];
-        };
-        settings = {
-          auto-optimise-store = true;
-          experimental-features = [ "flakes" "nix-command" ];
-        };
+  config = {
+    nix = {
+      gc = {
+        automatic = true;
+        dates = "03:15";
+        options = "--delete-older-than 7d";
       };
-      programs.ssh.extraConfig = ''
-        Host deploy.${cfg.hostname}
-          Hostname ${cfg.hostname}
-          IdentityFile "/etc/nixos/deploy-key"
-      '';
-      system.autoUpgrade = {
-        allowReboot = true;
-        enable = false;
-        flake = cfg.flake;
+      optimise = {
+        automatic = true;
+        dates = [ "04:15" ];
       };
-    })
-    # if this is mkDefault it gets lost
-    {
-      system.autoUpgrade.flags = [
+      settings = {
+        auto-optimise-store = true;
+        experimental-features = [ "flakes" "nix-command" ];
+      };
+    };
+    programs.ssh.extraConfig = ''
+      Host deploy.${cfg.hostname}
+        Hostname ${cfg.hostname}
+        IdentityFile "/etc/nixos/deploy-key"
+    '';
+    system.autoUpgrade = {
+      allowReboot = lib.mkDefault true;
+      enable = lib.mkDefault false;
+      flags = [
         "--no-write-lock-file"
       ] ++ (map (i: "--update-input ${i}") cfg.inputs);
-    }
-  ];
+      flake = cfg.flake;
+    };
+  };
 }
