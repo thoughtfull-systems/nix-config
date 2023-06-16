@@ -17,10 +17,16 @@
     emacsPackages = import ./emacsPackages;
     homeManagerModules = import ./homeManagerModules inputs;
     lib = rec {
+      callAllWithInputs = fs : map (f: callWithInputs f) fs;
       callWithInputs = f :
-        { ... }@args:
+        { pkgs, ... }@args:
         (if builtins.isPath f then import f else f)
-          (args // { inherit inputs; });
+          (args // {
+            inherit inputs;
+            lib = args.lib // {
+              inherit callWithInputs callAllWithInputs;
+            };
+          });
     };
     nixosConfigurations = {
       ziph = nixosSystem rec {
