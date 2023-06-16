@@ -11,7 +11,7 @@
     # for some software I want the most recent version
     unstable.url = "github:nixos/nixpkgs/nixos-unstable";
   };
-  outputs = { agenix, nixpkgs, ... }@inputs: with nixpkgs.lib; let
+  outputs = { nixpkgs, ... }@inputs: with nixpkgs.lib; let
     forAllSystems = genAttrs systems.flakeExposed;
   in rec {
     emacsPackages = import ./emacsPackages;
@@ -32,8 +32,8 @@
     };
     packages = forAllSystems (system: import ./packages (inputs // {
       nixpkgs = import nixpkgs {
+        config.allowUnfree = true;
         inherit system;
-        # TODO: not sure if I need to worry about config.allowUnfree = true?
       };
     }));
   };
