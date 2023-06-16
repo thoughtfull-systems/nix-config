@@ -27,10 +27,6 @@
             nixosModule = agenix.nixosModules.default;
             package = agenix.packages.${system}.default;
           };
-          thoughtfull = {
-            epkgs = import ./epkgs;
-            home-manager = import ./home-manager;
-          };
         };
         system = "x86_64-linux";
       };
