@@ -1,4 +1,4 @@
-{ inputs, lib, ...}@args: {
+{ inputs, lib, ...}: {
   imports = lib.callAllWithInputs [
     ./agenix.nix
     ./avahi.nix
