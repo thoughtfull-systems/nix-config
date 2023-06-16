@@ -21,7 +21,7 @@ in {
         type = lib.types.str;
       };
       inputs = lib.mkOption {
-        default = [ "nixpkgs" ];
+        default = [ "nixpkgs" "nixpkgs-unstable" "nixos-hardware" ];
         description = lib.mdDoc "Flake inputs to update for upgrades.";
         type = lib.types.listOf lib.types.str;
       };
