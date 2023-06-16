@@ -27,7 +27,7 @@ in {
       '';
     };
   };
-  config = lib.mkif enabled {
+  config = lib.mkIf enabled {
     assertions = [{
       assertion = postgres-enabled -> pgbackup.enable;
       message = "PostgreSQL is enabled without backups!";
