@@ -1,4 +1,5 @@
-{ inputs, thoughtfull, ... } : {
+{ inputs, pkgs, thoughtfull, ... } : {
+  environment.systemPackages = [ pkgs.home-manager ];
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
