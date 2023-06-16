@@ -30,7 +30,7 @@ in {
   config = lib.mkIf enabled {
     assertions = [{
       assertion = postgres-enabled -> pgbackup.enable;
-      message = "PostgreSQL is enabled without backups!";
+      message = "PostgreSQL is enabled without postgresqlBackup!";
     }];
     environment.systemPackages = [ pkgs.restic ];
     services.restic.backups.default = (lib.mkMerge [
