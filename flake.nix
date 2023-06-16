@@ -37,7 +37,10 @@
         system = system;
       };
     };
-    nixosModules = import ./nixosModules inputs;
+    nixosModules = rec {
+      default = thoughtfull;
+      thoughtfull = import ./nixosModules inputs;
+    };
     packages = forAllSystems (system: import ./packages (inputs // {
       nixpkgs = import nixpkgs {
         inherit system;
