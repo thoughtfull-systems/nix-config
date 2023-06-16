@@ -7,6 +7,7 @@ in {
     ./agenix.nix
     ./avahi.nix
     ./brother.nix
+    ./desktop.nix
     ./fonts.nix
     ./git.nix
     ./home-manager.nix

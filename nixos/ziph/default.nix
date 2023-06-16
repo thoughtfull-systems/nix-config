@@ -93,5 +93,6 @@
     "getty@tty1".enable = false;
     "autovt@tty1".enable = false;
   };
+  thoughtfull.desktop.enable = true;
   time.timeZone = "America/New_York";
 }
