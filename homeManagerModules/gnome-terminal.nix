@@ -48,5 +48,6 @@ in {
         visible-name = "Default";
       };
     };
+    programs.tmux.enable = true;
   };
 }
