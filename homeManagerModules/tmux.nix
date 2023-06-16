@@ -1,8 +1,7 @@
-{ lib, pkgs, ... }: {
+{ config, lib, pkgs, ... }: lib.mkIf config.programs.tmux.enable {
   programs.tmux = lib.mkDefault {
     baseIndex = 1;
     clock24 = true;
-    enable = true;
     extraConfig = ''
       set-option -g activity-action other
       set-option -g alternate-screen on
