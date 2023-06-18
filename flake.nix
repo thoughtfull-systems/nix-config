@@ -11,9 +11,7 @@
     # for some software I want the most recent version
     unstable.url = "github:nixos/nixpkgs/nixos-unstable";
   };
-  outputs = { nixpkgs, ... }@inputs: with nixpkgs.lib; let
-    forAllSystems = genAttrs systems.flakeExposed;
-  in rec {
+  outputs = { nixpkgs, ... }@inputs: rec {
     emacsPackages = import ./emacsPackages;
     homeManagerModules = import ./homeManagerModules inputs;
     lib = rec {
@@ -27,9 +25,10 @@
               inherit callWithInputs callAllWithInputs;
             };
           });
+      forAllSystems = nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed;
     };
     nixosConfigurations = {
-      ziph = nixosSystem rec {
+      ziph = nixpkgs.lib.nixosSystem rec {
         modules = [
           (import ./flake/overlay-thoughtfull.nix inputs)
           (import ./flake/overlay-unstable.nix inputs)
@@ -44,7 +43,7 @@
       default = thoughtfull;
       thoughtfull = lib.callWithInputs ./nixosModules;
     };
-    packages = forAllSystems (system: import ./packages (inputs // {
+    packages = lib.forAllSystems (system: import ./packages (inputs // {
       nixpkgs = import nixpkgs {
         config.allowUnfree = true;
         inherit system;
