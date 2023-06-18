@@ -11,27 +11,23 @@
     # for some software I want the most recent version
     unstable.url = "github:nixos/nixpkgs/nixos-unstable";
   };
-  outputs = { nixpkgs, ... }@inputs: rec {
+  outputs = { self, nixpkgs, ... }@inputs: {
     emacsPackages = import ./emacsPackages;
     homeManagerModules = import ./homeManagerModules inputs;
     lib = import ./lib inputs;
     nixosConfigurations = {
-      ziph = lib.thoughtfullSystem rec {
+      ziph = self.lib.thoughtfullSystem {
         modules = [
-          (import ./flake/overlay-thoughtfull.nix inputs)
-          (import ./flake/overlay-unstable.nix inputs)
           ./nixos/ziph
-          nixosModules.thoughtfull
         ];
-        specialArgs.system = system;
         system = "x86_64-linux";
       };
     };
     nixosModules = rec {
       default = thoughtfull;
-      thoughtfull = lib.callWithInputs ./nixosModules;
+      thoughtfull = self.lib.callWithInputs ./nixosModules;
     };
-    packages = lib.forAllSystems (system: import ./packages (inputs // {
+    packages = self.lib.forAllSystems (system: import ./packages (inputs // {
       nixpkgs = import nixpkgs {
         config.allowUnfree = true;
         inherit system;

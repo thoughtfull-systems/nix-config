@@ -1,6 +1,5 @@
 { inputs, lib, ...}: {
   imports = lib.callAllWithInputs [
-    ./agenix.nix
     ./avahi.nix
     ./brother.nix
     ./desktop.nix
