@@ -6,6 +6,7 @@ in {
     home.packages = with pkgs; [
       flameshot
       notify-desktop
+      unstable.obsidian
     ];
   };
   imports = [
