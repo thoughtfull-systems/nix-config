@@ -1,4 +1,4 @@
-{ inputs, ... }: {
+inputs: { ... }: {
   nixpkgs.overlays = [
     (final: prev: {
       unstable = import inputs.unstable {

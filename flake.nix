@@ -31,6 +31,8 @@
     nixosConfigurations = {
       ziph = nixosSystem rec {
         modules = [
+          (import ./flake/overlay-thoughtfull.nix inputs)
+          (import ./flake/overlay-unstable.nix inputs)
           ./nixos/ziph
           nixosModules.thoughtfull
         ];

@@ -12,9 +12,7 @@
     ./proton-vpn.nix
     ./restic.nix
     ./sudo.nix
-    ./thoughtfull-overlay.nix
     ./tt-rss.nix
-    ./unstable-overlay.nix
     ./vaultwarden.nix
     ./yubikey.nix
     ./zsh.nix
