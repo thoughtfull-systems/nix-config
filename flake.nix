@@ -25,11 +25,13 @@
       default = thoughtfull;
       thoughtfull = self.lib.callWithInputs ./nixosModules;
     };
-    packages = self.lib.forAllSystems (system: import ./packages (inputs // {
-      nixpkgs = import nixpkgs {
-        config.allowUnfree = true;
-        inherit system;
-      };
-    }));
+    packages = self.lib.forAllSystems (system:
+      import ./packages (inputs // {
+        nixpkgs = import nixpkgs {
+          config.allowUnfree = true;
+          inherit system;
+        };
+      })
+    );
   };
 }
