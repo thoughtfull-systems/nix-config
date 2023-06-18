@@ -14,9 +14,9 @@
   outputs = { nixpkgs, ... }@inputs: rec {
     emacsPackages = import ./emacsPackages;
     homeManagerModules = import ./homeManagerModules inputs;
-    lib = (import ./lib inputs);
+    lib = import ./lib inputs;
     nixosConfigurations = {
-      ziph = nixpkgs.lib.nixosSystem rec {
+      ziph = lib.thoughtfullSystem rec {
         modules = [
           (import ./flake/overlay-thoughtfull.nix inputs)
           (import ./flake/overlay-unstable.nix inputs)
