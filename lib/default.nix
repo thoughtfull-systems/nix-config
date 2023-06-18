@@ -10,5 +10,5 @@ inputs: rec {
         };
       });
   forAllSystems = inputs.nixpkgs.lib.genAttrs inputs.nixpkgs.lib.systems.flakeExposed;
-  thoughtfullSystem = import ./thoughtfull-system.nix inputs;
+  thoughtfullSystem = import ./thoughtfull-system inputs;
 }

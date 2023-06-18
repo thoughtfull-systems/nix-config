@@ -11,21 +11,21 @@
     # for some software I want the most recent version
     unstable.url = "github:nixos/nixpkgs/nixos-unstable";
   };
-  outputs = { self, nixpkgs, ... }@inputs: {
+  outputs = { nixpkgs, ... }@inputs: rec {
     emacsPackages = import ./emacsPackages;
     homeManagerModules = import ./homeManagerModules inputs;
     lib = import ./lib inputs;
     nixosConfigurations = {
-      ziph = self.lib.thoughtfullSystem {
+      ziph = lib.thoughtfullSystem {
         modules = [ ./nixos/ziph ];
         system = "x86_64-linux";
       };
     };
     nixosModules = rec {
       default = thoughtfull;
-      thoughtfull = self.lib.callWithInputs ./nixosModules;
+      thoughtfull = lib.callWithInputs ./nixosModules;
     };
-    packages = self.lib.forAllSystems (system:
+    packages = lib.forAllSystems (system:
       import ./packages (inputs // {
         nixpkgs = import nixpkgs {
           config.allowUnfree = true;
