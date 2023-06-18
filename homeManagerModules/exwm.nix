@@ -11,8 +11,8 @@ in {
   config = lib.mkIf cfg.enable {
     home = {
       packages = with pkgs; [
-        thoughtfull.exwm-trampoline
         flameshot
+        thoughtfull.exwm-trampoline
       ];
       sessionVariables.EDITOR = "emacsclient";
     };
