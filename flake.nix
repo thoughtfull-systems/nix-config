@@ -13,7 +13,7 @@
   };
   outputs = { nixpkgs, ... }@inputs: rec {
     emacsPackages = import ./emacsPackages;
-    homeManagerModules = import ./homeManagerModules inputs;
+    homeManagerModules = import ./homeManagerModules;
     lib = import ./lib inputs;
     nixosConfigurations = {
       ziph = lib.thoughtfullSystem {
@@ -23,7 +23,7 @@
     };
     nixosModules = rec {
       default = thoughtfull;
-      thoughtfull = lib.callWithInputs ./nixosModules;
+      thoughtfull = import ./nixosModules;
     };
     packages = lib.forAllSystems (system:
       import ./packages (inputs // {

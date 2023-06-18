@@ -1,5 +1,5 @@
-{ inputs, lib, ... }: {
-  imports = lib.callAllWithInputs [
+{ ... }: {
+  imports = [
     ./desktop
     ./emacs
     ./emacs-overlay.nix
