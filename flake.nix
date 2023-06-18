@@ -14,19 +14,7 @@
   outputs = { nixpkgs, ... }@inputs: rec {
     emacsPackages = import ./emacsPackages;
     homeManagerModules = import ./homeManagerModules inputs;
-    lib = rec {
-      callAllWithInputs = fs : map (f: callWithInputs f) fs;
-      callWithInputs = f :
-        { pkgs, ... }@args:
-        (if builtins.isPath f then import f else f)
-          (args // {
-            inherit inputs;
-            lib = args.lib // {
-              inherit callWithInputs callAllWithInputs;
-            };
-          });
-      forAllSystems = nixpkgs.lib.genAttrs nixpkgs.lib.systems.flakeExposed;
-    };
+    lib = (import ./lib inputs);
     nixosConfigurations = {
       ziph = nixpkgs.lib.nixosSystem rec {
         modules = [
