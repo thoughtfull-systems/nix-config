@@ -17,9 +17,7 @@
     lib = import ./lib inputs;
     nixosConfigurations = {
       ziph = self.lib.thoughtfullSystem {
-        modules = [
-          ./nixos/ziph
-        ];
+        modules = [ ./nixos/ziph ];
         system = "x86_64-linux";
       };
     };
