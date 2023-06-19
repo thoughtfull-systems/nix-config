@@ -15,10 +15,12 @@ in {
       ];
       sessionVariables.EDITOR = "emacsclient";
     };
-    programs.emacs.extraPackages = epkgs: with epkgs; [
-      my-exwm
-    ];
-    thoughtfull.emacs.enable = true;
+    programs.emacs = {
+      enable = true;
+      extraPackages = epkgs: with epkgs; [
+        my-exwm
+      ];
+    };
     xsession = {
       enable = true;
       initExtra = lib.mkAfter "[ ! -f $\{HOME}/.noexwm ] && exwm-trampoline &";
