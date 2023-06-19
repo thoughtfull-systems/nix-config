@@ -1,9 +1,9 @@
 { lib, pkgs, ... } : {
-  security.sudo = lib.mkDefault {
-    execWheelOnly = true;
+  security.sudo = {
+    execWheelOnly = lib.mkDefault true;
     extraConfig = "Defaults timestamp_type=global,timestamp_timeout=-1";
   };
-  systemd.services.sudo-reset = lib.mkDefault {
+  systemd.services.sudo-reset = {
     description = "Reset sudo timeout upon resume from sleep";
     partOf = [ "post-resume.target" ];
     serviceConfig = {
