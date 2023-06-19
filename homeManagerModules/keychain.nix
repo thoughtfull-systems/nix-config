@@ -1,9 +1,9 @@
 { lib, ... }: {
-  programs.keychain = lib.mkDefault {
+  programs.keychain = {
     agents = [ "gpg,ssh" ];
-    enable = true;
+    enable = lib.mkDefault true;
     extraFlags = [ "--nogui" "--systemd" "-q" ];
-    inheritType = "any-once";
+    inheritType = lib.mkDefault "any-once";
     keys = [ "id_ed25519" ];
   };
 }
