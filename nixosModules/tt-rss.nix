@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... } : let
+{ config, lib, pkgs, ... }: let
   cfg = config.thoughtfull.tt-rss;
 in {
   options.thoughtfull.tt-rss.enable = lib.mkEnableOption "tt-rss";
@@ -7,9 +7,7 @@ in {
       # needed for database migrations
       php
     ];
-    networking = {
-      firewall.allowedTCPPorts = [ 80 ];
-    };
+    networking.firewall.allowedTCPPorts = [ 80 ];
     services = {
       postgresql = {
         enable = true;

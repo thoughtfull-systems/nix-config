@@ -1,8 +1,6 @@
-{ config, lib, pkgs, ... }: lib.mkIf config.thoughtfull.desktop.enable {
+{ config, lib, ... }: lib.mkIf config.thoughtfull.desktop.enable {
   fonts = {
     enableDefaultFonts = true;
-    fontconfig = {
-      enable = true;
-    };
+    fontconfig.enable = true;
   };
 }

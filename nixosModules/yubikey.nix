@@ -3,10 +3,6 @@
     yubikey-manager-qt
     yubioath-desktop
   ];
-  hardware = {
-    gpgSmartcards.enable = true;
-  };
-  services = {
-    pcscd.enable = true;
-  };
+  hardware.gpgSmartcards.enable = true;
+  services.pcscd.enable = true;
 }

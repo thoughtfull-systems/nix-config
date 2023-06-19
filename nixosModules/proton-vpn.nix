@@ -11,9 +11,9 @@ in {
     services = lib.mkDefault {
       openvpn.servers.proton = {
         config = ''
-        config ${secrets.proton-ovpn.path}
-        auth-user-pass ${secrets.proton-txt.path}
-      '';
+          config ${secrets.proton-ovpn.path}
+          auth-user-pass ${secrets.proton-txt.path}
+        '';
         updateResolvConf = true;
       };
     };

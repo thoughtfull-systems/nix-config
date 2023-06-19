@@ -1,4 +1,4 @@
-{ lib, pkgs, ... } : {
+{ lib, pkgs, ... }: {
   security.sudo = {
     execWheelOnly = lib.mkDefault true;
     extraConfig = "Defaults timestamp_type=global,timestamp_timeout=-1";

@@ -3,9 +3,7 @@
 in {
   options.thoughtfull.vaultwarden.enable = lib.mkEnableOption "vaultwarden";
   config = lib.mkIf cfg.enable {
-    networking = {
-      firewall.allowedTCPPorts = [ 8000 ];
-    };
+    networking.firewall.allowedTCPPorts = [ 8000 ];
     services = {
       postgresql = {
         enable = true;

@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... } : let
+{ config, lib, pkgs, ... }: let
   cfg = config.thoughtfull.moonlander;
 in {
   options.thoughtfull.moonlander.enable = lib.mkEnableOption "moonlander";

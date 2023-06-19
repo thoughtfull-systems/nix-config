@@ -29,16 +29,16 @@ in {
   config = {
     nix = {
       gc = {
-        automatic = true;
-        dates = "03:15";
-        options = "--delete-older-than 7d";
+        automatic = lib.mkDefault true;
+        dates = lib.mkDefault "03:15";
+        options = lib.mkDefault "--delete-older-than 7d";
       };
       optimise = {
-        automatic = true;
+        automatic = lib.mkDefault true;
         dates = [ "04:15" ];
       };
       settings = {
-        auto-optimise-store = true;
+        auto-optimise-store = lib.mkDefault true;
         experimental-features = [ "flakes" "nix-command" ];
       };
     };
