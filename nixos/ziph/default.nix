@@ -16,7 +16,6 @@
     };
   };
   console.keyMap = "dvorak";
-  environment.etc."nixos/deploy-key".source = config.age.secrets.ziph-deploy-key.path;
   # environment.systemPackages = [];
   fileSystems = {
     "/" = {

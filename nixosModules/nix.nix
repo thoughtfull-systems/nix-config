@@ -25,8 +25,14 @@ in {
       description = lib.mdDoc "Flake inputs to update for upgrades.";
       type = lib.types.listOf lib.types.str;
     };
+    deployKeyPath = lib.mkOption {
+      default = config.age.secrets."${config.networking.hostName}-deploy-key".path;
+      description = lib.mdDoc "Path to deploy key with access to flake repository.";
+      type = lib.types.str;
+    };
   };
   config = {
+    environment.etc."nixos/deploy-key".source = cfg.deployKeyPath;
     nix = {
       gc = {
         automatic = lib.mkDefault true;
