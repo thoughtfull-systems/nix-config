@@ -339,9 +339,7 @@ in {
   config.systemd.user.services.syncthing-init = mkIf (
     cfg.devices != {} || cfg.folders != {}
   ) {
-    Install = {
-      WantedBy = [ "multi-user.target" ];
-    };
+    Install.WantedBy = [ "multi-user.target" ];
     Service = {
       RemainAfterExit = true;
       RuntimeDirectory = "syncthing-init";
