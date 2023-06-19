@@ -1,7 +1,6 @@
 { config, ... }: {
   age.secrets = {
     paul-password.file = ../../age/secrets/paul-password.age;
-    ziph-deploy-key.file = ../../age/secrets/ziph-deploy-key.age;
   };
   boot = {
     initrd = {

@@ -8,6 +8,7 @@
 #   `sudo ssh-keygen -t ed25519 -f /etc/nixos/deploy-key -N "" -C "`hostname` deploy key"`
 { config, lib, ... }: let
   cfg = config.thoughtfull.autoUpgrade;
+  deploy-key-name = "${config.networking.hostName}-deploy-key";
 in {
   options.thoughtfull.autoUpgrade = {
     flake = lib.mkOption {
@@ -25,14 +26,10 @@ in {
       description = lib.mdDoc "Flake inputs to update for upgrades.";
       type = lib.types.listOf lib.types.str;
     };
-    deployKeyPath = lib.mkOption {
-      default = config.age.secrets."${config.networking.hostName}-deploy-key".path;
-      description = lib.mdDoc "Path to deploy key with access to flake repository.";
-      type = lib.types.str;
-    };
   };
   config = {
-    environment.etc."nixos/deploy-key".source = cfg.deployKeyPath;
+    age.secrets.${deploy-key-name}.file = ../age/secrets/${deploy-key-name}.age;
+    environment.etc."nixos/deploy-key".source = config.age.secrets.${deploy-key-name}.path;
     nix = {
       gc = {
         automatic = lib.mkDefault true;
