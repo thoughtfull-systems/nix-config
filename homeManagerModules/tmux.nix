@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }: lib.mkIf config.programs.tmux.enable {
+{ config, lib, pkgs, ... }: {
   programs.tmux = lib.mkDefault {
     baseIndex = 1;
     clock24 = true;
