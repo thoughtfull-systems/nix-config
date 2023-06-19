@@ -1,7 +1,7 @@
-{ ... }: {
+{ lib, ... }: {
   home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
+    useGlobalPkgs = lib.mkDefault true;
+    useUserPackages = lib.mkDefault true;
     sharedModules = [ ../homeManagerModules ];
   };
 }
