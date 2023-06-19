@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... } : let
+{ config, lib, pkgs, ... }: let
   cfg = config.thoughtfull.services.xbanish;
 in {
   options.thoughtfull.services.xbanish.enable = lib.mkOption {

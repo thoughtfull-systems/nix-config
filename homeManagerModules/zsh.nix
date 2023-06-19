@@ -1,4 +1,4 @@
-{ lib, ... } : {
+{ lib, ... }: {
   programs.zsh = lib.mkDefault {
     autocd = true;
     enable = true;
