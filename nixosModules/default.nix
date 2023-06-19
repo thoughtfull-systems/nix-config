@@ -8,6 +8,7 @@
     ./home-manager.nix
     ./moonlander.nix
     ./nix.nix
+    ./postgresql-backup.nix
     ./proton-vpn.nix
     ./restic.nix
     ./sudo.nix
