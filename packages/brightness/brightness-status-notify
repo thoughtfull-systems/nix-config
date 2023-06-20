@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+notify-desktop -t 1000 -r 6727248298 "$(brightness-status)"

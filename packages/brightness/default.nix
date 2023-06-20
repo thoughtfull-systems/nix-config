@@ -2,10 +2,10 @@
   builder = nixpkgs.writeScript "builder.sh" ''
     source $stdenv/setup
     mkdir -p $out/bin
-    cp $src/keyboard-* $out/bin
+    cp $src/brightness-* $out/bin
     chmod +x $out/bin/*
   '';
-  pname = "keyboard";
+  pname = "brightness";
   src = ./.;
   version = "1.0.0";
 }
