@@ -3,9 +3,7 @@
 in {
   options.thoughtfull.gnome-terminal.enable = lib.mkEnableOption "gnome-terminal";
   config = lib.mkIf cfg.enable {
-    home.packages = with pkgs; [
-      gnome.gnome-terminal
-    ];
+    home.packages = [ pkgs.gnome.gnome-terminal ];
     dconf.settings = lib.mkDefault {
       "org/gnome/terminal/legacy" = {
         default-show-menubar = false;

@@ -53,9 +53,8 @@ in {
     system.autoUpgrade = {
       allowReboot = lib.mkDefault true;
       enable = lib.mkDefault false;
-      flags = [
-        "--no-write-lock-file"
-      ] ++ (map (i: "--update-input ${i}") cfg.inputs);
+      flags = [ "--no-write-lock-file" ] ++
+              (map (i: "--update-input ${i}") cfg.inputs);
       flake = cfg.flake;
     };
   };

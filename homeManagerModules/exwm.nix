@@ -10,16 +10,12 @@ in {
   };
   config = lib.mkIf cfg.enable {
     home = {
-      packages = with pkgs; [
-        thoughtfull.exwm-trampoline
-      ];
+      packages = [ pkgs.thoughtfull.exwm-trampoline ];
       sessionVariables.EDITOR = "emacsclient";
     };
     programs.emacs = {
       enable = true;
-      extraPackages = epkgs: with epkgs; [
-        my-exwm
-      ];
+      extraPackages = epkgs: [ epkgs.my-exwm ];
     };
     xsession = {
       enable = true;

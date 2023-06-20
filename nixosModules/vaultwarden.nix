@@ -4,14 +4,12 @@
     postgresql = {
       enable = true;
       ensureDatabases = [ "vaultwarden" ];
-      ensureUsers = [
-        {
-          name = "vaultwarden";
-          ensurePermissions = {
-            "DATABASE vaultwarden" = "ALL PRIVILEGES";
-          };
-        }
-      ];
+      ensureUsers = [{
+        name = "vaultwarden";
+        ensurePermissions = {
+          "DATABASE vaultwarden" = "ALL PRIVILEGES";
+        };
+      }];
     };
     postgresqlBackup.databases = [ "vaultwarden" ];
     vaultwarden = {
