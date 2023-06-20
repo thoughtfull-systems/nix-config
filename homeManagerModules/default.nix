@@ -11,6 +11,7 @@
     ./starship.nix
     ./syncthing.nix
     ./tmux.nix
+    ./yabar.nix
     ./zsh.nix
   ];
 }
