@@ -35,7 +35,7 @@ let
             ${cfg.configDir}/config.xml \
             >"$RUNTIME_DIRECTORY/api_key"
     do sleep 1; done
-    (printf "X-API-Key: "; cat "$RUNTIME_DIRECTORY/api_key") >"$RUNTIME_DIRECTORY/headers"
+    (printf "X-API-Key: "; ${pkgs.coreutils-full}/bin/cat "$RUNTIME_DIRECTORY/api_key") >"$RUNTIME_DIRECTORY/headers"
     curl() {
         ${pkgs.curl}/bin/curl -sSLk -H "@$RUNTIME_DIRECTORY/headers" \
             --retry 1000 --retry-delay 1 --retry-all-errors \
@@ -339,7 +339,7 @@ in {
   config.systemd.user.services.syncthing-init = mkIf (
     cfg.devices != {} || cfg.folders != {}
   ) {
-    Install.WantedBy = [ "multi-user.target" ];
+    Install.WantedBy = [ "syncthing.service" ];
     Service = {
       RemainAfterExit = true;
       RuntimeDirectory = "syncthing-init";
@@ -349,8 +349,7 @@ in {
     Unit = {
       After = [ "syncthing.service" ];
       Description = "Syncthing configuration updater";
-      PartOf = [ "syncthing.service" ];
-      Requisite = [ "syncthing.service" ];
+      Requires = [ "syncthing.service" ];
     };
   };
 }
