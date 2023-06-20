@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+echo -n " "
+if setxkbmap -query | grep variant > /dev/null; then
+  echo "dv";
+else
+  echo "us";
+fi
