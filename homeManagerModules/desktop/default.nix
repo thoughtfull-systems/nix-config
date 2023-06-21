@@ -7,7 +7,9 @@ in {
       flameshot
       notify-desktop
       unstable.obsidian
+      unstable.zoom-us
     ];
+    fonts.fontconfig.enable = lib.mkForce true;
   };
   imports = [
     ./firefox.nix
