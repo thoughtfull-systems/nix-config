@@ -1,6 +1,6 @@
-{ config, lib, pkgs, ... }: lib.mkIf config.thoughtfull.notifications.enable {
+{ config, lib, pkgs, ... }: {
   options.thoughtfull.notifications.enable = lib.mkEnableOption "notifications";
-  config = {
+  config = lib.mkIf config.thoughtfull.notifications.enable {
     home.packages = with pkgs; [
       notify-desktop
     ];
