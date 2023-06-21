@@ -1,5 +1,5 @@
 { lib, nix-lib, osConfig, pkgs, unstable, ... }:
-lib.mkIf osConfig.services.xserver.cinnamon.enable {
+lib.mkIf osConfig.services.xserver.desktopManager.cinnamon.enable {
   # these should all be lib.mkDefault
   dconf.settings = with lib.hm.gvariant; {
     "org/cinnamon" = {
@@ -96,6 +96,8 @@ lib.mkIf osConfig.services.xserver.cinnamon.enable {
     };
   };
   home.packages = with pkgs; [
+    arandr
+    autorandr
     b612
     cascadia-code
     fira
@@ -111,5 +113,6 @@ lib.mkIf osConfig.services.xserver.cinnamon.enable {
   thoughtfull = {
     gnome-terminal.enable = true;
     notifications.enable = true;
+    yabar.enable = true;
   };
 }

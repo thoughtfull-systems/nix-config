@@ -12,6 +12,7 @@ in {
     fonts.fontconfig.enable = lib.mkForce true;
   };
   imports = [
+    ./cinnamon.nix
     ./firefox.nix
     ./xbanish.nix
   ];
