@@ -1,13 +1,28 @@
 with builtins;
-let
-  keyDir = (readDir ./keys);
-  keyNames = (filter (n: keyDir.${n} == "regular") (attrNames keyDir));
-  keyPaths = (map (n: ./keys/${n}) keyNames);
-  keys = map readFile keyPaths;
-in
 {
-  "secrets/paul-password.age".publicKeys = keys;
-  "secrets/proton-ovpn.age".publicKeys = keys;
-  "secrets/proton-txt.age".publicKeys = keys;
-  "secrets/ziph-deploy-key.age".publicKeys = keys;
+  "secrets/kolide.deb.age".publicKeys = map readFile [
+    ./keys/bennu.pub
+    ./keys/id_ed25519.pub
+    ./keys/yk5nano475.pub
+  ];
+  "secrets/paul-password.age".publicKeys = map readFile [
+    ./keys/yk5nano475.pub
+    ./keys/id_ed25519.pub
+    ./keys/ziph.pub
+  ];
+  "secrets/proton-ovpn.age".publicKeys = map readFile [
+    ./keys/yk5nano475.pub
+    ./keys/id_ed25519.pub
+    ./keys/ziph.pub
+  ];
+  "secrets/proton-txt.age".publicKeys = map readFile [
+    ./keys/yk5nano475.pub
+    ./keys/id_ed25519.pub
+    ./keys/ziph.pub
+  ];
+  "secrets/ziph-deploy-key.age".publicKeys = map readFile [
+    ./keys/yk5nano475.pub
+    ./keys/id_ed25519.pub
+    ./keys/ziph.pub
+  ];
 }
