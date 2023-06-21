@@ -12,7 +12,7 @@
 in {
   options.thoughtfull.autoUpgrade = {
     flake = lib.mkOption {
-      default = "git+ssh://git@deploy.github.com/thoughtfull-systems/nix-config?ref=main";
+      default = "git+ssh://git@deploy.github.com/thoughtfull-systems/nixfiles?ref=main";
       description = lib.mdDoc "Flake used for automatic upgrades.";
       type = lib.types.str;
     };
