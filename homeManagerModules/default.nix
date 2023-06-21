@@ -8,6 +8,7 @@
     ./gnome-terminal.nix
     ./home-manager.nix
     ./keychain.nix
+    ./notifications.nix
     ./starship.nix
     ./syncthing.nix
     ./tmux.nix
