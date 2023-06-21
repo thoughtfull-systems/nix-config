@@ -26,7 +26,7 @@ in nixpkgs.symlinkJoin {
     (nixpkgs.substituteAll {
       dir = "bin";
       isExecutable = true;
-      src = ./mic-volume-mute;
+      src = ./mic-mute;
       inherit pactl;
       notify = "${notify}/bin/mic-status-notify";
     })
