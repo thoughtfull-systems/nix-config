@@ -2,6 +2,7 @@
   imports = [
     ./avahi.nix
     ./brother.nix
+    ./deploy-keys.nix
     ./desktop.nix
     ./fonts.nix
     ./git.nix
