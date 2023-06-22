@@ -1,4 +1,4 @@
 inputs: rec {
   default = thoughtfull;
-  thoughtfull = import ./thoughtfull;
+  thoughtfull = import ./thoughtfull inputs;
 }

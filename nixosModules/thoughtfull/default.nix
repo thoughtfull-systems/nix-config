@@ -1,5 +1,6 @@
-{ ... }: {
+inputs: { ... }: {
   imports = [
+    (import ./agenix.nix inputs.agenix)
     ./avahi.nix
     ./brother.nix
     ./deploy-keys.nix
