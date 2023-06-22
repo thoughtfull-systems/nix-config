@@ -42,7 +42,7 @@
         enable = lib.mkDefault false;
         id = "uwwsn-76zqc";
         ignorePerms = false;
-        path = "~/obsidian/Work";
+        path = lib.mkDefault "~/obsidian/Work";
         type = "sendreceive";
         versioning = {
           params = {
@@ -68,7 +68,7 @@
         enable = lib.mkDefault false;
         id = "44lzd-pmrfu";
         ignorePerms = false;
-        path = "~/org/work";
+        path = lib.mkDefault "~/org/work";
         type = "sendreceive";
         versioning = {
           params = {
