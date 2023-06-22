@@ -16,8 +16,11 @@
     homeManagerModules = import ./homeManagerModules;
     lib = import ./lib inputs;
     nixosConfigurations = {
-      ziph = lib.thoughtfullSystem {
-        modules = [ ./nixos/ziph ];
+      ziph = nixpkgs.lib.nixosSystem {
+        modules = [
+          ./nixos/ziph
+          nixosModules.thoughtfull
+        ];
         system = "x86_64-linux";
       };
     };
