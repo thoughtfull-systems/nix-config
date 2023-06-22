@@ -1,3 +1,0 @@
-{ thoughtfull, ... } : {
-  imports = [ thoughtfull.root ];
-}

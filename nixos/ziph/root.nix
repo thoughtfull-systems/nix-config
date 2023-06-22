@@ -1,4 +1,4 @@
 { thoughtfull, ... }: {
-  home-manager.users.root.imports = [ ../../home/ziph/root.nix ];
+  home-manager.users.root.imports = [ thoughtfull.home.root ];
   imports = [ thoughtfull.root ];
 }
