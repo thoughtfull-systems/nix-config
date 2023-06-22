@@ -1,5 +1,5 @@
 epkgs: {
-  my-prog = epkgs.elpaBuild {
+  my-clojure-dev = epkgs.elpaBuild {
     packageRequires = with epkgs; [
       cider
       clojure-mode
