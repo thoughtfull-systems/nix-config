@@ -11,6 +11,7 @@ inputs: { ... }: {
     ./git.nix
     ./moonlander.nix
     ./nix.nix
+    ./overlay-thoughtfull.nix
     ./postgresql-backup.nix
     ./proton-vpn.nix
     ./restic.nix
