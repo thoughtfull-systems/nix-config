@@ -1,5 +1,6 @@
 { ... }: {
   imports = [
+    ./clojure-dev.nix
     ./desktop
     ./emacs
     ./exwm.nix

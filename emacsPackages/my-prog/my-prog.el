@@ -15,6 +15,9 @@
   :hook (prog-mode . company-mode))
 (use-package display-line-numbers
   :hook (prog-mode . display-line-numbers-mode))
+(use-package eldoc
+  :hook ((clojure-mode . eldoc-mode)
+         (emacs-lisp-mode . eldoc-mode)))
 (use-package emacs-lisp
   :hook (emacs-lisp-mode . eldoc-mode))
 (use-package flycheck
@@ -28,7 +31,12 @@
   :after (flycheck)
   :commands (flycheck-pos-tip-mode)
   :config (flycheck-pos-tip-mode)
-  :if (display-graphic-p))
+  :if (display-graphic-p)
+  ;; :config
+  ;; (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages)
+  )
+(use-package flyspell
+  :hook (prog-mode . flyspell-prog-mode))
 (use-package imenu
   :bind (("C-c i" . imenu)
          ("C-c C-i" . imenu)))
