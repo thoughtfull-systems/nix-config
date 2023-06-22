@@ -2,7 +2,7 @@
   cfg = config.thoughtfull.deploy-keys;
 in {
   options.thoughtfull.deploy-keys = lib.mkOption {
-    default = null;
+    default = {};
     description = lib.mdDoc ''
     '';
     type = lib.types.attrsOf (
@@ -12,37 +12,59 @@ in {
             name = lib.mkOption {
               default = name;
               description = lib.mdDoc ''
+                Name of the deploy key.  Prepended to hostname for ssh config.
               '';
               type = lib.types.str;
             };
             hostname = lib.mkOption {
-              default = null;
+              default = "github.com";
               description = lib.mdDoc ''
+                Hostname combined with name in ssh config.
               '';
               type = lib.types.str;
             };
             path = lib.mkOption {
-              type = lib.types.path;
-              default = null;
               description = ''
+                Path to age file containing the private key.
               '';
+              type = lib.types.path;
             };
           };
         }
       )
     );
   };
-  config = lib.mkIf (cfg != {})
-    lib.mkMerge
-    (lib.mapAttrsToList
-      (name: cfg: {
-        age.secrets."${name}-deploy-key".file = cfg.path;
-        environment.etc."${name}-deploy-key".source = config.age.secrets."${name}-deploy-key".path;
-        programs.ssh.extraConfig = ''
-          Host ${name}.${cfg.hostname}
-          Hostname ${cfg.hostname}
-          IdentityFile "/etc/nixos/${name}-deploy-key"
-        '';
-      })
-      cfg);
+  config = {
+    age.secrets = lib.mkIf (cfg != {})
+      (lib.mkMerge
+        (lib.mapAttrsToList
+          (name: options: {
+            "${name}-deploy-key".file = options.path;
+          })
+          cfg
+        )
+      );
+    environment.etc = lib.mkIf (cfg != {})
+      (lib.mkMerge
+        (lib.mapAttrsToList
+          (name: options: {
+            "nixos/${name}-deploy-key".source = config.age.secrets."${name}-deploy-key".path;
+          })
+          cfg
+        )
+      );
+    programs.ssh = lib.mkIf (cfg != {})
+      (lib.mkMerge
+        (lib.mapAttrsToList
+          (name: options: {
+            extraConfig = ''
+              Host ${name}.${options.hostname}
+              Hostname ${options.hostname}
+              IdentityFile "/etc/nixos/${name}-deploy-key"
+            '';
+          })
+          cfg
+        )
+      );
+  };
 }
