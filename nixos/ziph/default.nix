@@ -1,4 +1,4 @@
-{ config, ... }: {
+{ config, thoughtfull, ... }: {
   age.secrets = {
     paul-password.file = ../../age/secrets/paul-password.age;
   };
@@ -32,6 +32,7 @@
     ./hardware-configuration.nix
     ./paul.nix
     ./root.nix
+    thoughtfull.thoughtfull
   ];
   i18n = {
     defaultLocale = "en_US.UTF-8";

@@ -17,10 +17,8 @@
     lib = import ./lib inputs;
     nixosConfigurations = {
       ziph = nixpkgs.lib.nixosSystem {
-        modules = [
-          ./nixos/ziph
-          nixosModules.thoughtfull
-        ];
+        modules = [ ./nixos/ziph ];
+        specialArgs.thoughtfull = nixosModules;
         system = "x86_64-linux";
       };
     };
