@@ -14,11 +14,7 @@
   };
   programs.git = {
     enable = lib.mkDefault true;
-    extraConfig = {
-      user = {
-        email = lib.mkDefault "paul@stadig.name";
-        name = lib.mkDefault "Paul Stadig";
-      };
-    };
+    userEmail = lib.mkDefault "paul@stadig.name";
+    userName = lib.mkDefault "Paul Stadig";
   };
 }
