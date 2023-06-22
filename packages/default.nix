@@ -1,7 +1,7 @@
-inputs: {
-  brightness = import ./brightness inputs;
-  exwm-trampoline = import ./exwm-trampoline inputs;
-  keyboard = import ./keyboard inputs;
-  mic = import ./mic inputs;
-  speaker = import ./speaker inputs;
+nixpkgs: {
+  brightness = import ./brightness nixpkgs;
+  exwm-trampoline = import ./exwm-trampoline nixpkgs;
+  keyboard = import ./keyboard nixpkgs;
+  mic = import ./mic nixpkgs;
+  speaker = import ./speaker nixpkgs;
 }

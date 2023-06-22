@@ -23,11 +23,9 @@
     };
     nixosModules = import ./nixosModules inputs;
     packages = lib.forAllSystems (system:
-      import ./packages (inputs // {
-        nixpkgs = import nixpkgs {
-          config.allowUnfree = true;
-          inherit system;
-        };
+      import ./packages (import nixpkgs {
+        config.allowUnfree = true;
+        inherit system;
       })
     );
   };

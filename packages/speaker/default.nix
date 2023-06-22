@@ -1,4 +1,4 @@
-{ nixpkgs, ... }: let
+nixpkgs: let
   notify = nixpkgs.substituteAll {
     dir = "bin";
     isExecutable = true;

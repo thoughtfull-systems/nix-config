@@ -1,4 +1,4 @@
-{ nixpkgs, ... }: let
+nixpkgs: let
   setxkbmap = "${nixpkgs.xorg.setxkbmap}/bin/setxkbmap";
 in nixpkgs.symlinkJoin {
   name = "keyboard";

@@ -1,4 +1,4 @@
-{ nixpkgs, ... }: let
+nixpkgs: let
   xbacklight = "${nixpkgs.xorg.xbacklight}/bin/xbacklight";
   status = nixpkgs.substituteAll {
     dir = "bin";
