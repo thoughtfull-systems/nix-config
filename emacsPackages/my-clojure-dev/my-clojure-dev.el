@@ -12,7 +12,7 @@
 
 (require 'use-package)
 
-(use-package my-dev)
+(use-package my-prog)
 (use-package cider
   :after clojure-mode)
 (use-package clojure-mode
@@ -20,11 +20,11 @@
          (clojure-mode . flycheck-mode)))
 (use-package clojure-mode-extra-font-locking
   :after clojure-mode)
-(use-package flycheck-clojure
-  :after (clojure-mode flycheck))
 (use-package flycheck-clj-kondo
   :after (flycheck-clojure)
   :init (flycheck-clojure-setup))
+(use-package flycheck-clojure
+  :after (clojure-mode flycheck))
 
 (deftheme my-clojure-dev)
 (custom-theme-set-variables
