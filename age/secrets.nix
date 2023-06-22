@@ -9,5 +9,4 @@ in
   "secrets/paul-password.age".publicKeys = keys;
   "secrets/proton-ovpn.age".publicKeys = keys;
   "secrets/proton-txt.age".publicKeys = keys;
-  "secrets/ziph-deploy-key.age".publicKeys = keys;
 }
