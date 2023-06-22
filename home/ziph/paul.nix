@@ -1,5 +1,8 @@
-{ ... } : {
-  imports = [ ../paul.nix ];
+{ thoughtfull, ... } : {
+  imports = [
+    thoughtfull.paul
+    thoughtfull.syncthing
+  ];
   thoughtfull = {
     services.syncthing-init.folders = {
       org = {

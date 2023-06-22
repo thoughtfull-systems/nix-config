@@ -12,7 +12,6 @@
     stateVersion = "22.11";
     username = "paul";
   };
-  imports = [ ./syncthing.nix ];
   programs.git = {
     enable = true;
     extraConfig = {

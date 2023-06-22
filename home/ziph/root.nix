@@ -1,3 +1,3 @@
-{ ... } : {
-  imports = [ ../root.nix ];
+{ thoughtfull, ... } : {
+  imports = [ thoughtfull.root ];
 }

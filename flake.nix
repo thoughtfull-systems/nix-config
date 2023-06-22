@@ -18,7 +18,7 @@
     nixosConfigurations = {
       ziph = nixpkgs.lib.nixosSystem {
         modules = [ ./nixos/ziph ];
-        specialArgs.thoughtfull = nixosModules;
+        specialArgs.thoughtfull = nixosModules // { home = homeManagerModules; };
         system = "x86_64-linux";
       };
     };
