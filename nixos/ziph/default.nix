@@ -1,7 +1,4 @@
 { config, thoughtfull, ... }: {
-  age.secrets = {
-    paul-password.file = ../../age/secrets/paul-password.age;
-  };
   boot = {
     initrd = {
       luks.devices."ziph-nixos" = {
