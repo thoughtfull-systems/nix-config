@@ -21,10 +21,7 @@
         system = "x86_64-linux";
       };
     };
-    nixosModules = rec {
-      default = thoughtfull;
-      thoughtfull = import ./nixosModules;
-    };
+    nixosModules = import ./nixosModules inputs;
     packages = lib.forAllSystems (system:
       import ./packages (inputs // {
         nixpkgs = import nixpkgs {
