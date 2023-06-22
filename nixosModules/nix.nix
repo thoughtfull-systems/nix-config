@@ -12,13 +12,8 @@
 in {
   options.thoughtfull.autoUpgrade = {
     flake = lib.mkOption {
-      default = "git+ssh://git@deploy.github.com/thoughtfull-systems/nixfiles?ref=main";
+      default = "github:thoughtfull-systems/nixfiles/main";
       description = lib.mdDoc "Flake used for automatic upgrades.";
-      type = lib.types.str;
-    };
-    hostname = lib.mkOption {
-      default = "github.com";
-      description = lib.mdDoc "Hostname prepended with 'deploy.' and configured for deploy key.";
       type = lib.types.str;
     };
     inputs = lib.mkOption {
@@ -28,8 +23,6 @@ in {
     };
   };
   config = {
-    age.secrets.${deploy-key-name}.file = ../age/secrets/${deploy-key-name}.age;
-    environment.etc."nixos/deploy-key".source = config.age.secrets.${deploy-key-name}.path;
     nix = {
       gc = {
         automatic = lib.mkDefault true;
@@ -45,11 +38,6 @@ in {
         experimental-features = [ "flakes" "nix-command" ];
       };
     };
-    programs.ssh.extraConfig = ''
-      Host deploy.${cfg.hostname}
-        Hostname ${cfg.hostname}
-        IdentityFile "/etc/nixos/deploy-key"
-    '';
     system.autoUpgrade = {
       allowReboot = lib.mkDefault true;
       enable = lib.mkDefault false;
