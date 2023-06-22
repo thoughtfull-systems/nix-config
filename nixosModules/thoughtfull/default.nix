@@ -2,6 +2,7 @@ inputs: { ... }: {
   imports = [
     (import ./agenix.nix inputs.agenix)
     (import ./home-manager.nix inputs.home-manager)
+    (import ./overlay-unstable.nix inputs.unstable)
     ./avahi.nix
     ./brother.nix
     ./deploy-keys.nix
