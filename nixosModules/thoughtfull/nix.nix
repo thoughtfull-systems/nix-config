@@ -8,7 +8,6 @@
 #   `sudo ssh-keygen -t ed25519 -f /etc/nixos/deploy-key -N "" -C "`hostname` deploy key"`
 { config, lib, ... }: let
   cfg = config.thoughtfull.autoUpgrade;
-  deploy-key-name = "${config.networking.hostName}-deploy-key";
 in {
   options.thoughtfull.autoUpgrade = {
     flake = lib.mkOption {
@@ -39,8 +38,8 @@ in {
       };
     };
     system.autoUpgrade = {
-      allowReboot = lib.mkDefault true;
-      enable = lib.mkDefault false;
+      allowReboot = lib.mkDefault (!config.thoughtfull.desktop.enable);
+      enable = lib.mkDefault true;
       flags = [ "--no-write-lock-file" ] ++
               (map (i: "--update-input ${i}") cfg.inputs);
       flake = cfg.flake;
