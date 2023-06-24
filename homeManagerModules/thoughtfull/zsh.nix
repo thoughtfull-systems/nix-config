@@ -1,7 +1,6 @@
 { lib, ... }: {
   programs.zsh = lib.mkDefault {
     autocd = true;
-    enable = true;
     enableAutosuggestions = true;
     enableCompletion = true;
     enableSyntaxHighlighting = true;
