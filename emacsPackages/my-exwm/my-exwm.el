@@ -124,7 +124,9 @@
         ("s-s" . exwm-workspace-switch)
         ("s-t" . (lambda ()
                    (interactive)
-                   (my-exwm-select-or-run "Xfce4-terminal" "xfce4-terminal")))
+                   (if (executable-find "xfce4-terminal")
+                       (my-exwm-select-or-run "Xfce4-terminal" "xfce4-terminal")
+                     (my-exwm-select-or-run "Gnome-terminal" "gnome-terminal"))))
         ("s-&" . my-exwm-run-command)
         ("s-$" . my-exwm-run-command-with-shell)
         ;; Align workspaces more intuitively with key bindings
