@@ -18,64 +18,58 @@ let
   mapExtra = v: lib.concatStringsSep "\n" (mapAttrsToList mapExtraOption v);
   listStrings = s: concatStringsSep "," (map (n: "\"${n}\"") s);
   listKeys = r: (listStrings (attrNames r));
-  maybeConfig = c: s:
-    if isNull c
-    then
-      ""
-    else
-      s;
   blockConfig = cfg:
     ''
     ${cfg.name}: {
-      ${maybeConfig cfg.exec "exec: \"${cfg.exec}\";"}
-      ${maybeConfig cfg.align "align: \"${cfg.align}\";"}
-      ${maybeConfig cfg.justify "justify: \"${cfg.justify}\";"}
-      ${maybeConfig cfg.type "type: \"${cfg.type}\";"}
-      ${maybeConfig cfg.interval "interval: ${toString cfg.interval};"}
-      ${maybeConfig cfg.fixed-size "fixed-size: ${toString cfg.fixed-size};"}
-      ${maybeConfig cfg.pango-markup
+      ${lib.optionalString cfg.exec "exec: \"${cfg.exec}\";"}
+      ${lib.optionalString cfg.align "align: \"${cfg.align}\";"}
+      ${lib.optionalString cfg.justify "justify: \"${cfg.justify}\";"}
+      ${lib.optionalString cfg.type "type: \"${cfg.type}\";"}
+      ${lib.optionalString cfg.interval "interval: ${toString cfg.interval};"}
+      ${lib.optionalString cfg.fixed-size "fixed-size: ${toString cfg.fixed-size};"}
+      ${lib.optionalString cfg.pango-markup
         "pango-markup: ${boolToString cfg.pango-markup};"}
-      ${maybeConfig cfg.foreground-color-rgb
+      ${lib.optionalString cfg.foreground-color-rgb
         "foreground-color-rgb: 0x${cfg.foreground-color-rgb};"}
-      ${maybeConfig cfg.background-color-rgb
+      ${lib.optionalString cfg.background-color-rgb
         "background-color-rgb: 0x${cfg.background-color-rgb};"}
-      ${maybeConfig cfg.underline-color-rgb
+      ${lib.optionalString cfg.underline-color-rgb
         "underline-color-rgb: 0x${cfg.underline-color-rgb};"}
-      ${maybeConfig cfg.overline-color-rgb
+      ${lib.optionalString cfg.overline-color-rgb
         "overline-color-rgb: 0x${cfg.overline-color-rgb};"}
-      ${maybeConfig cfg.command-button1
+      ${lib.optionalString cfg.command-button1
         "command-button1: \"${cfg.command-button1}\";"}
-      ${maybeConfig cfg.command-button2
+      ${lib.optionalString cfg.command-button2
         "command-button2: \"${cfg.command-button2}\";"}
-      ${maybeConfig cfg.command-button3
+      ${lib.optionalString cfg.command-button3
         "command-button3: \"${cfg.command-button3}\";"}
-      ${maybeConfig cfg.command-button4
+      ${lib.optionalString cfg.command-button4
         "command-button4: \"${cfg.command-button4}\";"}
-      ${maybeConfig cfg.command-button5
+      ${lib.optionalString cfg.command-button5
         "command-button5: \"${cfg.command-button5}\";"}
-      ${maybeConfig cfg."inherit" "inherit: \"${cfg."inherit"}\";"}
-      ${maybeConfig cfg.image "image: \"${cfg.image}\";"}
-      ${maybeConfig cfg.image-shift-x
+      ${lib.optionalString cfg."inherit" "inherit: \"${cfg."inherit"}\";"}
+      ${lib.optionalString cfg.image "image: \"${cfg.image}\";"}
+      ${lib.optionalString cfg.image-shift-x
         "image-shift-x: ${toString cfg.image-shift-x};"}
-      ${maybeConfig cfg.image-shift-y
+      ${lib.optionalString cfg.image-shift-y
         "image-shift-y: ${toString cfg.image-shift-y};"}
-      ${maybeConfig cfg.image-scale-width
+      ${lib.optionalString cfg.image-scale-width
         "image-scale-width: ${toString cfg.image-scale-width};"}
-      ${maybeConfig cfg.image-scale-height
+      ${lib.optionalString cfg.image-scale-height
         "image-scale-height: ${toString cfg.image-scale-height};"}
-      ${maybeConfig cfg.variable-size
+      ${lib.optionalString cfg.variable-size
         "variable-size: ${boolToString cfg.variable-size};"}
-      ${maybeConfig cfg.internal-prefix
+      ${lib.optionalString cfg.internal-prefix
         "internal-prefix: \"${cfg.internal-prefix}\";"}
-      ${maybeConfig cfg.internal-suffix
+      ${lib.optionalString cfg.internal-suffix
         "internal-suffix: \"${cfg.internal-suffix}\";"}
-      ${maybeConfig cfg.internal-option1
+      ${lib.optionalString cfg.internal-option1
         "internal-option1: \"${cfg.internal-option1}\";"}
-      ${maybeConfig cfg.internal-option2
+      ${lib.optionalString cfg.internal-option2
         "internal-option2: \"${cfg.internal-option2}\";"}
-      ${maybeConfig cfg.internal-option3
+      ${lib.optionalString cfg.internal-option3
         "internal-option3: \"${cfg.internal-option3}\";"}
-      ${maybeConfig cfg.internal-spacing
+      ${lib.optionalString cfg.internal-spacing
         "internal-spacing: ${boolToString cfg.internal-spacing};"}
       ${mapExtra cfg.extra}
     };
@@ -86,38 +80,38 @@ let
   in
     ''
     ${cfg.name}: {
-      ${maybeConfig cfg.font "font: \"${cfg.font}\";"}
-      ${maybeConfig cfg.position "position: \"${cfg.position}\";"}
-      ${maybeConfig cfg.gap-horizontal
+      ${lib.optionalString cfg.font "font: \"${cfg.font}\";"}
+      ${lib.optionalString cfg.position "position: \"${cfg.position}\";"}
+      ${lib.optionalString cfg.gap-horizontal
         "gap-horizontal: ${toString cfg.gap-horizontal};"}
-      ${maybeConfig cfg.gap-vertical
+      ${lib.optionalString cfg.gap-vertical
         "gap-vertical: ${toString cfg.gap-vertical};"}
-      ${maybeConfig cfg.height "height: ${toString cfg.height};"}
-      ${maybeConfig cfg.width "width: ${toString cfg.width};"}
-      ${maybeConfig cfg.monitor
+      ${lib.optionalString cfg.height "height: ${toString cfg.height};"}
+      ${lib.optionalString cfg.width "width: ${toString cfg.width};"}
+      ${lib.optionalString cfg.monitor
         "monitor: \"${concatStringsSep " " cfg.monitor}\""}
-      ${maybeConfig cfg.underline-size
+      ${lib.optionalString cfg.underline-size
         "underline-size: ${toString cfg.underline-size};"}
-      ${maybeConfig cfg.overline-size
+      ${lib.optionalString cfg.overline-size
         "overline-size: ${toString cfg.overline-size};"}
-      ${maybeConfig cfg.slack-size "slack-size: ${toString cfg.slack-size};"}
-      ${maybeConfig cfg.border-size
+      ${lib.optionalString cfg.slack-size "slack-size: ${toString cfg.slack-size};"}
+      ${lib.optionalString cfg.border-size
         "border-size: ${toString cfg.border-size};"}
-      ${maybeConfig cfg.border-color-rgb
+      ${lib.optionalString cfg.border-color-rgb
         "border-color-rgb: 0x${toString cfg.border-color-rgb};"}
-      ${maybeConfig cfg.background-color-nowindow-rgb
+      ${lib.optionalString cfg.background-color-nowindow-rgb
         "border-color-rgb: 0x${toString cfg.background-color-nowindow-rgb};"}
-      ${maybeConfig cfg."inherit" "inherit: \"${cfg."inherit"}\";"}
-      ${maybeConfig cfg.inherit-all "inherit-all: \"${cfg.inherit-all}\";"}
-      ${maybeConfig cfg.command-button1
+      ${lib.optionalString cfg."inherit" "inherit: \"${cfg."inherit"}\";"}
+      ${lib.optionalString cfg.inherit-all "inherit-all: \"${cfg.inherit-all}\";"}
+      ${lib.optionalString cfg.command-button1
         "command-button1: \"${cfg.command-button1}\";"}
-      ${maybeConfig cfg.command-button2
+      ${lib.optionalString cfg.command-button2
         "command-button2: \"${cfg.command-button2}\";"}
-      ${maybeConfig cfg.command-button3
+      ${lib.optionalString cfg.command-button3
         "command-button3: \"${cfg.command-button3}\";"}
-      ${maybeConfig cfg.command-button4
+      ${lib.optionalString cfg.command-button4
         "command-button4: \"${cfg.command-button4}\";"}
-      ${maybeConfig cfg.command-button5
+      ${lib.optionalString cfg.command-button5
         "command-button5: \"${cfg.command-button5}\";"}
 
       ${mapExtra cfg.extra}
@@ -140,12 +134,12 @@ in
   options.thoughtfull.yabar = {
     enable = mkEnableOption "yabar";
     package = mkOption {
-      default = pkgs.yabar-unstable;
-      defaultText = literalExpression "pkgs.yabar-unstable";
+      default = pkgs.unstable.yabar-unstable;
+      defaultText = literalExpression "pkgs.unstable.yabar-unstable";
       example = literalExpression "pkgs.yabar";
       type = types.package;
-      # `yabar-stable` segfaults under certain conditions.
-      apply = x: if x == pkgs.yabar-unstable then x else flip warn x ''
+      # `yabar` stable segfaults under certain conditions.
+      apply = x: if x == pkgs.unstable.yabar-unstable then x else flip warn x ''
         It's not recommended to use `yabar' with `programs.yabar', the (old)
         stable release tends to segfault under certain circumstances:
 
@@ -552,9 +546,7 @@ in
         WantedBy = [ "graphical-session.target" ];
       };
       Service = {
-        ExecStart = ''
-          ${cfg.package}/bin/yabar -c ${configFile}
-        '';
+        ExecStart = "${cfg.package}/bin/yabar -c ${configFile}";
         Restart = "always";
       };
     };
