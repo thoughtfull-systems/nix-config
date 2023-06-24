@@ -1,11 +1,11 @@
-{ config, lib, ... }: let
+{ config, lib, pkgs, ... }: let
   cfg = config.thoughtfull.deploy-keys;
 in {
   options.thoughtfull.deploy-keys = lib.mkOption {
-    default = {};
+    default = [];
     description = lib.mdDoc ''
     '';
-    type = lib.types.attrsOf (
+    type = lib.types.listOf (
       lib.types.submodule (
         { name, ... }: {
           options = {
@@ -23,48 +23,27 @@ in {
               '';
               type = lib.types.str;
             };
-            path = lib.mkOption {
-              description = ''
-                Path to age file containing the private key.
-              '';
-              type = lib.types.path;
-            };
           };
         }
       )
     );
   };
-  config = {
-    age.secrets = lib.mkIf (cfg != {})
-      (lib.mkMerge
-        (lib.mapAttrsToList
-          (name: options: {
-            "${name}-deploy-key".file = options.path;
-          })
-          cfg
-        )
-      );
-    environment.etc = lib.mkIf (cfg != {})
-      (lib.mkMerge
-        (lib.mapAttrsToList
-          (name: options: {
-            "nixos/${name}-deploy-key".source = config.age.secrets."${name}-deploy-key".path;
-          })
-          cfg
-        )
-      );
-    programs.ssh = lib.mkIf (cfg != {})
-      (lib.mkMerge
-        (lib.mapAttrsToList
-          (name: options: {
-            extraConfig = ''
-              Host ${name}.${options.hostname}
-              Hostname ${options.hostname}
-              IdentityFile "/etc/nixos/${name}-deploy-key"
-            '';
-          })
-          cfg
-        )
-      );
+  config = lib.mkIf (cfg != []) {
+    programs.ssh.extraConfig = (lib.concatMapStringsSep "\n"
+      ({ name, hostname }: ''
+        Host ${name}.${hostname}
+        Hostname ${hostname}
+        IdentityFile /etc/nixos/${name}-deploy-key
+      '')
+      cfg);
+    system.activationScripts = {
+      ensure-deploy-keys = lib.concatMapStringsSep "\n"
+        ({ name, ... }: ''
+          [ -f /etc/nixos/${name}-deploy-key ] || \
+            ${pkgs.openssh}/bin/ssh-keygen -f /etc/nixos/${name}-deploy-key -t ed25519 -N "" \
+              -C "${name} deploy key"
+        '')
+        cfg;
+    };
   };
 }
