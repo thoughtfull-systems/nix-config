@@ -16,4 +16,5 @@
     ./yabar.nix
     ./zsh.nix
   ];
+  systemd.user.startServices = "sd-switch";
 }
