@@ -1,9 +1,18 @@
 { config, lib, pkgs, ... }: {
-  programs.tmux = lib.mkDefault {
-    baseIndex = 1;
-    clock24 = true;
+  home = {
+    # TODO: run this on config change instead of activation
+    activation = lib.mkIf config.programs.tmux.enable {
+      reloadTmuxConfig = lib.hm.dag.entryAfter ["writeBoundary"] ''
+        export TMUX_TMPDIR=/run/user/$UID
+        [ -e "$TMUX_TMPDIR/default" ] &&
+        $DRY_RUN_CMD ${pkgs.tmux}/bin/tmux source-file $HOME/.config/tmux/tmux.conf
+      '';
+    };
+  };
+  programs.tmux = {
+    baseIndex = lib.mkDefault 1;
+    clock24 = lib.mkDefault true;
     extraConfig = ''
-      set-option -g activity-action other
       set-option -g alternate-screen on
       set-option -g copy-command "${pkgs.xsel}/bin/xsel -i --clipboard"
       set-option -g detach-on-destroy off
@@ -126,7 +135,7 @@
       unbind-key -T prefix o
       unbind-key -T prefix x
     '';
-    keyMode = "emacs";
+    keyMode = lib.mkDefault "emacs";
     plugins = with pkgs; [
       {
         plugin = tmuxPlugins.better-mouse-mode;
@@ -141,7 +150,7 @@
         '';
       }
     ];
-    shortcut = "z";
-    terminal = "screen-256color";
+    shortcut = lib.mkDefault "z";
+    terminal = lib.mkDefault "screen-256color";
   };
 }
