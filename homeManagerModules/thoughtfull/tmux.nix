@@ -4,7 +4,7 @@
     activation = lib.mkIf config.programs.tmux.enable {
       reloadTmuxConfig = lib.hm.dag.entryAfter ["writeBoundary"] ''
         export TMUX_TMPDIR=/run/user/$UID
-        [ -e "$TMUX_TMPDIR/default" ] &&
+        [ -e "$TMUX_TMPDIR/tmux-$UID/default" ] &&
         $DRY_RUN_CMD ${pkgs.tmux}/bin/tmux source-file $HOME/.config/tmux/tmux.conf
       '';
     };
