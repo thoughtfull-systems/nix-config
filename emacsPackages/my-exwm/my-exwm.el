@@ -78,9 +78,19 @@
   (desktop-save user-emacs-directory t)
   (kill-emacs 82))
 
+(defvar terminal-class
+  (if (executable-find "gnome-terminal")
+      "Gnome-terminal"
+    "Xfce4-terminal"))
+
+(defvar terminal-command
+  (if (executable-find "gnome-terminal")
+      "gnome-terminal"
+    "xfce4-terminal"))
+
 (defun my-exwm-run-command-with-shell (command)
   (interactive (list (read-shell-command "$ ")))
-  (my-exwm-select-or-run "Gnome-terminal" "gnome-terminal")
+  (my-exwm-select-or-run terminal-class terminal-command)
   (mapcar #'exwm-input--fake-key (concat "$" command "")))
 
 (defun my-exwm-run-command (command)
@@ -124,9 +134,7 @@
         ("s-s" . exwm-workspace-switch)
         ("s-t" . (lambda ()
                    (interactive)
-                   (if (executable-find "xfce4-terminal")
-                       (my-exwm-select-or-run "Xfce4-terminal" "xfce4-terminal")
-                     (my-exwm-select-or-run "Gnome-terminal" "gnome-terminal"))))
+                   (my-exwm-select-or-run terminal-class terminal-command)))
         ("s-&" . my-exwm-run-command)
         ("s-$" . my-exwm-run-command-with-shell)
         ;; Align workspaces more intuitively with key bindings
