@@ -1,7 +1,4 @@
 { lib, ... } : {
-  services.syncthing = {
-    enable = true;
-  };
   thoughtfull.services.syncthing-init = {
     devices = {
       bennu.id = "ILSWF2W-E6ARU5W-SCYVCOF-5ZE3ZCY-XFVQEA3-M5B2YZP-XEBD7DM-MIKWPAB";

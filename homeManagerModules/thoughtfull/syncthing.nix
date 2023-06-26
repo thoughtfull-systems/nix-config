@@ -24,6 +24,8 @@ let
     folder.enable
   ) cfg.folders);
 
+  enabled = config.services.syncthing.enable;
+
   updateConfig = pkgs.writers.writeDash "merge-syncthing-config" ''
     set -efu
     # be careful not to leak secrets in the filesystem or in process listings
@@ -333,23 +335,21 @@ in {
       '';
     };
   };
-
-  # upstream reference:
-  # https://github.com/syncthing/syncthing/blob/main/etc/linux-systemd/system/syncthing%40.service
-  config.systemd.user.services.syncthing-init = mkIf (
-    cfg.devices != {} || cfg.folders != {}
-  ) {
-    Install.WantedBy = [ "syncthing.service" ];
-    Service = {
-      RemainAfterExit = true;
-      RuntimeDirectory = "syncthing-init";
-      Type = "oneshot";
-      ExecStart = "${updateConfig}";
-    };
-    Unit = {
-      After = [ "syncthing.service" ];
-      Description = "Syncthing configuration updater";
-      Requires = [ "syncthing.service" ];
+  config = {
+    services.syncthing.enable = lib.mkDefault (folders != []);
+    systemd.user.services.syncthing-init = mkIf enabled {
+      Install.WantedBy = [ "syncthing.service" ];
+      Service = {
+        RemainAfterExit = true;
+        RuntimeDirectory = "syncthing-init";
+        Type = "oneshot";
+        ExecStart = "${updateConfig}";
+      };
+      Unit = {
+        After = [ "syncthing.service" ];
+        Description = "Syncthing configuration updater";
+        Requires = [ "syncthing.service" ];
+      };
     };
   };
 }
