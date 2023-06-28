@@ -21,55 +21,55 @@ let
   blockConfig = cfg:
     ''
     ${cfg.name}: {
-      ${lib.optionalString cfg.exec "exec: \"${cfg.exec}\";"}
-      ${lib.optionalString cfg.align "align: \"${cfg.align}\";"}
-      ${lib.optionalString cfg.justify "justify: \"${cfg.justify}\";"}
-      ${lib.optionalString cfg.type "type: \"${cfg.type}\";"}
-      ${lib.optionalString cfg.interval "interval: ${toString cfg.interval};"}
-      ${lib.optionalString cfg.fixed-size "fixed-size: ${toString cfg.fixed-size};"}
-      ${lib.optionalString cfg.pango-markup
+      ${lib.optionalString (cfg.exec != null) "exec: \"${cfg.exec}\";"}
+      ${lib.optionalString (cfg.align != null) "align: \"${cfg.align}\";"}
+      ${lib.optionalString (cfg.justify != null) "justify: \"${cfg.justify}\";"}
+      ${lib.optionalString (cfg.type != null) "type: \"${cfg.type}\";"}
+      ${lib.optionalString (cfg.interval != null) "interval: ${toString cfg.interval};"}
+      ${lib.optionalString (cfg.fixed-size != null) "fixed-size: ${toString cfg.fixed-size};"}
+      ${lib.optionalString (cfg.pango-markup != null)
         "pango-markup: ${boolToString cfg.pango-markup};"}
-      ${lib.optionalString cfg.foreground-color-rgb
+      ${lib.optionalString (cfg.foreground-color-rgb != null)
         "foreground-color-rgb: 0x${cfg.foreground-color-rgb};"}
-      ${lib.optionalString cfg.background-color-rgb
+      ${lib.optionalString (cfg.background-color-rgb != null)
         "background-color-rgb: 0x${cfg.background-color-rgb};"}
-      ${lib.optionalString cfg.underline-color-rgb
+      ${lib.optionalString (cfg.underline-color-rgb != null)
         "underline-color-rgb: 0x${cfg.underline-color-rgb};"}
-      ${lib.optionalString cfg.overline-color-rgb
+      ${lib.optionalString (cfg.overline-color-rgb != null)
         "overline-color-rgb: 0x${cfg.overline-color-rgb};"}
-      ${lib.optionalString cfg.command-button1
+      ${lib.optionalString (cfg.command-button1 != null)
         "command-button1: \"${cfg.command-button1}\";"}
-      ${lib.optionalString cfg.command-button2
+      ${lib.optionalString (cfg.command-button2 != null)
         "command-button2: \"${cfg.command-button2}\";"}
-      ${lib.optionalString cfg.command-button3
+      ${lib.optionalString (cfg.command-button3 != null)
         "command-button3: \"${cfg.command-button3}\";"}
-      ${lib.optionalString cfg.command-button4
+      ${lib.optionalString (cfg.command-button4 != null)
         "command-button4: \"${cfg.command-button4}\";"}
-      ${lib.optionalString cfg.command-button5
+      ${lib.optionalString (cfg.command-button5 != null)
         "command-button5: \"${cfg.command-button5}\";"}
-      ${lib.optionalString cfg."inherit" "inherit: \"${cfg."inherit"}\";"}
-      ${lib.optionalString cfg.image "image: \"${cfg.image}\";"}
-      ${lib.optionalString cfg.image-shift-x
+      ${lib.optionalString (cfg."inherit" != null) "inherit: \"${cfg."inherit"}\";"}
+      ${lib.optionalString (cfg.image != null) "image: \"${cfg.image}\";"}
+      ${lib.optionalString (cfg.image-shift-x != null)
         "image-shift-x: ${toString cfg.image-shift-x};"}
-      ${lib.optionalString cfg.image-shift-y
+      ${lib.optionalString (cfg.image-shift-y != null)
         "image-shift-y: ${toString cfg.image-shift-y};"}
-      ${lib.optionalString cfg.image-scale-width
+      ${lib.optionalString (cfg.image-scale-width != null)
         "image-scale-width: ${toString cfg.image-scale-width};"}
-      ${lib.optionalString cfg.image-scale-height
+      ${lib.optionalString (cfg.image-scale-height != null)
         "image-scale-height: ${toString cfg.image-scale-height};"}
-      ${lib.optionalString cfg.variable-size
+      ${lib.optionalString (cfg.variable-size != null)
         "variable-size: ${boolToString cfg.variable-size};"}
-      ${lib.optionalString cfg.internal-prefix
+      ${lib.optionalString (cfg.internal-prefix != null)
         "internal-prefix: \"${cfg.internal-prefix}\";"}
-      ${lib.optionalString cfg.internal-suffix
+      ${lib.optionalString (cfg.internal-suffix != null)
         "internal-suffix: \"${cfg.internal-suffix}\";"}
-      ${lib.optionalString cfg.internal-option1
+      ${lib.optionalString (cfg.internal-option1 != null)
         "internal-option1: \"${cfg.internal-option1}\";"}
-      ${lib.optionalString cfg.internal-option2
+      ${lib.optionalString (cfg.internal-option2 != null)
         "internal-option2: \"${cfg.internal-option2}\";"}
-      ${lib.optionalString cfg.internal-option3
+      ${lib.optionalString (cfg.internal-option3 != null)
         "internal-option3: \"${cfg.internal-option3}\";"}
-      ${lib.optionalString cfg.internal-spacing
+      ${lib.optionalString (cfg.internal-spacing != null)
         "internal-spacing: ${boolToString cfg.internal-spacing};"}
       ${mapExtra cfg.extra}
     };
@@ -80,39 +80,39 @@ let
   in
     ''
     ${cfg.name}: {
-      ${lib.optionalString cfg.font "font: \"${cfg.font}\";"}
-      ${lib.optionalString cfg.position "position: \"${cfg.position}\";"}
-      ${lib.optionalString cfg.gap-horizontal
+      ${lib.optionalString (cfg.font != null) "font: \"${cfg.font}\";"}
+      ${lib.optionalString (cfg.position != null) "position: \"${cfg.position}\";"}
+      ${lib.optionalString (cfg.gap-horizontal != null)
         "gap-horizontal: ${toString cfg.gap-horizontal};"}
-      ${lib.optionalString cfg.gap-vertical
+      ${lib.optionalString (cfg.gap-vertical != null)
         "gap-vertical: ${toString cfg.gap-vertical};"}
-      ${lib.optionalString cfg.height "height: ${toString cfg.height};"}
-      ${lib.optionalString cfg.width "width: ${toString cfg.width};"}
-      ${lib.optionalString cfg.monitor
+      ${lib.optionalString (cfg.height != null) "height: ${toString cfg.height};"}
+      ${lib.optionalString (cfg.width != null) "width: ${toString cfg.width};"}
+      ${lib.optionalString (cfg.monitor != null)
         "monitor: \"${concatStringsSep " " cfg.monitor}\""}
-      ${lib.optionalString cfg.underline-size
+      ${lib.optionalString (cfg.underline-size != null)
         "underline-size: ${toString cfg.underline-size};"}
-      ${lib.optionalString cfg.overline-size
+      ${lib.optionalString (cfg.overline-size != null)
         "overline-size: ${toString cfg.overline-size};"}
-      ${lib.optionalString cfg.slack-size "slack-size: ${toString cfg.slack-size};"}
-      ${lib.optionalString cfg.border-size
+      ${lib.optionalString (cfg.slack-size != null) "slack-size: ${toString cfg.slack-size};"}
+      ${lib.optionalString (cfg.border-size != null)
         "border-size: ${toString cfg.border-size};"}
-      ${lib.optionalString cfg.border-color-rgb
+      ${lib.optionalString (cfg.border-color-rgb != null)
         "border-color-rgb: 0x${toString cfg.border-color-rgb};"}
-      ${lib.optionalString cfg.background-color-nowindow-rgb
+      ${lib.optionalString (cfg.background-color-nowindow-rgb != null)
         "border-color-rgb: 0x${toString cfg.background-color-nowindow-rgb};"}
-      ${lib.optionalString cfg."inherit" "inherit: \"${cfg."inherit"}\";"}
-      ${lib.optionalString cfg.inherit-all "inherit-all: \"${cfg.inherit-all}\";"}
-      ${lib.optionalString cfg.command-button1
+      ${lib.optionalString (cfg."inherit" != null) "inherit: \"${cfg."inherit"}\";"}
+      ${lib.optionalString (cfg.inherit-all != null) "inherit-all: \"${cfg.inherit-all}\";"}
+      ${lib.optionalString (cfg.command-button1 != null)
         "command-button1: \"${cfg.command-button1}\";"}
-      ${lib.optionalString cfg.command-button2
+      ${lib.optionalString (cfg.command-button2 != null)
         "command-button2: \"${cfg.command-button2}\";"}
-      ${lib.optionalString cfg.command-button3
+      ${lib.optionalString (cfg.command-button3 != null)
         "command-button3: \"${cfg.command-button3}\";"}
-      ${lib.optionalString cfg.command-button4
+      ${lib.optionalString (cfg.command-button4 != null)
         "command-button4: \"${cfg.command-button4}\";"}
-      ${lib.optionalString cfg.command-button5
-        "command-button5: \"${cfg.command-button5}\";"}
+        ${lib.optionalString (cfg.command-button5 != null)
+          "command-button5: \"${cfg.command-button5}\";"}
 
       ${mapExtra cfg.extra}
 
