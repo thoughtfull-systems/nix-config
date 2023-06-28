@@ -6,8 +6,11 @@ in {
     home.packages = with pkgs; [
       flameshot
       notify-desktop
+      tor-browser-bundle-bin
       unstable.obsidian
-      unstable.zoom-us
+      # current version of zoom fails to download
+      # unstable.zoom-us
+      zoom-us
     ];
     fonts.fontconfig.enable = lib.mkForce true;
   };
