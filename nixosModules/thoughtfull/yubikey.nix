@@ -1,5 +1,6 @@
 { pkgs, ... }: {
   environment.systemPackages = with pkgs; [
+    age-plugin-yubikey
     yubikey-manager
     yubikey-manager-qt
     yubioath-desktop
