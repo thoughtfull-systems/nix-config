@@ -18,6 +18,7 @@ inputs: { ... }: {
     ./sudo.nix
     ./tt-rss.nix
     ./vaultwarden.nix
+    ./xfce.nix
     ./yubikey.nix
     ./zsh.nix
   ];

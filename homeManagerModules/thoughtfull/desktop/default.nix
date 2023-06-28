@@ -18,5 +18,6 @@ in {
     ./cinnamon.nix
     ./firefox.nix
     ./xbanish.nix
+    ./xfce.nix
   ];
 }

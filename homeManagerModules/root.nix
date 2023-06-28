@@ -12,4 +12,5 @@
     stateVersion = "22.11";
     username = "root";
   };
+  thoughtfull.desktop.enable = false;
 }

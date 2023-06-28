@@ -1,5 +1,7 @@
-{ lib, nix-lib, osConfig, pkgs, unstable, ... }:
-lib.mkIf osConfig.services.xserver.desktopManager.cinnamon.enable {
+{ config, lib, nix-lib, osConfig, pkgs, unstable, ... }: let
+  enable = config.thoughtfull.desktop.enable &&
+           osConfig.services.xserver.desktopManager.cinnamon.enable;
+in lib.mkIf enable {
   # these should all be lib.mkDefault
   dconf.settings = with lib.hm.gvariant; {
     "org/cinnamon" = {
