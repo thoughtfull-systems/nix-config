@@ -8,7 +8,6 @@
   imports = [
     thoughtfull.paul
     thoughtfull.syncthing
-    thoughtfull.yabar
   ];
   thoughtfull = {
     gnome-terminal.enable = true;
@@ -38,6 +37,5 @@
         enable = true;
       };
     };
-    yabar.enable = true;
   };
 }
