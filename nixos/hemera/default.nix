@@ -95,7 +95,7 @@
     # throttled.enable = true;
     trezord.enable = true;
     xserver = {
-      desktopManager.cinnamon.enable = true;
+      desktopManager.xfce.enable = true;
       displayManager = {
         autoLogin = {
           enable = true;
