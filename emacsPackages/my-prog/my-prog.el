@@ -50,6 +50,9 @@
  'my-prog
  '(display-line-numbers-minor-tick 10)
  '(display-line-numbers-width-start t)
+ ;; electric-indent-mode swaps the default behavior of C-j and RET which is confusing, I prefer the
+ ;; default behavior.
+ '(electric-indent-mode nil)
  '(emacs-lisp-docstring-fill-column 80)
  '(fill-column 100)
  '(flycheck-emacs-lisp-load-path 'inherit)
