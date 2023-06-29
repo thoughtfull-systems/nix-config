@@ -1,4 +1,21 @@
-{ lib, ... } : {
+{ config, lib, ... } : let
+  cfg = config.thoughtfull.services.syncthing-init;
+in {
+  home.file = lib.mkMerge [
+    (lib.mkIf cfg.folders.obsidian.enable {
+      "obsidian/.stignore".text = ''
+        .obsidian/workspace
+        .obsidian/workspace.json
+        .obsidian/workspace-mobile.json
+        Work
+      '';
+    })
+    (lib.mkIf cfg.folders.org.enable {
+      "org/.stignore".text = ''
+        work
+      '';
+    })
+  ];
   thoughtfull.services.syncthing-init = {
     devices = {
       bennu.id = "ILSWF2W-E6ARU5W-SCYVCOF-5ZE3ZCY-XFVQEA3-M5B2YZP-XEBD7DM-MIKWPAB";
