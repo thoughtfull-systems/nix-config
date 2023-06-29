@@ -16,6 +16,11 @@
     homeManagerModules = import ./homeManagerModules;
     lib = import ./lib inputs;
     nixosConfigurations = {
+      hemera = nixpkgs.lib.nixosSystem {
+        modules = [ ./nixos/hemera ];
+        specialArgs.thoughtfull = nixosModules;
+        system = "x86_64-linux";
+      };
       ziph = nixpkgs.lib.nixosSystem {
         modules = [ ./nixos/ziph ];
         specialArgs.thoughtfull = nixosModules;
