@@ -25,7 +25,7 @@ in {
           "panels/panel-1/icon-size" = 16;
           "panels/panel-1/length" = 100;
           "panels/panel-1/mode" = 0;
-          "panels/panel-1/plugin-ids" = [ 1 3 5 6 9 10 11 12 13 14 ];
+          "panels/panel-1/plugin-ids" = [ 1 3 5 6 8 9 10 11 12 13 14 ];
           "panels/panel-1/position" = "p=6;x=0;y=0";
           "panels/panel-1/position-locked" = true;
           "panels/panel-1/size" = 26;
