@@ -18,6 +18,7 @@ lib.mkIf config.services.xserver.desktopManager.xfce.enable {
     # https://forum.xfce.org/viewtopic.php?id=13918
     # https://gitlab.xfce.org/xfce/xfce4-power-manager/-/issues/7
     logind.lidSwitch = "hybrid-sleep";
+    picom.enable = true;
     xserver.desktopManager.xfce = {
       # without desktop I get the default X cursor over the panel; not a big deal, but I don't like
       # it
