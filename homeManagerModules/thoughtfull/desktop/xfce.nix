@@ -56,6 +56,20 @@ in {
           "plugins/plugin-13/style" = 0;
           "plugins/plugin-14" = "actions";
         };
+        xfce4-notifyd = {
+          "do-fadeout" = true;
+          "do-slideout" = true;
+          "expire-timeout" = 5;
+          "expire-timeout-allow-override" = true;
+          "expire-timeout-enabled" = true;
+          "gauge-ignores-dnd" = true; # show volume changes even with DnD
+          "initial-opacity" = 0.8;
+          "notification-display-fields" = "icon-summary-body";
+          "notify-location" = 1; # show bottom left corner
+          "primary-monitor" = 0; # show on monitor with mouse pointer
+          "show-text-with-gauge" = true; # show percentage with volume change
+          "theme"  = "Default";
+        };
         xfce4-power-manager = {
           # xfce4-power-manager does not seem to support hybrid-sleep, so let logind handle the lid
           # switch
