@@ -44,6 +44,7 @@ in {
           "plugins/plugin-6/square-icons" = true;
           "plugins/plugin-8" = "pulseaudio";
           "plugins/plugin-8/enable-keyboard-shortcuts" = true;
+          "plugins/plugin-8/play-sound" = true;
           "plugins/plugin-8/show-notifications" = true;
           "plugins/plugin-9" = "power-manager-plugin";
           "plugins/plugin-10" = "notification-plugin";
