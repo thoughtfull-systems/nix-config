@@ -37,9 +37,9 @@ in {
           "plugins/plugin-5/style" = 0;
           "plugins/plugin-6" = "systray";
           "plugins/plugin-6/known-legacy-items" = [
+            "ethernet network connection \"wired connection 1\" active"
             "networkmanager applet"
             "xfce4-power-manager"
-            "ethernet network connection \"wired connection 1\" active"
           ];
           "plugins/plugin-6/square-icons" = true;
           "plugins/plugin-8" = "pulseaudio";
@@ -64,27 +64,27 @@ in {
       };
       unsettings = {
         "xfce4-keyboard-shortcuts" = [
+          "commands/custom/<Alt><Super>s"
           "commands/custom/<Alt>F1"
           "commands/custom/<Alt>F2"
           "commands/custom/<Alt>F2/startup-notify"
           "commands/custom/<Alt>F3"
           "commands/custom/<Alt>F3/startup-notify"
           "commands/custom/<Alt>Print"
-          "commands/custom/<Alt><Super>s"
-          "commands/custom/HomePage"
           "commands/custom/<Primary><Alt>Delete"
           "commands/custom/<Primary><Alt>Escape"
           "commands/custom/<Primary><Alt>f"
           "commands/custom/<Primary><Alt>l"
           "commands/custom/<Primary><Alt>t"
-          "commands/custom/<Primary>Escape"
           "commands/custom/<Primary><Shift>Escape"
-          "commands/custom/Print"
+          "commands/custom/<Primary>Escape"
           "commands/custom/<Shift>Print"
           "commands/custom/<Super>e"
           "commands/custom/<Super>p"
           "commands/custom/<Super>r"
           "commands/custom/<Super>r/startup-notify"
+          "commands/custom/HomePage"
+          "commands/custom/Print"
           "commands/custom/XF86Display"
           "commands/custom/XF86Mail"
           "commands/custom/XF86WWW"
