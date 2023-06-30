@@ -56,6 +56,7 @@ in {
           "plugins/plugin-14" = "actions";
         };
         xfce4-power-manager = {
+          "xfce4-power-manager/logind-handle-lid-switch" = true;
           "xfce4-power-manager/show-panel-label" = 1;
         };
         xfce4-session = {
