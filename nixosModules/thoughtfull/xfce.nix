@@ -14,6 +14,7 @@ lib.mkIf config.services.xserver.desktopManager.xfce.enable {
   ];
   environment.systemPackages = [
     pkgs.xfce.xfce4-xkb-plugin
+    pkgs.xfce.xfce4-weather-plugin
   ];
   services = {
     xserver.desktopManager.xfce = {

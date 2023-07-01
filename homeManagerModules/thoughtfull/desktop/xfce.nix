@@ -77,7 +77,7 @@ in {
           "panels/panel-1/length-adjust" = true;
           "panels/panel-1/mode" = 0;
           "panels/panel-1/nrows" = 1;
-          "panels/panel-1/plugin-ids" = [ 1 15 16 3 17 6 8 9 10 12 14 ];
+          "panels/panel-1/plugin-ids" = [ 1 16 3 17 6 8 9 10 12 18 15 14 ];
           "panels/panel-1/position" = "p=6;x=0;y=0";
           "panels/panel-1/position-locked" = true;
           "panels/panel-1/size" = 26;
@@ -146,7 +146,7 @@ in {
           ];
           "plugins/plugin-15" = "separator";
           "plugins/plugin-15/expand" = false;
-          "plugins/plugin-15/style" = 0; # transparent
+          "plugins/plugin-15/style" = 1; # transparent
           "plugins/plugin-16" = "directorymenu";
           "plugins/plugin-16/base-directory" = "/home/paul";
           "plugins/plugin-16/hidden-files" = false;
@@ -160,6 +160,24 @@ in {
           "plugins/plugin-17/show-notifications" = false;
           "plugins/plugin-17/display-tooltip-icon" = false;
           "plugins/plugin-17/group-policy" = 0; # configure globally
+          "plugins/plugin-18" = "weather";
+          "plugins/plugin-18/forecast/days" = 5;
+          "plugins/plugin-18/forecast/layout" = 0; # columns
+          "plugins/plugin-18/labels/label0" = 3; # temperature
+          "plugins/plugin-18/power-saving" = true;
+          "plugins/plugin-18/round" = true;
+          "plugins/plugin-18/scrollbox/animate" = true;
+          "plugins/plugin-18/scrollbox/lines" = 1;
+          "plugins/plugin-18/scrollbox/show" = true;
+          "plugins/plugin-18/scrollbox/use-color" = false;
+          "plugins/plugin-18/single-row" = true;
+          "plugins/plugin-18/tooltip-style" = 0; # simple
+          "plugins/plugin-18/units/altitude" = 1; # feet
+          "plugins/plugin-18/units/apparent-temperature" = 0; # windchill/heat index
+          "plugins/plugin-18/units/precipitation" = 1; # inches
+          "plugins/plugin-18/units/pressure" = 2; # psi
+          "plugins/plugin-18/units/temperature" = 1; # fahrenheit
+          "plugins/plugin-18/units/windspeed" = 1; # mph
         };
         xfce4-power-manager = {
           "xfce4-power-manager/battery-button-action" = 0; # nothing
