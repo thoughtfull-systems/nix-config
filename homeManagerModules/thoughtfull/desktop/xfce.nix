@@ -58,7 +58,7 @@ in {
           "gauge-ignores-dnd" = true; # show volume changes even with DnD
           "initial-opacity" = 0.8;
           "notification-display-fields" = "icon-summary-body";
-          "notify-location" = 1; # show bottom left corner
+          "notify-location" = { type = "uint"; value = 1; }; # show bottom left corner
           "primary-monitor" = 0; # show on monitor with mouse pointer
           "show-text-with-gauge" = true; # show percentage with volume change
           "theme"  = "Default";
