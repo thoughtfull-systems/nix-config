@@ -97,7 +97,7 @@ in {
           "plugins/plugin-12" = "clock";
           "plugins/plugin-12/command" = "";
           "plugins/plugin-12/digital-layout" = 3; # full date
-          "plugins/plugin-12/digital-time-font" = "B612 Bold 11";
+          "plugins/plugin-12/digital-time-font" = "B612 11";
           "plugins/plugin-12/digital-time-format" = "%R"; # hh:mm
           "plugins/plugin-12/mode" = 2; # digital
           "plugins/plugin-12/timezone" = "";
@@ -157,6 +157,24 @@ in {
         };
         xfce4-session = {
           "general/SaveOnExit" = false;
+        };
+        xsettings = {
+          "Gdk/WindowScalingFactor" = 1;
+          "Gtk/ButtonImages" = true;
+          "Gtk/CanChangeAccels" = false;
+          "Gtk/DialogsUseHeader" = false;
+          "Gtk/FontName" = "B612 11";
+          "Gtk/MenuImages" = true;
+          "Gtk/MonospaceFontName" = "Source Code Pro 11";
+          "Net/EnableEventSounds" = false;
+          "Net/EnableInputFeedbackSounds" = false;
+          "Net/IconThemeName" = "Adwaita";
+          "Net/ThemeName" = "Adwaita";
+          "Xfce/LastCustomDPI" = 96;
+          "Xft/Antialias" = 1;
+          "Xft/DPI" = 96;
+          "Xft/HintStyle" = "hintfull";
+          "Xft/RGBA" = "none";
         };
       };
       unsettings = {
