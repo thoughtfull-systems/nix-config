@@ -21,44 +21,6 @@ in {
         pointers = {
           "ELAN067600_04F33195_Touchpad/Properties/libinput_Tapping_Enabled" = 0;
         };
-        xfce4-panel = {
-          "configver" = 2;
-          "panels" = [ 1 ];
-          "panels/dark-mode" = true;
-          "panels/panel-1/icon-size" = 16;
-          "panels/panel-1/length" = 100;
-          "panels/panel-1/mode" = 0;
-          "panels/panel-1/plugin-ids" = [ 1 3 5 6 8 9 10 11 12 13 14 ];
-          "panels/panel-1/position" = "p=6;x=0;y=0";
-          "panels/panel-1/position-locked" = true;
-          "panels/panel-1/size" = 26;
-          "plugins/plugin-1" = "applicationsmenu";
-          "plugins/plugin-3" = "separator";
-          "plugins/plugin-3/expand" = true;
-          "plugins/plugin-3/style" = 0;
-          "plugins/plugin-5" = "separator";
-          "plugins/plugin-5/style" = 0;
-          "plugins/plugin-6" = "systray";
-          "plugins/plugin-6/known-legacy-items" = [
-            "ethernet network connection \"wired connection 1\" active"
-            "networkmanager applet"
-            "xfce4-power-manager"
-          ];
-          "plugins/plugin-6/square-icons" = true;
-          "plugins/plugin-8" = "pulseaudio";
-          "plugins/plugin-8/enable-keyboard-shortcuts" = true;
-          "plugins/plugin-8/play-sound" = true;
-          "plugins/plugin-8/show-notifications" = true;
-          "plugins/plugin-9" = "power-manager-plugin";
-          "plugins/plugin-10" = "notification-plugin";
-          "plugins/plugin-11" = "separator";
-          "plugins/plugin-11/style" = 0;
-          "plugins/plugin-12" = "clock";
-          "plugins/plugin-12/mode" = 2;
-          "plugins/plugin-13" = "separator";
-          "plugins/plugin-13/style" = 0;
-          "plugins/plugin-14" = "actions";
-        };
         xfce4-notifyd = {
           "do-fadeout" = true;
           "do-slideout" = true;
@@ -72,6 +34,88 @@ in {
           "primary-monitor" = 0; # show on monitor with mouse pointer
           "show-text-with-gauge" = true; # show percentage with volume change
           "theme"  = "Default";
+        };
+        xfce4-panel = {
+          "configver" = 2;
+          "panels" = [ 1 ];
+          "panels/dark-mode" = false;
+          "panels/panel-1/autohide-behavior" = 0; # never
+          "panels/panel-1/background-style" = 0; # use system style
+          "panels/panel-1/enable-struts" = true;
+          "panels/panel-1/enter-opacity" = 100;
+          "panels/panel-1/icon-size" = 16;
+          "panels/panel-1/leave-opacity" = 100;
+          "panels/panel-1/length" = 100.0;
+          "panels/panel-1/length-adjust" = true;
+          "panels/panel-1/mode" = 0;
+          "panels/panel-1/nrows" = 1;
+          "panels/panel-1/plugin-ids" = [ 1 3 6 8 9 10 12 14 ];
+          "panels/panel-1/position" = "p=6;x=0;y=0";
+          "panels/panel-1/position-locked" = true;
+          "panels/panel-1/size" = 26;
+          "plugin/after-menu-shown" = "mark-all-read";
+          "plugin/hide-clear-prompt" = false;
+          "plugin/hide-on-read" = false;
+          "plugin/log-display-limit" = 10;
+          "plugin/log-icon-size" = 16;
+          "plugin/log-only-today" = false;
+          "plugin/show-in-menu" = "show-all";
+          "plugins/plugin-1" = "applicationsmenu";
+          "plugins/plugin-1/button-icon" = "org.xfce.panel.applicationsmenu";
+          "plugins/plugin-1/button-title" =  "Applications";
+          "plugins/plugin-1/custom-menu" = false;
+          "plugins/plugin-1/show-button-title" = false;
+          "plugins/plugin-1/show-generic-names" = false;
+          "plugins/plugin-1/show-menu-icons" = true;
+          "plugins/plugin-1/show-tooltips" = false;
+          "plugins/plugin-1/small" = true; # show on one line
+          "plugins/plugin-3" = "separator";
+          "plugins/plugin-3/expand" = true;
+          "plugins/plugin-3/style" = 0;
+          "plugins/plugin-6" = "systray";
+          "plugins/plugin-6/hide-new-items" = false;
+          "plugins/plugin-6/icon-size" = 16;
+          "plugins/plugin-6/known-legacy-items" = [
+            "ethernet network connection \"wired connection 1\" active"
+            "networkmanager applet"
+            "xfce4-power-manager"
+          ];
+          "plugins/plugin-6/menu-is-primary" = false; # must right click for menu
+          "plugins/plugin-6/single-row" = false;
+          "plugins/plugin-6/square-icons" = true;
+          "plugins/plugin-6/symbolic-icons" = false;
+          "plugins/plugin-8" = "pulseaudio";
+          "plugins/plugin-8/enable-keyboard-shortcuts" = true; # volume keys
+          "plugins/plugin-8/enable-mpris" = true; # control media players
+          "plugins/plugin-8/enable-multimedia-keys" = true; # media player keys
+          "plugins/plugin-8/mixer-command" =  "pavucontrol";
+          "plugins/plugin-8/play-sound" = true; # play volume adjustment sound
+          "plugins/plugin-8/show-notifications" = 1; # all
+          "plugins/plugin-8/volume-step" = 5;
+          "plugins/plugin-9" = "power-manager-plugin";
+          "plugins/plugin-10" = "notification-plugin";
+          "plugins/plugin-12" = "clock";
+          "plugins/plugin-12/command" = "";
+          "plugins/plugin-12/digital-layout" = 3; # full date
+          "plugins/plugin-12/digital-time-font" = "B612 Bold 11";
+          "plugins/plugin-12/digital-time-format" = "%R"; # hh:mm
+          "plugins/plugin-12/mode" = 2; # digital
+          "plugins/plugin-12/timezone" = "";
+          "plugins/plugin-14" = "actions";
+          "plugins/plugin-14/appearance" = 0; # action buttons
+          "plugins/plugin-14/ask-confirmation" = false;
+          "plugins/plugin-14/items" = [
+            "+suspend"
+            "+hybrid-sleep"
+            "+logout"
+            "-separator"
+            "-switch-user"
+            "-hibernate"
+            "-shutdown"
+            "-restart"
+            "-logout-dialog"
+            "-lock-screen"
+          ];
         };
         xfce4-power-manager = {
           "xfce4-power-manager/battery-button-action" = 0; # nothing
@@ -98,6 +142,7 @@ in {
           "xfce4-power-manager/lock-screen-suspend-hibernate" = true;
           "xfce4-power-manager/power-button-action" = 2; # hibernate
           "xfce4-power-manager/show-panel-label" = 1;
+          "xfce4-power-manager/show-presentation-indicator" = true;
           "xfce4-power-manager/show-tray-icon" = false;
           "xfce4-power-manager/sleep-button-action" = 1; # suspend
         };
