@@ -96,12 +96,6 @@ in {
           "xfce4-power-manager/inactivity-sleep-mode-on-ac" = 1; # suspend
           "xfce4-power-manager/inactivity-sleep-mode-on-battery" = 1; # suspend
           "xfce4-power-manager/lock-screen-suspend-hibernate" = true;
-          # xfce4-power-manager does not seem to support hybrid-sleep, so let logind handle the lid
-          # switch
-          #
-          # https://forum.xfce.org/viewtopic.php?id=13918
-          # https://gitlab.xfce.org/xfce/xfce4-power-manager/-/issues/7
-          "xfce4-power-manager/logind-handle-lid-switch" = true;
           "xfce4-power-manager/power-button-action" = 2; # hibernate
           "xfce4-power-manager/show-panel-label" = 1;
           "xfce4-power-manager/show-tray-icon" = false;
