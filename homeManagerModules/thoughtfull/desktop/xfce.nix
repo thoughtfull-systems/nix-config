@@ -146,7 +146,7 @@ in {
           ];
           "plugins/plugin-15" = "separator";
           "plugins/plugin-15/expand" = false;
-          "plugins/plugin-15/style" = 1; # transparent
+          "plugins/plugin-15/style" = 1; # separator
           "plugins/plugin-16" = "directorymenu";
           "plugins/plugin-16/base-directory" = "/home/paul";
           "plugins/plugin-16/hidden-files" = false;
