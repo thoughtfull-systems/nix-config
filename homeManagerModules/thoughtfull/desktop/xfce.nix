@@ -71,7 +71,7 @@ in {
           "plugins/plugin-1/small" = true; # show on one line
           "plugins/plugin-3" = "separator";
           "plugins/plugin-3/expand" = true;
-          "plugins/plugin-3/style" = 0;
+          "plugins/plugin-3/style" = 0; # transparent
           "plugins/plugin-6" = "systray";
           "plugins/plugin-6/hide-new-items" = false;
           "plugins/plugin-6/icon-size" = 16;
@@ -118,7 +118,7 @@ in {
           ];
           "plugins/plugin-15" = "separator";
           "plugins/plugin-15/expand" = false;
-          "plugins/plugin-15/style" = 0;
+          "plugins/plugin-15/style" = 0; # transparent
           "plugins/plugin-16" = "directorymenu";
           "plugins/plugin-16/base-directory" = "/home/paul";
           "plugins/plugin-16/hidden-files" = false;
