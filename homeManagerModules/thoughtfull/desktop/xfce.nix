@@ -77,7 +77,7 @@ in {
           "panels/panel-1/length-adjust" = true;
           "panels/panel-1/mode" = 0;
           "panels/panel-1/nrows" = 1;
-          "panels/panel-1/plugin-ids" = [ 1 16 3 17 6 8 9 10 12 18 15 14 ];
+          "panels/panel-1/plugin-ids" = [ 1 16 3 6 17 8 10 9 19 12 18 15 14 ];
           "panels/panel-1/position" = "p=6;x=0;y=0";
           "panels/panel-1/position-locked" = true;
           "panels/panel-1/size" = 26;
@@ -178,6 +178,9 @@ in {
           "plugins/plugin-18/units/pressure" = 2; # psi
           "plugins/plugin-18/units/temperature" = 1; # fahrenheit
           "plugins/plugin-18/units/windspeed" = 1; # mph
+          "plugins/plugin-19" = "separator";
+          "plugins/plugin-19/expand" = false;
+          "plugins/plugin-19/style" = 1; # separator
         };
         xfce4-power-manager = {
           "xfce4-power-manager/battery-button-action" = 0; # nothing
