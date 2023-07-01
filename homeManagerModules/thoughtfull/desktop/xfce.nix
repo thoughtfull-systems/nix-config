@@ -49,7 +49,7 @@ in {
           "panels/panel-1/length-adjust" = true;
           "panels/panel-1/mode" = 0;
           "panels/panel-1/nrows" = 1;
-          "panels/panel-1/plugin-ids" = [ 1 3 6 8 9 10 12 14 ];
+          "panels/panel-1/plugin-ids" = [ 1 15 16 3 6 8 9 10 12 14 ];
           "panels/panel-1/position" = "p=6;x=0;y=0";
           "panels/panel-1/position-locked" = true;
           "panels/panel-1/size" = 26;
@@ -116,6 +116,15 @@ in {
             "-logout-dialog"
             "-lock-screen"
           ];
+          "plugins/plugin-15" = "separator";
+          "plugins/plugin-15/expand" = false;
+          "plugins/plugin-15/style" = 0;
+          "plugins/plugin-16" = "directorymenu";
+          "plugins/plugin-16/base-directory" = "/home/paul";
+          "plugins/plugin-16/hidden-files" = false;
+          "plugins/plugin-16/new-document" = false;
+          "plugins/plugin-16/new-folder" = false;
+          "plugins/plugin-16/open-in-terminal" = false;
         };
         xfce4-power-manager = {
           "xfce4-power-manager/battery-button-action" = 0; # nothing
