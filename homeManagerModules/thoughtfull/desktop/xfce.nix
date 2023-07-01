@@ -77,7 +77,7 @@ in {
           "panels/panel-1/length-adjust" = true;
           "panels/panel-1/mode" = 0;
           "panels/panel-1/nrows" = 1;
-          "panels/panel-1/plugin-ids" = [ 1 15 16 3 6 8 9 10 12 14 ];
+          "panels/panel-1/plugin-ids" = [ 1 15 16 3 17 6 8 9 10 12 14 ];
           "panels/panel-1/position" = "p=6;x=0;y=0";
           "panels/panel-1/position-locked" = true;
           "panels/panel-1/size" = 26;
@@ -153,6 +153,13 @@ in {
           "plugins/plugin-16/new-document" = false;
           "plugins/plugin-16/new-folder" = false;
           "plugins/plugin-16/open-in-terminal" = false;
+          "plugins/plugin-17" = "xkb";
+          "plugins/plugin-17/display-type" = 0; # image
+          "plugins/plugin-17/display-name" = 0; # country
+          "plugins/plugin-17/display-scale" = 80;
+          "plugins/plugin-17/show-notifications" = false;
+          "plugins/plugin-17/display-tooltip-icon" = false;
+          "plugins/plugin-17/group-policy" = 0; # configure globally
         };
         xfce4-power-manager = {
           "xfce4-power-manager/battery-button-action" = 0; # nothing

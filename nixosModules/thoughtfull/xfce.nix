@@ -12,6 +12,9 @@ lib.mkIf config.services.xserver.desktopManager.xfce.enable {
       };
     })
   ];
+  environment.systemPackages = [
+    pkgs.xfce.xfce4-xkb-plugin
+  ];
   services = {
     xserver.desktopManager.xfce = {
       # without desktop I get the default X cursor over the panel; not a big deal, but I don't like
