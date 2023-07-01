@@ -74,13 +74,47 @@ in {
           "theme"  = "Default";
         };
         xfce4-power-manager = {
+          "xfce4-power-manager/battery-button-action" = 0; # nothing
+          "xfce4-power-manager/blank-on-ac" = 0; # never
+          "xfce4-power-manager/blank-on-battery" = 0;
+          "xfce4-power-manager/brightness-level-on-ac" = 100;
+          "xfce4-power-manager/brightness-level-on-battery" = 100;
+          "xfce4-power-manager/brightness-on-ac" = 9; # never
+          "xfce4-power-manager/brightness-on-battery" = 9; # never
+          "xfce4-power-manager/critical-power-action" = 2; # hibernate
+          "xfce4-power-manager/critical-power-level" = 10;
+          "xfce4-power-manager/dpms-enabled" = true; # sleep display after inactivity?
+          "xfce4-power-manager/dpms-on-ac-off" = 0; # never
+          "xfce4-power-manager/dpms-on-ac-sleep" = 0; # never
+          "xfce4-power-manager/dpms-on-battery-off" = 0;
+          "xfce4-power-manager/dpms-on-battery-sleep" = 10;
+          "xfce4-power-manager/general-notification" = false;
+          "xfce4-power-manager/handle-brightness-keys" = true;
+          "xfce4-power-manager/hibernate-button-action" = 2; # hibernate
+          "xfce4-power-manager/inactivity-on-ac" = 14; # never
+          "xfce4-power-manager/inactivity-on-battery" = 20;
+          "xfce4-power-manager/inactivity-sleep-mode-on-ac" = 1; # suspend
+          "xfce4-power-manager/inactivity-sleep-mode-on-battery" = 1; # suspend
+          "xfce4-power-manager/lock-screen-suspend-hibernate" = true;
           # xfce4-power-manager does not seem to support hybrid-sleep, so let logind handle the lid
           # switch
           #
           # https://forum.xfce.org/viewtopic.php?id=13918
           # https://gitlab.xfce.org/xfce/xfce4-power-manager/-/issues/7
           "xfce4-power-manager/logind-handle-lid-switch" = true;
+          "xfce4-power-manager/power-button-action" = 2; # hibernate
           "xfce4-power-manager/show-panel-label" = 1;
+          "xfce4-power-manager/show-tray-icon" = false;
+          "xfce4-power-manager/sleep-button-action" = 1; # suspend
+        };
+        xfce4-screensaver = {
+          "lock/embedded-keyboard/enabled" = false;
+          "lock/enabled" = true;
+          "lock/logout/enabled" = false;
+          "lock/saver-activation/enabled" = false;
+          "lock/status-messages/enabled" = true;
+          "lock/user-switching/enabled" = true;
+          "saver/enabled" = false;
         };
         xfce4-session = {
           "general/SaveOnExit" = false;
