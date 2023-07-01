@@ -16,6 +16,34 @@ in {
     '';
   };
   config = lib.mkIf enable {
+    services.picom.enable = true;
+    home.activation.xfconfUnsettings = lib.hm.dag.entryAfter [ "installPackages" ]
+      (let
+        mkCommand = channel: property: ''
+          $DRY_RUN_CMD ${pkgs.xfce.xfconf}/bin/xfconf-query \
+            ${
+              lib.escapeShellArgs
+                ([ "-r" "-c" channel "-p" "/${property}" ])
+            }
+        '';
+
+        commands = lib.mapAttrsToList
+          (channel: properties: map (mkCommand channel) properties)
+          cfg.unsettings;
+
+        load = pkgs.writeShellScript "unset-xfconf"
+          (lib.concatMapStrings lib.concatStrings commands);
+      in ''
+        if [[ -v DBUS_SESSION_BUS_ADDRESS ]]; then
+          export DBUS_RUN_SESSION_CMD=""
+        else
+          export DBUS_RUN_SESSION_CMD="${pkgs.dbus}/bin/dbus-run-session --dbus-daemon=${pkgs.dbus}/bin/dbus-daemon"
+        fi
+
+        $DRY_RUN_CMD $DBUS_RUN_SESSION_CMD ${load}
+
+        unset DBUS_RUN_SESSION_CMD
+      '');
     xfconf = {
       settings = {
         pointers = {
@@ -215,32 +243,5 @@ in {
         ];
       };
     };
-    home.activation.xfconfUnsettings = lib.hm.dag.entryAfter [ "installPackages" ]
-      (let
-        mkCommand = channel: property: ''
-          $DRY_RUN_CMD ${pkgs.xfce.xfconf}/bin/xfconf-query \
-            ${
-              lib.escapeShellArgs
-                ([ "-r" "-c" channel "-p" "/${property}" ])
-            }
-        '';
-
-        commands = lib.mapAttrsToList
-          (channel: properties: map (mkCommand channel) properties)
-          cfg.unsettings;
-
-        load = pkgs.writeShellScript "unset-xfconf"
-          (lib.concatMapStrings lib.concatStrings commands);
-      in ''
-        if [[ -v DBUS_SESSION_BUS_ADDRESS ]]; then
-          export DBUS_RUN_SESSION_CMD=""
-        else
-          export DBUS_RUN_SESSION_CMD="${pkgs.dbus}/bin/dbus-run-session --dbus-daemon=${pkgs.dbus}/bin/dbus-daemon"
-        fi
-
-        $DRY_RUN_CMD $DBUS_RUN_SESSION_CMD ${load}
-
-        unset DBUS_RUN_SESSION_CMD
-      '');
   };
 }
