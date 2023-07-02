@@ -1,0 +1,25 @@
+#!@bash@
+
+RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$UID}"
+SOCKET="${RUNTIME_DIR}/yubikey-touch-detector.socket"
+STATUS_FILE="${1:-${RUNTIME_DIR}/yubikey-waiting}"
+
+echo "Using ${SOCKET} socket"
+echo "Using ${STATUS_FILE} status file"
+
+mkdir -p $(dirname ${STATUS_FILE})
+
+if [ -S "${SOCKET}" ]; then
+  nc -U $SOCKET | while read -N 5 cmd; do
+    if [ "${cmd:4:1}" = "1" ]; then
+      echo "yubikey is waiting for touch"
+      touch ${STATUS_FILE}
+    else
+      echo "yubikey is no longer waiting for touch"
+      rm ${STATUS_FILE}
+    fi
+  done
+else
+  echo "yubikey-touch-detector socket not found: ${SOCKET}" >&2
+  exit 1
+fi

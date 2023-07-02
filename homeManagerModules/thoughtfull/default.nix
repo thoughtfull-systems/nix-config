@@ -14,6 +14,7 @@
     ./syncthing.nix
     ./tmux.nix
     ./yabar.nix
+    ./yubikey.nix
     ./zsh.nix
   ];
   systemd.user.startServices = "sd-switch";

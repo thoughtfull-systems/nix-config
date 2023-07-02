@@ -4,4 +4,5 @@ nixpkgs: {
   keyboard = import ./keyboard nixpkgs;
   mic = import ./mic nixpkgs;
   speaker = import ./speaker nixpkgs;
+  yubikey-touch-status = import ./yubikey-touch-detector-status nixpkgs;
 }
