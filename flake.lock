@@ -65,15 +65,15 @@
         ]
       },
       "locked": {
-        "lastModified": 1687871164,
-        "narHash": "sha256-bBFlPthuYX322xOlpJvkjUBz0C+MOBjZdDOOJJ+G2jU=",
-        "owner": "nix-community",
+        "lastModified": 1688493856,
+        "narHash": "sha256-edIvYl+1qPsfWVvmMJvPafODW2H5mMnpXRpoJUHa8c4=",
+        "owner": "thoughtfull-systems",
         "repo": "home-manager",
-        "rev": "07c347bb50994691d7b0095f45ebd8838cf6bc38",
+        "rev": "74c31c6ff8dfb739628269c256af6d9a2ea5fbf4",
         "type": "github"
       },
       "original": {
-        "owner": "nix-community",
+        "owner": "thoughtfull-systems",
         "ref": "release-23.05",
         "repo": "home-manager",
         "type": "github"
@@ -97,15 +97,15 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1687829761,
-        "narHash": "sha256-QRe1Y8SS3M4GeC58F/6ajz6V0ZLUVWX3ZAMgov2N3/g=",
-        "owner": "nixos",
+        "lastModified": 1688492622,
+        "narHash": "sha256-b4YQvWPsLj6S7kIUR9fC09c4ms+HTYkCoAdSg9Gy3rI=",
+        "owner": "thoughtfull-systems",
         "repo": "nixpkgs",
-        "rev": "9790f3242da2152d5aa1976e3e4b8b414f4dd206",
+        "rev": "46b6d7271ec01fd27921c69c16a2ffbf75130127",
         "type": "github"
       },
       "original": {
-        "owner": "nixos",
+        "owner": "thoughtfull-systems",
         "ref": "nixos-23.05",
         "repo": "nixpkgs",
         "type": "github"
