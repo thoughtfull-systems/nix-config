@@ -69,7 +69,7 @@ in lib.mkIf enable {
         "panels/panel-1/leave-opacity" = uint 100;
         "panels/panel-1/length" = 100.0;
         "panels/panel-1/length-adjust" = true;
-        "panels/panel-1/mode" = uint 0;
+        "panels/panel-1/mode" = uint 0; # horizontal
         "panels/panel-1/nrows" = uint 1;
         "panels/panel-1/plugin-ids" = [ 1 16 3 20 6 17 8 10 9 19 12 18 15 14 ];
         "panels/panel-1/position" = "p=6;x=0;y=0";
@@ -179,7 +179,7 @@ in lib.mkIf enable {
       xfce4-power-manager = {
         "xfce4-power-manager/battery-button-action" = uint 0; # nothing
         "xfce4-power-manager/blank-on-ac" = 0; # never
-        "xfce4-power-manager/blank-on-battery" = 0;
+        "xfce4-power-manager/blank-on-battery" = 0; # never
         "xfce4-power-manager/brightness-level-on-ac" = uint 100;
         "xfce4-power-manager/brightness-level-on-battery" = uint 100;
         "xfce4-power-manager/brightness-on-ac" = uint 9; # never
@@ -189,7 +189,7 @@ in lib.mkIf enable {
         "xfce4-power-manager/dpms-enabled" = true; # sleep display after inactivity?
         "xfce4-power-manager/dpms-on-ac-off" = uint 0; # never
         "xfce4-power-manager/dpms-on-ac-sleep" = uint 0; # never
-        "xfce4-power-manager/dpms-on-battery-off" = uint 0;
+        "xfce4-power-manager/dpms-on-battery-off" = uint 10;
         "xfce4-power-manager/dpms-on-battery-sleep" = uint 10;
         "xfce4-power-manager/general-notification" = false;
         "xfce4-power-manager/handle-brightness-keys" = true;
@@ -200,7 +200,7 @@ in lib.mkIf enable {
         "xfce4-power-manager/inactivity-sleep-mode-on-battery" = uint 1; # suspend
         "xfce4-power-manager/lock-screen-suspend-hibernate" = true;
         "xfce4-power-manager/power-button-action" = uint 2; # hibernate
-        "xfce4-power-manager/show-panel-label" = 1;
+        "xfce4-power-manager/show-panel-label" = 1; # percentage
         "xfce4-power-manager/show-presentation-indicator" = true;
         "xfce4-power-manager/show-tray-icon" = false;
         "xfce4-power-manager/sleep-button-action" = uint 1; # suspend
