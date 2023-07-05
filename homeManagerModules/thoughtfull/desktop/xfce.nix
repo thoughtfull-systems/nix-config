@@ -63,7 +63,7 @@ in lib.mkIf enable {
         "panels/panel-1/length-adjust" = true;
         "panels/panel-1/mode" = 0;
         "panels/panel-1/nrows" = 1;
-        "panels/panel-1/plugin-ids" = [ 1 16 3 6 17 8 10 9 19 12 18 15 14 ];
+        "panels/panel-1/plugin-ids" = [ 1 16 3 20 6 17 8 10 9 19 12 18 15 14 ];
         "panels/panel-1/position" = "p=6;x=0;y=0";
         "panels/panel-1/position-locked" = true;
         "panels/panel-1/size" = 26;
@@ -167,6 +167,13 @@ in lib.mkIf enable {
         "plugins/plugin-19" = "separator";
         "plugins/plugin-19/expand" = false;
         "plugins/plugin-19/style" = 1; # separator
+        "plugins/plugin-20" = "genmon";
+        "plugins/plugin-20/command" = "${pkgs.thoughtfull.yubikey-touch-plugin}/bin/yubikey-touch-plugin";
+        "plugins/plugin-20/enable-single-row" = true;
+        "plugins/plugin-20/font" = "B612 11";
+        "plugins/plugin-20/text" = "";
+        "plugins/plugin-20/update-period" = 250;
+        "plugins/plugin-20/use-label" = false;
       };
       xfce4-power-manager = {
         "xfce4-power-manager/battery-button-action" = 0; # nothing

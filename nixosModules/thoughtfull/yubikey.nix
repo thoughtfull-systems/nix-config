@@ -1,6 +1,7 @@
 { pkgs, ... }: {
   environment.systemPackages = with pkgs; [
     age-plugin-yubikey
+    xfce.xfce4-genmon-plugin
     yubikey-manager
     yubikey-manager-qt
   ] ++
