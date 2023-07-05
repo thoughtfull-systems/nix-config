@@ -1,15 +1,11 @@
 nixpkgs: let
   yubikey-touch-plugin = nixpkgs.substituteAll {
-    bash = "${nixpkgs.bash}/bin/bash";
     isExecutable = true;
     src = ./yubikey-touch-plugin;
   };
   yubikey-touch-plugin-updater = nixpkgs.substituteAll {
-    bash = "${nixpkgs.bash}/bin/bash";
-    convert = "${nixpkgs.imagemagick}/bin/convert";
     isExecutable = true;
     not_waiting = not-waiting;
-    notify = "${nixpkgs.notify-desktop}/bin/notify-desktop";
     src = ./yubikey-touch-plugin-updater;
     waiting = waiting;
   };

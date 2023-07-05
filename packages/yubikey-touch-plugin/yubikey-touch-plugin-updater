@@ -1,4 +1,4 @@
-#!@bash@
+#!/usr/bin/env bash
 
 RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$UID}"
 SOCKET="${RUNTIME_DIR}/yubikey-touch-detector.socket"
@@ -17,7 +17,7 @@ echo "Using not waiting image: ${NOT_WAITING_IMG}"
 echo "Using waiting image: ${WAITING_IMG}"
 
 [ -f "${NOT_WAITING_IMG}" ] ||
-  @convert@ -resize ${SIZE}x${SIZE} @not_waiting@ "${NOT_WAITING_IMG}"
+  convert -resize ${SIZE}x${SIZE} @not_waiting@ "${NOT_WAITING_IMG}"
 echo "<img>${NOT_WAITING_IMG}</img><tool>Yubikey is not waiting for touch</tool>" > "${STATUS_FILE}"
 
 
@@ -25,13 +25,13 @@ if [ -S "${SOCKET}" ]; then
   nc -U "${SOCKET}" | while read -N 5 cmd; do
     (if [ "${cmd:4:1}" = "1" ]; then
        [ -f "${WAITING_IMG}" ] ||
-         @convert@ -resize ${SIZE}x${SIZE} @waiting@ "${WAITING_IMG}"
-       @notify@ -r 1877223 -i @waiting@ -t0 "Yubikey touch" "Yubikey is waiting for touch..."
+         convert -resize ${SIZE}x${SIZE} @waiting@ "${WAITING_IMG}"
+       notify-desktop -r 1877223 -i @waiting@ -t0 "Yubikey" "Yubikey is waiting for touch..."
        echo "<img>${WAITING_IMG}</img><tool>Yubikey is waiting for touch...</tool>"
      else
        [ -f "${NOT_WAITING_IMG}" ] ||
-         @convert@ -resize ${SIZE}x${SIZE} @not_waiting@ "${NOT_WAITING_IMG}"
-       @notify@ -r 1877223 -i @waiting@ -t1 "Yubikey touch" "Yubikey is waiting for touch..."
+         convert -resize ${SIZE}x${SIZE} @not_waiting@ "${NOT_WAITING_IMG}"
+       notify-desktop -r 1877223 -i @waiting@ -t1 "Yubikey" "Yubikey is waiting for touch..."
        echo "<img>${NOT_WAITING_IMG}</img><tool>Yubikey is not waiting for touch</tool>"
      fi) >"${STATUS_FILE}"
   done
