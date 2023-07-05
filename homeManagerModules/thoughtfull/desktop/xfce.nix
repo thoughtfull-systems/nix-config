@@ -2,6 +2,7 @@
   cfg = config.xfconf;
   enable = config.thoughtfull.desktop.enable &&
            osConfig.services.xserver.desktopManager.xfce.enable;
+  uint = value: { type = "uint"; value = value; };
 in lib.mkIf enable {
   services.picom.enable = true;
   xfconf = {
@@ -44,29 +45,7 @@ in lib.mkIf enable {
         "gauge-ignores-dnd" = true; # show volume changes even with DnD
         "initial-opacity" = 0.8;
         "notification-display-fields" = "icon-summary-body";
-        "notify-location" = { type = "uint"; value = 1; }; # show bottom left corner
-        "primary-monitor" = 0; # show on monitor with mouse pointer
-        "show-text-with-gauge" = true; # show percentage with volume change
-        "theme"  = "Default";
-      };
-      xfce4-panel = {
-        "configver" = 2;
-        "panels" = [ 1 ];
-        "panels/dark-mode" = false;
-        "panels/panel-1/autohide-behavior" = 0; # never
-        "panels/panel-1/background-style" = 0; # use system style
-        "panels/panel-1/enable-struts" = true;
-        "panels/panel-1/enter-opacity" = 100;
-        "panels/panel-1/icon-size" = 16;
-        "panels/panel-1/leave-opacity" = 100;
-        "panels/panel-1/length" = 100.0;
-        "panels/panel-1/length-adjust" = true;
-        "panels/panel-1/mode" = 0;
-        "panels/panel-1/nrows" = 1;
-        "panels/panel-1/plugin-ids" = [ 1 16 3 20 6 17 8 10 9 19 12 18 15 14 ];
-        "panels/panel-1/position" = "p=6;x=0;y=0";
-        "panels/panel-1/position-locked" = true;
-        "panels/panel-1/size" = 26;
+        "notify-location" = uint 1; # show bottom left corner
         "plugin/after-menu-shown" = "mark-all-read";
         "plugin/hide-clear-prompt" = false;
         "plugin/hide-on-read" = false;
@@ -74,6 +53,28 @@ in lib.mkIf enable {
         "plugin/log-icon-size" = 16;
         "plugin/log-only-today" = false;
         "plugin/show-in-menu" = "show-all";
+        "primary-monitor" = uint 0; # show on monitor with mouse pointer
+        "show-text-with-gauge" = true; # show percentage with volume change
+        "theme"  = "Default";
+      };
+      xfce4-panel = {
+        "configver" = 2;
+        "panels" = [ 1 ];
+        "panels/dark-mode" = false;
+        "panels/panel-1/autohide-behavior" = uint 0; # never
+        "panels/panel-1/background-style" = uint 0; # use system style
+        "panels/panel-1/enable-struts" = true;
+        "panels/panel-1/enter-opacity" = uint 100;
+        "panels/panel-1/icon-size" = uint 16;
+        "panels/panel-1/leave-opacity" = uint 100;
+        "panels/panel-1/length" = 100.0;
+        "panels/panel-1/length-adjust" = true;
+        "panels/panel-1/mode" = uint 0;
+        "panels/panel-1/nrows" = uint 1;
+        "panels/panel-1/plugin-ids" = [ 1 16 3 20 6 17 8 10 9 19 12 18 15 14 ];
+        "panels/panel-1/position" = "p=6;x=0;y=0";
+        "panels/panel-1/position-locked" = true;
+        "panels/panel-1/size" = uint 26;
         "plugins/plugin-1" = "applicationsmenu";
         "plugins/plugin-1/button-icon" = "org.xfce.panel.applicationsmenu";
         "plugins/plugin-1/button-title" =  "Applications";
@@ -85,7 +86,7 @@ in lib.mkIf enable {
         "plugins/plugin-1/small" = true; # show on one line
         "plugins/plugin-3" = "separator";
         "plugins/plugin-3/expand" = true;
-        "plugins/plugin-3/style" = 0; # transparent
+        "plugins/plugin-3/style" = uint 0; # transparent
         "plugins/plugin-6" = "systray";
         "plugins/plugin-6/hide-new-items" = false;
         "plugins/plugin-6/icon-size" = 16;
@@ -104,19 +105,19 @@ in lib.mkIf enable {
         "plugins/plugin-8/enable-multimedia-keys" = true; # media player keys
         "plugins/plugin-8/mixer-command" =  "pavucontrol";
         "plugins/plugin-8/play-sound" = true; # play volume adjustment sound
-        "plugins/plugin-8/show-notifications" = 1; # all
-        "plugins/plugin-8/volume-step" = 5;
+        "plugins/plugin-8/show-notifications" = uint 1; # all
+        "plugins/plugin-8/volume-step" = uint 5;
         "plugins/plugin-9" = "power-manager-plugin";
         "plugins/plugin-10" = "notification-plugin";
         "plugins/plugin-12" = "clock";
         "plugins/plugin-12/command" = "";
-        "plugins/plugin-12/digital-layout" = 3; # full date
+        "plugins/plugin-12/digital-layout" = uint 3; # full date
         "plugins/plugin-12/digital-time-font" = "B612 11";
         "plugins/plugin-12/digital-time-format" = "%R"; # hh:mm
-        "plugins/plugin-12/mode" = 2; # digital
+        "plugins/plugin-12/mode" = uint 2; # digital
         "plugins/plugin-12/timezone" = "";
         "plugins/plugin-14" = "actions";
-        "plugins/plugin-14/appearance" = 0; # action buttons
+        "plugins/plugin-14/appearance" = uint 0; # action buttons
         "plugins/plugin-14/ask-confirmation" = false;
         "plugins/plugin-14/items" = [
           "+suspend"
@@ -132,7 +133,7 @@ in lib.mkIf enable {
         ];
         "plugins/plugin-15" = "separator";
         "plugins/plugin-15/expand" = false;
-        "plugins/plugin-15/style" = 1; # separator
+        "plugins/plugin-15/style" = uint 1; # separator
         "plugins/plugin-16" = "directorymenu";
         "plugins/plugin-16/base-directory" = "/home/paul";
         "plugins/plugin-16/hidden-files" = false;
@@ -140,12 +141,12 @@ in lib.mkIf enable {
         "plugins/plugin-16/new-folder" = false;
         "plugins/plugin-16/open-in-terminal" = false;
         "plugins/plugin-17" = "xkb";
-        "plugins/plugin-17/display-type" = 0; # image
-        "plugins/plugin-17/display-name" = 0; # country
-        "plugins/plugin-17/display-scale" = 80;
+        "plugins/plugin-17/display-type" = uint 0; # image
+        "plugins/plugin-17/display-name" = uint 0; # country
+        "plugins/plugin-17/display-scale" = uint 80;
         "plugins/plugin-17/show-notifications" = false;
         "plugins/plugin-17/display-tooltip-icon" = false;
-        "plugins/plugin-17/group-policy" = 0; # configure globally
+        "plugins/plugin-17/group-policy" = uint 0; # configure globally
         "plugins/plugin-18" = "weather";
         "plugins/plugin-18/forecast/days" = 5;
         "plugins/plugin-18/forecast/layout" = 0; # columns
@@ -166,7 +167,7 @@ in lib.mkIf enable {
         "plugins/plugin-18/units/windspeed" = 1; # mph
         "plugins/plugin-19" = "separator";
         "plugins/plugin-19/expand" = false;
-        "plugins/plugin-19/style" = 1; # separator
+        "plugins/plugin-19/style" = uint 1; # separator
         "plugins/plugin-20" = "genmon";
         "plugins/plugin-20/command" = "${pkgs.thoughtfull.yubikey-touch-plugin}/bin/yubikey-touch-plugin";
         "plugins/plugin-20/enable-single-row" = true;
@@ -176,33 +177,33 @@ in lib.mkIf enable {
         "plugins/plugin-20/use-label" = false;
       };
       xfce4-power-manager = {
-        "xfce4-power-manager/battery-button-action" = 0; # nothing
+        "xfce4-power-manager/battery-button-action" = uint 0; # nothing
         "xfce4-power-manager/blank-on-ac" = 0; # never
         "xfce4-power-manager/blank-on-battery" = 0;
-        "xfce4-power-manager/brightness-level-on-ac" = 100;
-        "xfce4-power-manager/brightness-level-on-battery" = 100;
-        "xfce4-power-manager/brightness-on-ac" = 9; # never
-        "xfce4-power-manager/brightness-on-battery" = 9; # never
-        "xfce4-power-manager/critical-power-action" = 2; # hibernate
-        "xfce4-power-manager/critical-power-level" = 10;
+        "xfce4-power-manager/brightness-level-on-ac" = uint 100;
+        "xfce4-power-manager/brightness-level-on-battery" = uint 100;
+        "xfce4-power-manager/brightness-on-ac" = uint 9; # never
+        "xfce4-power-manager/brightness-on-battery" = uint 9; # never
+        "xfce4-power-manager/critical-power-action" = uint 2; # hibernate
+        "xfce4-power-manager/critical-power-level" = uint 10;
         "xfce4-power-manager/dpms-enabled" = true; # sleep display after inactivity?
-        "xfce4-power-manager/dpms-on-ac-off" = 0; # never
-        "xfce4-power-manager/dpms-on-ac-sleep" = 0; # never
-        "xfce4-power-manager/dpms-on-battery-off" = 0;
-        "xfce4-power-manager/dpms-on-battery-sleep" = 10;
+        "xfce4-power-manager/dpms-on-ac-off" = uint 0; # never
+        "xfce4-power-manager/dpms-on-ac-sleep" = uint 0; # never
+        "xfce4-power-manager/dpms-on-battery-off" = uint 0;
+        "xfce4-power-manager/dpms-on-battery-sleep" = uint 10;
         "xfce4-power-manager/general-notification" = false;
         "xfce4-power-manager/handle-brightness-keys" = true;
-        "xfce4-power-manager/hibernate-button-action" = 2; # hibernate
-        "xfce4-power-manager/inactivity-on-ac" = 14; # never
-        "xfce4-power-manager/inactivity-on-battery" = 20;
-        "xfce4-power-manager/inactivity-sleep-mode-on-ac" = 1; # suspend
-        "xfce4-power-manager/inactivity-sleep-mode-on-battery" = 1; # suspend
+        "xfce4-power-manager/hibernate-button-action" = uint 2; # hibernate
+        "xfce4-power-manager/inactivity-on-ac" = uint 14; # never
+        "xfce4-power-manager/inactivity-on-battery" = uint 20;
+        "xfce4-power-manager/inactivity-sleep-mode-on-ac" = uint 1; # suspend
+        "xfce4-power-manager/inactivity-sleep-mode-on-battery" = uint 1; # suspend
         "xfce4-power-manager/lock-screen-suspend-hibernate" = true;
-        "xfce4-power-manager/power-button-action" = 2; # hibernate
+        "xfce4-power-manager/power-button-action" = uint 2; # hibernate
         "xfce4-power-manager/show-panel-label" = 1;
         "xfce4-power-manager/show-presentation-indicator" = true;
         "xfce4-power-manager/show-tray-icon" = false;
-        "xfce4-power-manager/sleep-button-action" = 1; # suspend
+        "xfce4-power-manager/sleep-button-action" = uint 1; # suspend
       };
       xfce4-screensaver = {
         "lock/embedded-keyboard/enabled" = false;
