@@ -212,6 +212,7 @@ in lib.mkIf enable {
         "xfce4-power-manager/sleep-button-action" = uint 1; # suspend
       };
       xfce4-session = {
+        "sessions/Failsafe/Client0_Command" = [ "${pkgs.thoughtfull.exwm-trampoline}/bin/exwm-trampoline" ];
         "general/SaveOnExit" = false;
       };
       xsettings = {

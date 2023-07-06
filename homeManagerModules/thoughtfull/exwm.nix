@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }: let
+{ config, lib, osConfig, pkgs, ... }: let
   cfg = config.thoughtfull.exwm;
   desktop = config.thoughtfull.desktop.enable;
 in {
@@ -19,7 +19,8 @@ in {
     };
     xsession = {
       enable = true;
-      initExtra = lib.mkAfter "[ ! -f $\{HOME}/.noexwm ] && exwm-trampoline &";
+      initExtra = lib.mkIf (!osConfig.services.xserver.desktopManager.xfce.enable)
+        (lib.mkAfter "[ ! -f $\{HOME}/.noexwm ] && exwm-trampoline &");
     };
   };
 }

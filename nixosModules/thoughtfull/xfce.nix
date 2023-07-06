@@ -19,6 +19,7 @@ lib.mkIf config.services.xserver.desktopManager.xfce.enable {
   environment.systemPackages = with pkgs; [
     # Since screen saver is disabled, use light-locker for screen locking
     lightlocker
+    xfce.xfce4-panel
     xfce.xfce4-xkb-plugin
     xfce.xfce4-weather-plugin
   ];
@@ -28,9 +29,7 @@ lib.mkIf config.services.xserver.desktopManager.xfce.enable {
         # Screensaver and power-manager fight for DPMS (display power management system), the best
         # way to resolve it is disable screensaver.
         enableScreensaver = lib.mkDefault false;
-        # Without desktop I get the default X cursor over the panel; not a big deal, but I don't
-        # like it
-        noDesktop = lib.mkDefault false;
+        noDesktop = lib.mkDefault true;
         enableXfwm = lib.mkDefault false;
       };
       displayManager.lightdm.enable = true;
