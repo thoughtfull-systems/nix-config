@@ -20,20 +20,22 @@ echo "Using waiting image: ${WAITING_IMG}"
   convert -resize ${SIZE}x${SIZE} @not_waiting@ "${NOT_WAITING_IMG}"
 echo "<img>${NOT_WAITING_IMG}</img><tool>Yubikey is not waiting for touch</tool>" > "${STATUS_FILE}"
 
-
 if [ -S "${SOCKET}" ]; then
   nc -U "${SOCKET}" | while read -N 5 cmd; do
-    (if [ "${cmd:4:1}" = "1" ]; then
-       [ -f "${WAITING_IMG}" ] ||
-         convert -resize ${SIZE}x${SIZE} @waiting@ "${WAITING_IMG}"
-       notify-desktop -r 1877223 -i @waiting@ -t0 "Yubikey" "Yubikey is waiting for touch..."
-       echo "<img>${WAITING_IMG}</img><tool>Yubikey is waiting for touch...</tool>"
-     else
-       [ -f "${NOT_WAITING_IMG}" ] ||
-         convert -resize ${SIZE}x${SIZE} @not_waiting@ "${NOT_WAITING_IMG}"
-       notify-desktop -r 1877223 -i @waiting@ -t1 "Yubikey" "Yubikey is waiting for touch..."
-       echo "<img>${NOT_WAITING_IMG}</img><tool>Yubikey is not waiting for touch</tool>"
-     fi) >"${STATUS_FILE}"
+    if [ "${cmd:4:1}" = "1" ]; then
+      [ -f "${WAITING_IMG}" ] ||
+        convert -resize ${SIZE}x${SIZE} @waiting@ "${WAITING_IMG}"
+      NID=$(notify-desktop -i @waiting@ -t0 "Yubikey" "Yubikey is waiting for touch...")
+      echo "<img>${WAITING_IMG}</img><tool>Yubikey is waiting for touch...</tool>" >"${STATUS_FILE}"
+    else
+      [ -f "${NOT_WAITING_IMG}" ] ||
+        convert -resize ${SIZE}x${SIZE} @not_waiting@ "${NOT_WAITING_IMG}"
+      if [ -v NID ]; then
+        notify-desktop -r ${NID} -i @waiting@ -t2 "Yubikey" "Yubikey is no longer waiting for touch"
+        unset NID
+      fi
+      echo "<img>${NOT_WAITING_IMG}</img><tool>Yubikey is not waiting for touch</tool>" >"${STATUS_FILE}"
+    fi
   done
 else
   echo "yubikey-touch-detector socket not found: ${SOCKET}" >&2

@@ -52,7 +52,7 @@ in lib.mkIf enable {
         "notification-log" = true;
         "notify-location" = uint 1; # show bottom left corner
         "plugin/after-menu-shown" = "mark-shown-read";
-        "plugin/hide-clear-prompt" = false;
+        "plugin/hide-clear-prompt" = true;
         "plugin/hide-on-read" = false;
         "plugin/log-display-limit" = 10;
         "plugin/log-icon-size" = 16;
