@@ -9,19 +9,32 @@ lib.mkIf config.services.xserver.desktopManager.xfce.enable {
               super.libcanberra
             ];
           }));
+        xfce4-power-manager = super.xfce.xfce4-power-manager.overrideAttrs (
+          (prevAttrs: {
+            patches = [ ./0001-Hybrid-Sleep-v2.2.patch ];
+          }));
       };
     })
   ];
-  environment.systemPackages = [
-    pkgs.xfce.xfce4-xkb-plugin
-    pkgs.xfce.xfce4-weather-plugin
+  environment.systemPackages = with pkgs; [
+    # Since screen saver is disabled, use light-locker for screen locking
+    lightlocker
+    xfce.xfce4-xkb-plugin
+    xfce.xfce4-weather-plugin
   ];
   services = {
-    xserver.desktopManager.xfce = {
-      # without desktop I get the default X cursor over the panel; not a big deal, but I don't like
-      # it
-      noDesktop = lib.mkDefault false;
-      enableXfwm = lib.mkDefault false;
+    xserver = {
+      desktopManager.xfce = {
+        # Screensaver and power-manager fight for DPMS (display power management system), the best
+        # way to resolve it is disable screensaver.
+        enableScreensaver = lib.mkDefault false;
+        # Without desktop I get the default X cursor over the panel; not a big deal, but I don't
+        # like it
+        noDesktop = lib.mkDefault false;
+        enableXfwm = lib.mkDefault false;
+      };
+      displayManager.lightdm.enable = true;
     };
+    logind.lidSwitch = "ignore";
   };
 }

@@ -19,7 +19,6 @@ inputs: { ... }: {
     ./tt-rss.nix
     ./vaultwarden.nix
     ./xfce.nix
-    ./xfce/hybrid-sleep.nix
     ./yubikey.nix
     ./zsh.nix
   ];
