@@ -20,6 +20,7 @@ lib.mkIf config.services.xserver.desktopManager.xfce.enable {
     # Since screen saver is disabled, use light-locker for screen locking
     lightlocker
     xfce.xfce4-panel
+    xfce.xfce4-pulseaudio-plugin
     xfce.xfce4-xkb-plugin
     xfce.xfce4-weather-plugin
   ];
