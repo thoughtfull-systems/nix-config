@@ -5,10 +5,6 @@
         "sd_mod"
         "usb_storage"
       ];
-      luks.devices.secure = {
-        device = "/dev/disk/by-uuid/b2edd8a5-48ae-4fa0-b539-9ecc6c095190";
-        preLVM = true;
-      };
     };
     loader = {
       efi.canTouchEfiVariables = true;
@@ -25,16 +21,6 @@
     unstable.ledger-live-desktop
     virt-manager
   ];
-  fileSystems = {
-    "/" = {
-      device = "/dev/disk/by-uuid/75fc9a6f-3ebc-4cf1-b588-89edde2574d7";
-      fsType = "ext4";
-    };
-    "/boot" = {
-      device = "/dev/disk/by-uuid/BC8B-B321";
-      fsType = "vfat";
-    };
-  };
   hardware = {
     acpilight.enable = true;
     enableAllFirmware = true;
@@ -43,6 +29,7 @@
     pulseaudio.enable = true;
   };
   imports = [
+    ./filesystems.nix
     ./hardware-configuration.nix
     ./paul.nix
     ./root.nix
@@ -56,9 +43,7 @@
   };
   nixpkgs.config.allowUnfree = true;
   programs = {
-    gnupg.agent = {
-      enable = true;
-    };
+    gnupg.agent.enable = true;
     ssh.extraConfig = ''
       Host *.local
         ForwardAgent yes
@@ -84,10 +69,6 @@
   services = {
     openssh.enable = true;
     printing.enable = true;
-    # supposedly a fix for CPU throttling on Lenovo/Intel, but it given an error
-    # saying that my CPU is not supported
-    #
-    # throttled.enable = true;
     trezord.enable = true;
     xserver = {
       desktopManager.xfce.enable = true;
@@ -97,10 +78,6 @@
           user = "paul";
         };
         lightdm.enable = true;
-        # This is for running a VM on a second X display.  I was able to get X
-        # to run, but the cinnamon session then gets wedged.  Still more to
-        # figure out ...
-        # startx.enable = true;
       };
       enable = true;
       layout = "dvorak";
@@ -108,14 +85,8 @@
     };
   };
   sound.enable = true;
-  swapDevices = [
-    { device = "/dev/disk/by-uuid/32f36738-8930-46ae-8847-9f811219075a"; }
-  ];
   time.timeZone = "America/New_York";
-  users = {
-    mutableUsers = false;
-    users.root.password = null;
-  };
+  users.mutableUsers = false;
   system = {
     autoUpgrade = {
       allowReboot = false;
