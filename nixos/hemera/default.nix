@@ -2,19 +2,14 @@
   boot = {
     initrd = {
       availableKernelModules = [
-        "nvme"
         "sd_mod"
-        "thunderbolt"
         "usb_storage"
-        "xhci_pci"
       ];
-      kernelModules = [ "dm-snapshot" ];
       luks.devices.secure = {
         device = "/dev/disk/by-uuid/b2edd8a5-48ae-4fa0-b539-9ecc6c095190";
         preLVM = true;
       };
     };
-    kernelModules = [ "kvm-intel" ];
     loader = {
       efi.canTouchEfiVariables = true;
       systemd-boot.enable = true;
@@ -48,6 +43,7 @@
     pulseaudio.enable = true;
   };
   imports = [
+    ./hardware-configuration.nix
     ./paul.nix
     ./root.nix
     thoughtfull.thoughtfull
@@ -59,7 +55,6 @@
     networkmanager.enable = true;
   };
   nixpkgs.config.allowUnfree = true;
-  powerManagement.cpuFreqGovernor = "powersave";
   programs = {
     gnupg.agent = {
       enable = true;
@@ -109,7 +104,6 @@
       };
       enable = true;
       layout = "dvorak";
-      libinput.enable = true;
       xkbOptions = "ctrl:nocaps";
     };
   };

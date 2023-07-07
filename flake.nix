@@ -11,13 +11,16 @@
     # for some software I want the most recent version
     unstable.url = "github:nixos/nixpkgs/nixos-unstable";
   };
-  outputs = { nixpkgs, ... }@inputs: rec {
+  outputs = { hardware, nixpkgs, ... }@inputs: rec {
     emacsPackages = import ./emacsPackages;
     homeManagerModules = import ./homeManagerModules;
     lib = import ./lib inputs;
     nixosConfigurations = {
       hemera = nixpkgs.lib.nixosSystem {
-        modules = [ ./nixos/hemera ];
+        modules = [
+          hardware.nixosModules.lenovo-thinkpad-x13
+          ./nixos/hemera
+        ];
         specialArgs.thoughtfull = nixosModules;
         system = "x86_64-linux";
       };
