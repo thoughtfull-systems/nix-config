@@ -25,6 +25,7 @@ lib.mkIf config.services.xserver.desktopManager.xfce.enable {
     xfce.xfce4-weather-plugin
   ];
   services = {
+    gnome.gnome-keyring.enable = true;
     xserver = {
       desktopManager.xfce = {
         # Screensaver and power-manager fight for DPMS (display power management system), the best
