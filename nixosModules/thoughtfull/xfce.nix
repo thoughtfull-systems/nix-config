@@ -27,6 +27,7 @@ lib.mkIf config.services.xserver.desktopManager.xfce.enable {
       desktopManager.xfce = {
         noDesktop = lib.mkDefault true;
         enableXfwm = lib.mkDefault false;
+        excludePackages = [ pkgs.xfce.xfce4-volumed-pulse ];
       };
       displayManager.lightdm.enable = true;
     };
