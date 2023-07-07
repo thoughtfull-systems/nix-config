@@ -211,6 +211,17 @@ in lib.mkIf enable {
         "xfce4-power-manager/show-tray-icon" = false;
         "xfce4-power-manager/sleep-button-action" = uint 1; # suspend
       };
+      xfce4-screensaver = {
+        "lock/embedded-keyboard/enabled" = false;
+        "lock/enabled" = true;
+        "lock/logout/enabled" = false;
+        "lock/saver-activation/enabled" = false;
+        "lock/status-messages/enabled" = true;
+        "lock/user-switching/enabled" = true;
+        "saver/enabled" = false;
+        "saver/idle-activation/delay" = 1440;
+        "saver/idle-activation/enabled" = false;
+      };
       xfce4-session = {
         "sessions/Failsafe/Client0_Command" = [ "${pkgs.thoughtfull.exwm-trampoline}/bin/exwm-trampoline" ];
         "general/SaveOnExit" = false;

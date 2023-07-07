@@ -17,8 +17,6 @@ lib.mkIf config.services.xserver.desktopManager.xfce.enable {
     })
   ];
   environment.systemPackages = with pkgs; [
-    # Since screen saver is disabled, use light-locker for screen locking
-    lightlocker
     xfce.xfce4-panel
     xfce.xfce4-pulseaudio-plugin
     xfce.xfce4-xkb-plugin
@@ -28,9 +26,6 @@ lib.mkIf config.services.xserver.desktopManager.xfce.enable {
     gnome.gnome-keyring.enable = true;
     xserver = {
       desktopManager.xfce = {
-        # Screensaver and power-manager fight for DPMS (display power management system), the best
-        # way to resolve it is disable screensaver.
-        enableScreensaver = lib.mkDefault false;
         noDesktop = lib.mkDefault true;
         enableXfwm = lib.mkDefault false;
       };
