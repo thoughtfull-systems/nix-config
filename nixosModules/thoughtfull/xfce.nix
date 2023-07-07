@@ -23,7 +23,6 @@ lib.mkIf config.services.xserver.desktopManager.xfce.enable {
     xfce.xfce4-weather-plugin
   ];
   services = {
-    gnome.gnome-keyring.enable = true;
     xserver = {
       desktopManager.xfce = {
         noDesktop = lib.mkDefault true;
