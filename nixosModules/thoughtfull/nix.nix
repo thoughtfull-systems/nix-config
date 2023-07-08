@@ -4,9 +4,11 @@
 #   3. Enable nix store garbage collection
 #   4. Enable autoUpgrade for nixpkgs
 #
-# For autoUpgrade you must create a deploy key and store it at `/etc/nixos/deploy-key`.  Example:
-#   `sudo ssh-keygen -t ed25519 -f /etc/nixos/deploy-key -N "" -C "`hostname` deploy key"`
+# For a private repo you must create a deploy key and use the appropriate hostname.  For exmaple, if
+# your deploy key is named 'nixfiles', the flake should be something like
+# 'git+ssh://git@nixfiles.github.com/...'.
 { config, lib, ... }: let
+  desktop = config.thoughtfull.desktop.enable;
   cfg = config.thoughtfull.autoUpgrade;
 in {
   options.thoughtfull.autoUpgrade = {
@@ -25,12 +27,12 @@ in {
     nix = {
       gc = {
         automatic = lib.mkDefault true;
-        dates = lib.mkDefault "03:15";
+        dates = lib.mkDefault (if desktop then "12:15" else "03:15");
         options = lib.mkDefault "--delete-older-than 7d";
       };
       optimise = {
         automatic = lib.mkDefault true;
-        dates = [ "04:15" ];
+        dates = lib.mkDefault (if desktop then [ "12:30" ] else [ "03:30" ]);
       };
       settings = {
         auto-optimise-store = lib.mkDefault true;
@@ -38,7 +40,8 @@ in {
       };
     };
     system.autoUpgrade = {
-      allowReboot = lib.mkDefault (!config.thoughtfull.desktop.enable);
+      allowReboot = lib.mkDefault (!desktop);
+      dates = lib.mkDefault (if desktop then "12:00" else "03:00");
       enable = lib.mkDefault true;
       flags = [ "--no-write-lock-file" ] ++
               (map (i: "--update-input ${i}") cfg.inputs);

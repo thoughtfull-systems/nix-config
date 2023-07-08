@@ -1,7 +1,13 @@
 { pkgs, thoughtfull, ... } : {
   home = {
     packages = with pkgs; [
+      adapta-gtk-theme
+      anki-bin
+      gparted
+      monero-gui
       tor-browser-bundle-bin
+      unstable.ledger-live-desktop
+      virt-manager
     ];
     stateVersion = "22.05";
   };

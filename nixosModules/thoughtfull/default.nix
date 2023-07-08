@@ -1,4 +1,6 @@
-inputs: { ... }: {
+inputs: { lib, ... }: {
+  console.useXkbConfig = lib.mkDefault true;
+  hardware.enableAllFirmware = lib.mkDefault true;
   imports = [
     (import ./agenix.nix inputs.agenix)
     (import ./home-manager.nix inputs.home-manager)
@@ -22,5 +24,15 @@ inputs: { ... }: {
     ./yubikey.nix
     ./zsh.nix
   ];
-  users.mutableUsers = false;
+  i18n.defaultLocale = lib.mkDefault "en_US.UTF-8";
+  networking.domain = lib.mkDefault "stadig.name";
+  nixpkgs.config.allowUnfree = true;
+  services = {
+    openssh.enable = lib.mkDefault true;
+    xserver = {
+      layout = lib.mkDefault "dvorak";
+      xkbOptions = lib.mkDefault "ctrl:nocaps";
+    };
+  };
+  users.mutableUsers = lib.mkDefault false;
 }
