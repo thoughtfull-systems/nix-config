@@ -56,7 +56,7 @@ in lib.mkIf enable {
         "plugin/hide-on-read" = false;
         "plugin/log-display-limit" = 10;
         "plugin/log-icon-size" = 16;
-        "plugin/log-only-today" = true;
+        "plugin/log-only-today" = false;
         "plugin/show-in-menu" = "show-all";
         "primary-monitor" = uint 0; # show on monitor with mouse pointer
         "show-text-with-gauge" = true; # show percentage with volume change
