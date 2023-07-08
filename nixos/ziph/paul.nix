@@ -1,6 +1,5 @@
-{ config, thoughtfull, ... }: {
-  age.secrets.paul-password.file = ../../age/secrets/paul-password.age;
+{ thoughtfull, ... }: {
   home-manager.users.paul.imports = [ ../../home/ziph/paul.nix ];
   imports = [ thoughtfull.paul ];
-  users.users.paul.passwordFile = config.age.secrets.paul-password.path;
+  users.users.paul.hashedPassword = "$6$vUahGtm42AXeeW5s$a1FOSoEWC0c0CGYhF1VrvZapI0bJjEAx/hsi1m8m2b3yHM5eV09carT8SnPa9Vzkf70T5fopiLGfE5T1Wapfb.";
 }
