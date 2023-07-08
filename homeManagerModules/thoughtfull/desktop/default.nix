@@ -1,4 +1,4 @@
-{ config, lib, pkgs, ... }: let
+{ config, lib, osConfig, pkgs, ... }: let
   cfg = config.thoughtfull.desktop;
 in {
   options.thoughtfull.desktop.enable = lib.mkEnableOption "desktop";
@@ -13,6 +13,7 @@ in {
       zoom-us
     ];
     fonts.fontconfig.enable = lib.mkForce true;
+    services.blueman-applet.enable = lib.mkDefault osConfig.hardware.bluetooth.enable;
   };
   imports = [
     ./cinnamon.nix

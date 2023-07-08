@@ -6,6 +6,7 @@ inputs: { lib, ... }: {
     (import ./home-manager.nix inputs.home-manager)
     (import ./overlay-unstable.nix inputs.unstable)
     ./avahi.nix
+    ./bluetooth.nix
     ./brother.nix
     ./deploy-keys.nix
     ./desktop.nix

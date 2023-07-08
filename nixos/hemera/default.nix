@@ -5,6 +5,7 @@
   };
   hardware = {
     acpilight.enable = true;
+    bluetooth.enable = true;
     ledger.enable = true;
     opengl.enable = true;
   };
