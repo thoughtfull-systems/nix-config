@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ lib, pkgs, ... }: {
   environment.systemPackages = with pkgs; [
     age-plugin-yubikey
     xfce.xfce4-genmon-plugin
@@ -12,6 +12,6 @@
    else
      # 22.11
      [ yubioath-desktop ]);
-  hardware.gpgSmartcards.enable = true;
-  services.pcscd.enable = true;
+  hardware.gpgSmartcards.enable = lib.mkDefault true;
+  services.pcscd.enable = lib.mkDefault true;
 }

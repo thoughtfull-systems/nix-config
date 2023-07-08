@@ -27,6 +27,10 @@ inputs: { lib, ... }: {
   i18n.defaultLocale = lib.mkDefault "en_US.UTF-8";
   networking.domain = lib.mkDefault "stadig.name";
   nixpkgs.config.allowUnfree = true;
+  programs = {
+    git.enable = lib.mkDefault true;
+    zsh.enable = lib.mkDefault true;
+  };
   services = {
     openssh.enable = lib.mkDefault true;
     xserver = {

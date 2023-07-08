@@ -3,10 +3,12 @@
 in {
   options.thoughtfull.desktop.enable = lib.mkEnableOption "desktop";
   config = {
+    hardware.pulseaudio.enable = lib.mkDefault cfg.enable;
     home-manager.sharedModules = [({ ... }: {
       thoughtfull.desktop.enable = lib.mkDefault cfg.enable;
     })];
     networking.networkmanager.enable = lib.mkDefault cfg.enable;
+    security.rtkit.enable = lib.mkDefault config.hardware.pulseaudio.enable;
     services = {
       printing.enable = lib.mkDefault cfg.enable;
       xserver = {
@@ -21,7 +23,6 @@ in {
         enable = lib.mkDefault cfg.enable;
       };
     };
-    sound.enable = lib.mkDefault cfg.enable;
     time.timeZone = lib.mkIf (cfg.enable) (lib.mkDefault "America/New_York");
   };
 }

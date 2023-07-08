@@ -1,1 +1,3 @@
-age/keys/bootstrap.pub
+/age/keys/bootstrap.pub
+/result
+*.qcow2

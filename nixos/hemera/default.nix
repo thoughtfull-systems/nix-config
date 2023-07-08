@@ -7,7 +7,6 @@
     acpilight.enable = true;
     ledger.enable = true;
     opengl.enable = true;
-    pulseaudio.enable = true;
   };
   imports = [
     ./filesystems.nix
