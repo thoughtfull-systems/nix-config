@@ -19,6 +19,7 @@ inputs: { lib, ... }: {
     ./proton-vpn.nix
     ./restic.nix
     ./sudo.nix
+    ./tlp.nix
     ./tt-rss.nix
     ./vaultwarden.nix
     ./xfce.nix
