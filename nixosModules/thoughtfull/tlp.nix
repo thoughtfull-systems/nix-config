@@ -7,9 +7,9 @@
     SOUND_POWER_SAVE_ON_AC = lib.mkDefault 1; # seconds
     SOUND_POWER_SAVE_ON_BAT = lib.mkDefault 1; # seconds
     SOUND_POWER_SAVE_CONTROLLER = lib.mkDefault "Y";
-    # START_CHARGE_THRESH_BATT0 = 96; # hardware threshold
+    # START_CHARGE_THRESH_BAT0 = 96; # hardware threshold
     # STOP_CHARGE_THRESH_BAT0 = 100; # hardware threshold
-    START_CHARGE_THRESH_BATT0 = lib.mkDefault 75;
+    START_CHARGE_THRESH_BAT0 = lib.mkDefault 75;
     STOP_CHARGE_THRESH_BAT0 = lib.mkDefault 80;
     RESTORE_THRESHOLDS_ON_BAT = lib.mkDefault 0; # disabled
     NATACPI_ENABLE = lib.mkDefault 1; # enabled
