@@ -17,12 +17,7 @@
         ssh = {
           authorizedKeys = config.users.users.paul.openssh.authorizedKeys.keys;
           enable = true;
-          hostKeys = [
-            # config.age.secrets.initrd_ssh_host_ed25519_key.path
-            # config.age.secrets.initrd_ssh_host_rsa_key.path
-            (/. + config.age.secrets.initrd_ssh_host_ed25519_key.path)
-            (/. + config.age.secrets.initrd_ssh_host_rsa_key.path)
-          ];
+          ignoreEmptyHostKeys = true;
           port = 222;
         };
       };
@@ -168,7 +163,6 @@
     openssh = {
       enable = true;
       passwordAuthentication = false;
-      permitRootLogin = "prohibit-password";
     };
     syncthing.guiAddress = "0.0.0.0:8384";
     vaultwarden.enable = true;

@@ -1,5 +1,6 @@
-{ ... }: {
+{ thoughtfull, ... }: {
   home-manager.users.root.imports = [ ../../home/raspi3b/root.nix ];
+  imports = [ thoughtfull.root ];
   # imports = [
   #   ../common/home-manager.nix
   # ];
