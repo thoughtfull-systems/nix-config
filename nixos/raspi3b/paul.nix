@@ -1,5 +1,5 @@
 { ... }: {
-  home-manager.users.paul.import = [ ../../home/raspi3b/paul.nix ];
+  home-manager.users.paul.imports = [ ../../home/raspi3b/paul.nix ];
   users.users.paul = {
     extraGroups = [ "wheel" ];
     group = "users";

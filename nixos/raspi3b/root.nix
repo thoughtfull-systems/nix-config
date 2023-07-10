@@ -1,5 +1,5 @@
 { ... }: {
-  home-manager.users.root.import = [ ../../home/raspi3b/root.nix ];
+  home-manager.users.root.imports = [ ../../home/raspi3b/root.nix ];
   # imports = [
   #   ../common/home-manager.nix
   # ];
