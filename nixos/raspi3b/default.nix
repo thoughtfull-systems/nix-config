@@ -20,8 +20,8 @@
           hostKeys = [
             # config.age.secrets.initrd_ssh_host_ed25519_key.path
             # config.age.secrets.initrd_ssh_host_rsa_key.path
-            /. + config.age.secrets.initrd_ssh_host_ed25519_key.path
-            /. + config.age.secrets.initrd_ssh_host_rsa_key.path
+            /. + "${config.age.secrets.initrd_ssh_host_ed25519_key.path}"
+            /. + "${config.age.secrets.initrd_ssh_host_rsa_key.path}"
           ];
           port = 222;
         };
