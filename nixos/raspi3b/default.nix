@@ -82,7 +82,11 @@
     ./root.nix
   ];
   # my.restic.s3Bucket = "stadig-restic";
-  thoughtfull.restic.s3Bucket = "stadig-restic";
+  thoughtfull.restic = {
+    environmentFile = "/var/lib/restic/.env";
+    passwordFile = "/var/lib/restic/passphrase";
+    s3Bucket = "stadig-restic";
+  };
   nix.gc.options = lib.mkForce "--delete-older-than 7d";
   networking = {
     domain = "stadig.name";
