@@ -18,6 +18,7 @@ inputs: { lib, ... }: {
     ./overlay-thoughtfull.nix
     ./postgresql-backup.nix
     ./proton-vpn.nix
+    ./power-supply.nix
     ./restic.nix
     ./sudo.nix
     ./tlp.nix
