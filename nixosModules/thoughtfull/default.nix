@@ -10,6 +10,7 @@ inputs: { lib, ... }: {
     ./brother.nix
     ./deploy-keys.nix
     ./desktop.nix
+    ./emoji.nix
     ./fonts.nix
     ./git.nix
     ./moonlander.nix
